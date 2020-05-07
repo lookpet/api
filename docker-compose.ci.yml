@@ -1,0 +1,25 @@
+version: "3.3"
+
+services:
+  php:
+    image: ${PHP_IMAGE}
+    environment:
+      - BASE_PHP_IMAGE=${BASE_PHP_IMAGE}
+      - APP_ENV=${APP_ENV}
+      - APP_SECRET=${APP_SECRET}
+    volumes:
+      - ./:/var/www
+
+  nginx:
+    build:
+      context: docker/nginx
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/sites/:/etc/nginx/sites-available
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d
+      - ./docker/logs:/var/log
+    depends_on:
+      - php
+    ports:
+      - "80:80"
+      - "443:443"

@@ -1,0 +1,31 @@
+PROJECT_VOLUME = -v $(CURDIR)/$(TARGET_DIR):$(APP_ROOT)/$(TARGET_DIR)
+
+test-unit:
+	mkdir -p $(JUNIT_LOCATION_PATH)
+	docker run \
+		--rm \
+		$(PROJECT_VOLUME) \
+		$(NAMESPACE)/api-php-dev:$(GIT_SHA) \
+		./bin/phpunit \
+			--coverage-xml $(COVERAGE_XML_PATH) \
+			--coverage-clover $(CLOVER_XML_PATH) \
+			--coverage-html $(CLOVER_HTML_PATH) \
+			--group=unit \
+			--log-junit=$(JUNIT_FILE_PATH)
+
+build-prod-php:
+	$(call about,Build production PHP image)
+	($(PULL_IF_EXIST) == true && docker pull $(NAMESPACE)/php:$(GIT_SHA)) || \
+	docker build --secret id=ssh,src="$(SSH_KEY_FILE)" \
+		-t $(NAMESPACE)/php:$(GIT_SHA) \
+		--build-arg BASE_PHP_IMAGE=$(BASE_PHP_IMAGE) \
+		--build-arg TIMESTAMP=$(TIMESTAMP) \
+		--build-arg VERSION=$(VERSION) \
+		--build-arg GIT_SHA=$(GIT_SHA) \
+		-f docker/php-prod/Dockerfile \
+		docker/../
+	docker tag $(NAMESPACE)/php:$(GIT_SHA) $(NAMESPACE)/php:$(VERSION)
+	docker tag $(NAMESPACE)/php:$(GIT_SHA) $(NAMESPACE)/php:latest
+
+deploy-prod:
+	ssh root@142.93.107.232 "cd /root/website-deploy && make deploy"
