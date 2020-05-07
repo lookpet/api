@@ -13,8 +13,9 @@ class AccountController extends AbstractController
      */
     public function index(LoggerInterface $logger)
     {
-        $logger->debug('PAge for '.$this->getUser()->getEmail());
+        $logger->debug('PAge for ' . $this->getUser()->getEmail());
         dd($this->getUser());
+
         return $this->json([
             'message' => 'Welcome to your new controller!',
             'path' => 'src/Controller/AccountController.php',
@@ -29,7 +30,7 @@ class AccountController extends AbstractController
         $user = $this->getUser();
 
         return $this->json($user, 200, [], [
-            'groups' => ['main']
+            'groups' => ['main'],
         ]);
     }
 }

@@ -24,19 +24,20 @@ final class ApiTokenAuthenticator extends AbstractGuardAuthenticator
     public function supports(Request $request): bool
     {
         return $request->headers->has('Authorization')
-            && 0 === strpos($request->headers->get('Authorization'), 'Bearer ');
+            && 0 === mb_strpos($request->headers->get('Authorization'), 'Bearer ');
     }
 
     public function getCredentials(Request $request): string
     {
         $authorizationHeader = $request->headers->get('Authorization');
-        return substr($authorizationHeader, 7);
+
+        return mb_substr($authorizationHeader, 7);
     }
 
-    public function getUser($credentials, UserProviderInterface $userProvider):?UserInterface
+    public function getUser($credentials, UserProviderInterface $userProvider): ?UserInterface
     {
         $token = $this->apiTokenRepository->findOneBy([
-            'token' => $credentials
+            'token' => $credentials,
         ]);
 
         if ($token === null || $token->isExpired()) {
@@ -48,13 +49,13 @@ final class ApiTokenAuthenticator extends AbstractGuardAuthenticator
 
     public function checkCredentials($credentials, UserInterface $user): bool
     {
-       return true;
+        return true;
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): JsonResponse
     {
         return new JsonResponse([
-            'message' => $exception->getMessageKey()
+            'message' => $exception->getMessageKey(),
         ], 401);
     }
 

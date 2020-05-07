@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\ApiToken;
 use App\Entity\User;
-use App\Security\ApiTokenAuthenticator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -12,7 +11,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 final class SecurityController extends AbstractController
@@ -42,9 +40,11 @@ final class SecurityController extends AbstractController
 
     /**
      * @Route("/api/v1/authentication/register", methods={"POST"}, name="api_register")
+     *
      * @param Request $request
      * @param UserPasswordEncoderInterface $passwordEncoder
      * @param EntityManagerInterface $entityManager
+     *
      * @return JsonResponse
      */
     public function register(
@@ -62,7 +62,7 @@ final class SecurityController extends AbstractController
             $entityManager->flush();
         } catch (\Exception $exception) {
             return new JsonResponse([
-                'message' => 'User already exists'
+                'message' => 'User already exists',
             ], Response::HTTP_BAD_REQUEST);
         }
 
@@ -73,7 +73,7 @@ final class SecurityController extends AbstractController
         return new JsonResponse(
             [
                 'token' => $apiToken->getToken(),
-                'expires_at' => $apiToken->getExpiresAt()
+                'expires_at' => $apiToken->getExpiresAt(),
             ]
         );
     }

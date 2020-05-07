@@ -6,7 +6,6 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -103,7 +102,7 @@ class User implements UserInterface
     /**
      * @see UserInterface
      */
-    public function getPassword():?string
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -152,13 +151,14 @@ class User implements UserInterface
         return $this->apiTokens;
     }
 
-    public function getActiveApiToken():?ApiToken
+    public function getActiveApiToken(): ?ApiToken
     {
         foreach ($this->apiTokens as $apiToken) {
             if (!$apiToken->isExpired()) {
                 return $apiToken;
             }
         }
+
         return null;
     }
 

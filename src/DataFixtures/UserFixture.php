@@ -9,8 +9,8 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserFixture extends BaseFixture
 {
-    private UserPasswordEncoderInterface $passwordEncoder;
     private const DEFAULT_PASSWORD = 'engage';
+    private UserPasswordEncoderInterface $passwordEncoder;
 
     public function __construct(UserPasswordEncoderInterface $passwordEncoder)
     {
