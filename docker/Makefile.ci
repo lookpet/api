@@ -28,4 +28,4 @@ build-prod-php:
 	docker tag $(NAMESPACE)/php:$(GIT_SHA) $(NAMESPACE)/php:latest
 
 deploy-prod:
-	ssh root@142.93.107.232 "cd /root/website-deploy && make deploy"
+	ssh root@142.93.107.232 "cd /root/api-deploy && make deploy"
