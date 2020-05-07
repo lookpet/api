@@ -33,6 +33,10 @@ export COMPOSE_PROJECT_NAME ?= lookpet_$(COMPOSE_SUFFIX)
 
 export PROJECT_VERSION=$(GIT_SHA)
 
+define compose
+	docker-compose $1
+endef
+
 include docker/Makefile
 include docker/Makefile.ci
 
@@ -80,7 +84,8 @@ migrate:
 	bin/console doctrine:migrations:migrate -n
 
 fixtures:
-	bin/console doctrine:fixtures:load
+	$(call compose,exec php bin/console doctrine:fixtures:load --no-interactions)
+
 
 aws-v2-login:
 	aws --region ${AWS_REGION} ecr get-login-password \
