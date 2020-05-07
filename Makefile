@@ -78,7 +78,9 @@ pull:
 	git pull
 migrate:
 	bin/console doctrine:migrations:migrate -n
-deploy: pull migrate clean
+
+fixtures:
+	bin/console doctrine:fixtures:load
 
 aws-v2-login:
 	aws --region ${AWS_REGION} ecr get-login-password \
