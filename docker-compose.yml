@@ -24,7 +24,7 @@ services:
       PHP_IDE_CONFIG: serverName=${XDEBUG_SERVER_NAME:-lookpet.docker}
       XDEBUG_CONFIG: remote_host=${XDEBUG_HOST:-192.168.99.1}
     volumes:
-      - /hosthome/gas/lookpet/website:/app
+      - /hosthome/gas/lookpet/api:/app
 
   nginx:
     image: 641201314091.dkr.ecr.eu-central-1.amazonaws.com/nginx:${PROJECT_VERSION:-latest}

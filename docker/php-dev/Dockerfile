@@ -12,7 +12,7 @@ ENV APP_VERSION_NUMBER=${VERSION:-latest}\
     COMPOSER_HOME=/var/composer
 
 COPY --chown=www-data . /app
-COPY --chown=root docker/api-php-dev/conf.d/ $PHP_INI_DIR/conf.d/
+COPY --chown=root docker/php-dev/conf.d/ $PHP_INI_DIR/conf.d/
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 RUN composer install --prefer-dist --dev
