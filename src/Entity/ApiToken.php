@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\ApiTokenRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=ApiTokenRepository::class)
@@ -31,9 +32,9 @@ class ApiToken
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="apiTokens")
      * @ORM\JoinColumn(nullable=false)
      */
-    private User $user;
+    private UserInterface $user;
 
-    public function __construct(User $user)
+    public function __construct(UserInterface $user)
     {
         $this->token = bin2hex(random_bytes(60));
         $this->user = $user;

@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -25,18 +26,18 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=180, unique=true)
      * @Groups("main")
      */
-    private $email;
+    private string $email;
 
     /**
      * @ORM\Column(type="json")
      */
-    private $roles = [];
+    private array $roles = [];
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("main")
      */
-    private string $firstName;
+    private ?string $firstName;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -129,7 +130,7 @@ class User implements UserInterface
         return $this->firstName;
     }
 
-    public function setFirstName(string $firstName): self
+    public function setFirstName(?string $firstName): self
     {
         $this->firstName = $firstName;
 
@@ -149,6 +150,16 @@ class User implements UserInterface
     public function getApiTokens(): Collection
     {
         return $this->apiTokens;
+    }
+
+    public function getActiveApiToken():?ApiToken
+    {
+        foreach ($this->apiTokens as $apiToken) {
+            if (!$apiToken->isExpired()) {
+                return $apiToken;
+            }
+        }
+        return null;
     }
 
     public function addApiToken(ApiToken $apiToken): self
