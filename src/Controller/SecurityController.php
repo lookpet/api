@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\ApiToken;
 use App\Entity\User;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -11,25 +12,62 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 final class SecurityController extends AbstractController
 {
     /**
      * @Route("/api/v1/authentication/login", name="api_login")
+     *
+     * @param Request $request
+     * @param UserRepository $userRepository
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param EntityManagerInterface $entityManager
+     *
+     * @return JsonResponse
      */
-    public function login(AuthenticationUtils $authenticationUtils)
+    public function login(Request $request,
+                          UserRepository $userRepository,
+                          UserPasswordEncoderInterface $passwordEncoder,
+                          EntityManagerInterface $entityManager): JsonResponse
     {
-        // get the login error if there is one
-        $error = $authenticationUtils->getLastAuthenticationError();
+        $email = $request->request->get('email');
 
-        // last username entered by the user
-        $lastUsername = $authenticationUtils->getLastUsername();
+        if ($email === null) {
+            return new JsonResponse([
+                'message' => 'Empty email',
+            ], 400);
+        }
 
-        $activeToken = $this->getUser()->getActiveApiToken();
+        $password = $request->request->get('password');
+
+        if ($password === null) {
+            return new JsonResponse([
+                'message' => 'Empty password',
+            ], 400);
+        }
+
+        $user = $userRepository->findOneBy([
+            'email' => $email,
+        ]);
+
+        if ($user === null) {
+            return new JsonResponse([
+                'message' => 'Invalid email or password',
+            ], 400);
+        }
+
+        if (!$passwordEncoder->isPasswordValid($user, $password)) {
+            return new JsonResponse([
+                'message' => 'Invalid email or password',
+            ], 400);
+        }
+
+        $activeToken = $user->getActiveApiToken();
 
         if ($activeToken === null) {
             $activeToken = new ApiToken($this->getUser());
+            $entityManager->persist($activeToken);
+            $entityManager->flush();
         }
 
         return $this->json([
@@ -55,6 +93,7 @@ final class SecurityController extends AbstractController
         try {
             /** @todo use form validation with DTO */
             $user = new User();
+            $user->setFirstName($request->request->get('firstName'));
             $user->setEmail($request->request->get('email'));
             $user->setPassword($passwordEncoder->encodePassword($user, $request->request->get('password')));
 
