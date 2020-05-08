@@ -111,6 +111,8 @@ final class SecurityController extends AbstractController
 
         return new JsonResponse(
             [
+                'slug' => $user->getSlug(),
+                'email' => $user->getEmail(),
                 'token' => $apiToken->getToken(),
                 'expires_at' => $apiToken->getExpiresAt(),
             ]
