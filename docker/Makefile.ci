@@ -15,17 +15,17 @@ test-unit:
 
 build-prod-php:
 	$(call about,Build production PHP image)
-	($(PULL_IF_EXIST) == true && docker pull $(NAMESPACE)/php:$(GIT_SHA)) || \
+	($(PULL_IF_EXIST) == true && docker pull $(NAMESPACE)/api-php:$(GIT_SHA)) || \
 	docker build --secret id=ssh,src="$(SSH_KEY_FILE)" \
-		-t $(NAMESPACE)/php:$(GIT_SHA) \
+		-t $(NAMESPACE)/api-php:$(GIT_SHA) \
 		--build-arg BASE_PHP_IMAGE=$(BASE_PHP_IMAGE) \
 		--build-arg TIMESTAMP=$(TIMESTAMP) \
 		--build-arg VERSION=$(VERSION) \
 		--build-arg GIT_SHA=$(GIT_SHA) \
 		-f docker/php-prod/Dockerfile \
 		docker/../
-	docker tag $(NAMESPACE)/php:$(GIT_SHA) $(NAMESPACE)/php:$(VERSION)
-	docker tag $(NAMESPACE)/php:$(GIT_SHA) $(NAMESPACE)/php:latest
+	docker tag $(NAMESPACE)/api-php:$(GIT_SHA) $(NAMESPACE)/api-php:$(VERSION)
+	docker tag $(NAMESPACE)/api-php:$(GIT_SHA) $(NAMESPACE)/api-php:latest
 
 deploy-prod:
 	ssh root@142.93.107.232 "cd /root/api-deploy && make deploy"

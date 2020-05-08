@@ -24,7 +24,7 @@ build-nginx:
 	($(PULL_IF_EXIST) == true && docker pull $(NAMESPACE)/nginx:$(GIT_SHA)) || \
 	docker build \
 		-t $(NAMESPACE)/nginx:$(GIT_SHA) \
-		--build-arg PROD_PHP_IMAGE=$(NAMESPACE)/php:$(VERSION) \
+		--build-arg PROD_PHP_IMAGE=$(NAMESPACE)/api-php:$(VERSION) \
 		-f docker/nginx/Dockerfile \
 		docker/../
 	docker tag $(NAMESPACE)/nginx:$(GIT_SHA) $(NAMESPACE)/nginx:$(VERSION)
@@ -36,8 +36,8 @@ push-nginx:
 
 push-prod: push-nginx ## Push production images
 	$(call about,Pushing production images)
-	docker push $(NAMESPACE)/php:$(VERSION)
-	docker push $(NAMESPACE)/php:$(GIT_SHA)
+	docker push $(NAMESPACE)/api-php:$(VERSION)
+	docker push $(NAMESPACE)/api-php:$(GIT_SHA)
 
 push-dev: push-nginx ## Push develop images
 	$(call about,Pushing dev images)
