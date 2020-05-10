@@ -29,3 +29,5 @@ build-prod-php:
 
 deploy-prod:
 	ssh root@142.93.107.232 "cd /root/api-deploy && make deploy"
+
+run-deploy: aws-v2-login build-push deploy-prod
