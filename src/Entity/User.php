@@ -244,13 +244,6 @@ class User implements UserInterface
         return $this;
     }
 
-    private function generateSlug(): void
-    {
-        $slugify = new Slugify();
-        $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
-        $this->slug = $slugify->slugify(implode('-', [$slugEntropy]));
-    }
-
     /**
      * @return Collection|Media[]
      */
@@ -282,11 +275,19 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getAvatarUrl():?string
+    public function getAvatarUrl(): ?string
     {
-        if ($this->media->count() !== 0){
+        if ($this->media->count() !== 0) {
             return $this->media->first()->getPublicUrl();
         }
+
         return null;
+    }
+
+    private function generateSlug(): void
+    {
+        $slugify = new Slugify();
+        $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
+        $this->slug = $slugify->slugify(implode('-', [$slugEntropy]));
     }
 }

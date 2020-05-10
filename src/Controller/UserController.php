@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-
 namespace App\Controller;
-
 
 use App\Entity\Media;
 use App\Entity\User;
@@ -15,18 +13,17 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 final class UserController extends AbstractController
 {
     /**
      * @Route("/api/v1/user", methods={"POST"})
+     *
      * @return JsonResponse
      */
-    public function updateUserInfo(Request $request, UserRepository $userRepository):JsonResponse
+    public function updateUserInfo(Request $request, UserRepository $userRepository): JsonResponse
     {
-
         /** @var User $user */
         $user = $this->getUser();
         $this->setPhotoIfExists($request, $user);
@@ -36,6 +33,7 @@ final class UserController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($user);
         $entityManager->flush();
+
         return new JsonResponse([
             'slug' => $user->getSlug(),
             'firstName' => $user->getFirstName(),
@@ -45,7 +43,7 @@ final class UserController extends AbstractController
         ]);
     }
 
-    private function setPhotoIfExists(Request $request, User $user):void
+    private function setPhotoIfExists(Request $request, User $user): void
     {
         $newPhoto = $request->files->get('photo');
         $entityManager = $this->getDoctrine()->getManager();

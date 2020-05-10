@@ -65,7 +65,7 @@ final class SecurityController extends AbstractController
         $activeToken = $user->getActiveApiToken();
 
         if ($activeToken === null) {
-            $activeToken = new ApiToken($this->getUser());
+            $activeToken = new ApiToken($user);
             $entityManager->persist($activeToken);
             $entityManager->flush();
         }
