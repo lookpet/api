@@ -3,7 +3,6 @@
 use App\Kernel;
 use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\HttpFoundation\Request;
-header('Access-Control-Allow-Origin: *');
 require dirname(__DIR__) . '/config/bootstrap.php';
 
 if ($_SERVER['APP_DEBUG']) {
