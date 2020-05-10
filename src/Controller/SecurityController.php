@@ -71,8 +71,9 @@ final class SecurityController extends AbstractController
         }
 
         return $this->json([
-           'token' => $activeToken->getToken(),
-           'expires_at' => $activeToken->getExpiresAt(),
+            'user' => $user,
+            'token' => $activeToken->getToken(),
+            'expires_at' => $activeToken->getExpiresAt(),
         ]);
     }
 
@@ -101,7 +102,7 @@ final class SecurityController extends AbstractController
             $entityManager->flush();
         } catch (\Exception $exception) {
             return new JsonResponse([
-                'message' => 'User already exists',
+                'message' => $exception->getMessage(),
             ], Response::HTTP_BAD_REQUEST);
         }
 
@@ -111,8 +112,7 @@ final class SecurityController extends AbstractController
 
         return new JsonResponse(
             [
-                'slug' => $user->getSlug(),
-                'email' => $user->getEmail(),
+                'user' => $user,
                 'token' => $apiToken->getToken(),
                 'expires_at' => $apiToken->getExpiresAt(),
             ]

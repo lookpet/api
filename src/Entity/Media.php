@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=MediaRepository::class)
  */
-class Media
+class Media implements \JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -73,4 +73,14 @@ class Media
 
         return $this;
     }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'size' => $this->getSize(),
+            'publicUrl' => $this->getPublicUrl(),
+        ];
+    }
+
+
 }

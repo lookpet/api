@@ -13,7 +13,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  */
-class User implements UserInterface
+class User implements UserInterface, \JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -290,4 +290,17 @@ class User implements UserInterface
         $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
         $this->slug = $slugify->slugify(implode('-', [$slugEntropy]));
     }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'slug' => $this->getSlug(),
+            'firstName' => $this->getFirstName(),
+            'phone' => $this->getPhone(),
+            'description' => $this->getDescription(),
+            'avatar' => $this->getAvatarUrl(),
+        ];
+    }
+
+
 }
