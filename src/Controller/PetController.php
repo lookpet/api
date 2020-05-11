@@ -1,0 +1,134 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\Pet;
+use App\Repository\PetRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+
+final class PetController extends AbstractController
+{
+    /**
+     * @Route("/api/v1/pet", methods={"POST"}, name="pet")
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    public function create(Request $request): JsonResponse
+    {
+        if (!$request->request->has('type')) {
+            return new JsonResponse([
+                'message' => 'Empty type',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        if (!$request->request->has('slug')) {
+            return new JsonResponse([
+                'message' => 'Empty slug',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $slug = $request->request->get('slug');
+        $type = $request->request->get('type');
+        $name = $request->request->get('name');
+
+        $pet = new Pet($type, $slug, $name, null, $this->getUser());
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($pet);
+        $entityManager->flush();
+
+        return new JsonResponse(
+            $pet
+        );
+    }
+
+    /**
+     * @Route("/api/v1/pet/{slug}", methods={"POST"}, name="pet")
+     *
+     * @param string $slug
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    public function update(string $slug, Request $request, PetRepository $petRepository): JsonResponse
+    {
+        if (!$request->request->has('type')) {
+            return new JsonResponse([
+                'message' => 'Empty type',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $pet = $petRepository->findOneBy([
+            'slug' => $slug,
+        ]);
+
+        if ($pet === null) {
+            return new JsonResponse([
+                'message' => 'Pet not exist',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $type = $request->request->get('type');
+        $name = $request->request->get('name');
+
+        $pet->setType($type);
+        $pet->setType($name);
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($pet);
+        $entityManager->flush();
+
+        return new JsonResponse(
+            $pet
+        );
+    }
+
+    /**
+     * @Route("/api/v1/pet/{slug}", methods={"GET"})
+     *
+     * @return JsonResponse
+     */
+    public function getBySlug(string $slug, PetRepository $petRepository): JsonResponse
+    {
+        if (!$slug) {
+            return new JsonResponse([
+                'message' => 'No slug was sent',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $pet = $petRepository->findOneBy([
+            'slug' => $slug,
+        ]);
+
+        if ($pet === null) {
+            return new JsonResponse([
+                'message' => 'No pet was found',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        return new JsonResponse(
+            $pet
+        );
+    }
+
+    /**
+     * @Route("/api/v1/pets", methods={"GET"})
+     *
+     * @param PetRepository $petRepository
+     *
+     * @return JsonResponse
+     */
+    public function search(PetRepository $petRepository): JsonResponse
+    {
+        $pets = $petRepository->findAll();
+
+        return new JsonResponse([
+            'pets' => $pets,
+        ]);
+    }
+}

@@ -17,8 +17,7 @@ class User implements UserInterface, \JsonSerializable
 {
     /**
      * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string")
      */
     private $id;
 
@@ -69,11 +68,27 @@ class User implements UserInterface, \JsonSerializable
      */
     private $media;
 
-    public function __construct()
+    /**
+     * @ORM\OneToMany(targetEntity=Pet::class, mappedBy="user")
+     */
+    private $pets;
+
+    public function __construct(?string $slug, ?string $name = null, ?string $id = null)
     {
+        if ($slug === null) {
+            $this->generateSlug();
+        } else {
+            $this->slug = $slug;
+        }
+
+        $this->id = $id;
+        if ($id === null) {
+            $this->id = Uuid::uuid4()->toString();
+        }
+
         $this->apiTokens = new ArrayCollection();
-        $this->generateSlug();
         $this->media = new ArrayCollection();
+        $this->pets = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -284,13 +299,6 @@ class User implements UserInterface, \JsonSerializable
         return null;
     }
 
-    private function generateSlug(): void
-    {
-        $slugify = new Slugify();
-        $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
-        $this->slug = $slugify->slugify(implode('-', [$slugEntropy]));
-    }
-
     public function jsonSerialize(): array
     {
         return [
@@ -302,5 +310,41 @@ class User implements UserInterface, \JsonSerializable
         ];
     }
 
+    /**
+     * @return Collection|Pet[]
+     */
+    public function getPets(): Collection
+    {
+        return $this->pets;
+    }
 
+    public function addPet(Pet $pet): self
+    {
+        if (!$this->pets->contains($pet)) {
+            $this->pets[] = $pet;
+            $pet->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePet(Pet $pet): self
+    {
+        if ($this->pets->contains($pet)) {
+            $this->pets->removeElement($pet);
+            // set the owning side to null (unless already changed)
+            if ($pet->getUser() === $this) {
+                $pet->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    private function generateSlug(): void
+    {
+        $slugify = new Slugify();
+        $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
+        $this->slug = $slugify->slugify(implode('-', [$slugEntropy]));
+    }
 }

@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Entity\Media;
 use App\Entity\User;
+use App\Repository\PetRepository;
 use App\Repository\UserRepository;
 use Gedmo\Sluggable\Util\Urlizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,7 +16,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Swagger\Annotations as SWG;
 
 final class UserController extends AbstractController
 {
@@ -50,7 +50,7 @@ final class UserController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse([
-            $user
+            $user,
         ]);
     }
 
@@ -58,12 +58,14 @@ final class UserController extends AbstractController
      * @Route("/api/v1/user/photo", methods={"POST"})
      *
      * @param Request $request
+     *
      * @return JsonResponse
      */
     public function addUserPhoto(Request $request): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
+
         return $this->setPhotoIfExists($request, $user);
     }
 
@@ -72,13 +74,14 @@ final class UserController extends AbstractController
      *
      * @param string $slug
      * @param UserRepository $userRepository
+     *
      * @return JsonResponse
      */
-    public function getUserBySlug(string $slug, UserRepository $userRepository):JsonResponse
+    public function getUserBySlug(string $slug, UserRepository $userRepository): JsonResponse
     {
         if (!$slug) {
             return new JsonResponse([
-                'message' => 'No slug was sent'
+                'message' => 'No slug was sent',
             ], Response::HTTP_BAD_REQUEST);
         }
 
@@ -86,7 +89,7 @@ final class UserController extends AbstractController
 
         if ($user === null) {
             return new JsonResponse([
-                'message' => 'No user was found'
+                'message' => 'No user was found',
             ], Response::HTTP_BAD_REQUEST);
         }
 
@@ -95,12 +98,47 @@ final class UserController extends AbstractController
         );
     }
 
+    /**
+     * @Route("/api/v1/user/{slug}/pets", methods={"GET"})
+     *
+     * @return JsonResponse
+     */
+    public function getPets(string $slug, PetRepository $petRepository, UserRepository $userRepository): JsonResponse
+    {
+        $user = $userRepository->findOneBy([
+            'slug' => $slug,
+        ]);
+
+        $pets = $petRepository->findBy([
+            'user' => $user,
+        ]);
+
+        return new JsonResponse([
+            'pets' => $pets,
+        ]);
+    }
+
+    /**
+     * @Route("/api/v1/users", methods={"GET"})
+     *
+     * @param UserRepository $userRepository
+     *
+     * @return JsonResponse
+     */
+    public function search(UserRepository $userRepository): JsonResponse
+    {
+        $users = $userRepository->findAll();
+
+        return new JsonResponse([
+            'pets' => $users,
+        ]);
+    }
 
     private function setPhotoIfExists(Request $request, User $user): JsonResponse
     {
         if (!$request->files->has('photo')) {
             return new JsonResponse([
-                'message' => 'Empty request'
+                'message' => 'Empty request',
             ], Response::HTTP_BAD_REQUEST);
         }
 
@@ -119,7 +157,7 @@ final class UserController extends AbstractController
         }
 
         return new JsonResponse([
-            'message' => 'No file was uploaded'
+            'message' => 'No file was uploaded',
         ], Response::HTTP_BAD_REQUEST);
     }
 

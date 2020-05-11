@@ -12,8 +12,7 @@ class Media implements \JsonSerializable
 {
     /**
      * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string")
      */
     private $id;
 
@@ -81,6 +80,4 @@ class Media implements \JsonSerializable
             'publicUrl' => $this->getPublicUrl(),
         ];
     }
-
-
 }

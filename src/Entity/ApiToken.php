@@ -13,8 +13,7 @@ class ApiToken
 {
     /**
      * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string")
      */
     private $id;
 
