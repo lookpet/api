@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 final class SecurityController extends AbstractController
 {
     /**
-     * @Route("/api/v1/authentication/login", name="api_login")
+     * @Route("/api/v1/authentication/login", methods={"POST"}, name="api_login")
      *
      * @param Request $request
      * @param UserRepository $userRepository
