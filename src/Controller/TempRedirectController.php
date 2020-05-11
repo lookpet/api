@@ -15,8 +15,8 @@ final class TempRedirectController extends AbstractController
      *
      * @return RedirectResponse
      */
-    public function redirectToReactApp()
+    public function redirectToReactApp(): RedirectResponse
     {
-        return $this->render('base.html.twig');
+        return new RedirectResponse('http://look.pet:3002');
     }
 }
