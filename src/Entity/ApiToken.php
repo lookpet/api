@@ -3,7 +3,9 @@
 namespace App\Entity;
 
 use App\Repository\ApiTokenRepository;
+use Cocur\Slugify\Slugify;
 use Doctrine\ORM\Mapping as ORM;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -35,6 +37,7 @@ class ApiToken
 
     public function __construct(UserInterface $user)
     {
+        $this->id = Uuid::uuid4()->toString();
         $this->token = bin2hex(random_bytes(60));
         $this->user = $user;
         $this->expiresAt = new \DateTime('+1 hour');
