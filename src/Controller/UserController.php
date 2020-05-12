@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Repository\PetRepository;
 use App\Repository\UserRepository;
 use Gedmo\Sluggable\Util\Urlizer;
+use League\Flysystem\FilesystemInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -19,6 +20,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 final class UserController extends AbstractController
 {
+    private FilesystemInterface $filesystem;
+
+    public function __construct(FilesystemInterface $filesystem)
+    {
+        $this->filesystem = $filesystem;
+    }
+
     /**
      * @Route("/api/v1/user", methods={"POST"})
      *
@@ -151,7 +159,7 @@ final class UserController extends AbstractController
         if ($newPhoto) {
             $newFile = $this->uploadFile($newPhoto);
             $media = new Media();
-            $media->setPublicUrl('/uploads/' . $newFile);
+            $media->setPublicUrl($newFile);
             $media->setUser($user);
             $media->setSize('original');
             $entityManager->persist($media);
@@ -168,7 +176,7 @@ final class UserController extends AbstractController
     private function uploadFile(File $file, string $destination = null): string
     {
         if ($destination === null) {
-            $destination = $this->getParameter('kernel.project_dir') . '/public/uploads';
+            $destination = '/pets/uploads/';
         }
 
         if ($file instanceof UploadedFile) {
@@ -179,8 +187,15 @@ final class UserController extends AbstractController
 
         $newFilename = Urlizer::urlize(pathinfo($originalFilename, PATHINFO_FILENAME)) . '-' . uniqid('', true) . '.' . $file->guessExtension();
 
-        $file->move($destination, $newFilename);
+        $stream = fopen($file->getPathname(), 'rb');
+        $this->filesystem->write(
+                $destination . $newFilename,
+                $stream
+            );
+        if (is_resource($stream)) {
+            fclose($stream);
+        }
 
-        return $newFilename;
+        return $destination . $newFilename;
     }
 }

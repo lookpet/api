@@ -8,6 +8,7 @@
         "aws/aws-sdk-php": "^3.137",
         "cocur/slugify": "^4.0",
         "gedmo/doctrine-extensions": "^2.4",
+        "league/flysystem-aws-s3-v3": "^1.0",
         "league/flysystem-bundle": "^1.5",
         "nelmio/api-doc-bundle": "^3.6",
         "nelmio/cors-bundle": "^2.0",

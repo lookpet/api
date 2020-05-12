@@ -135,6 +135,9 @@
     "league/flysystem": {
         "version": "1.0.67"
     },
+    "league/flysystem-aws-s3-v3": {
+        "version": "1.0.24"
+    },
     "league/flysystem-bundle": {
         "version": "1.0",
         "recipe": {
