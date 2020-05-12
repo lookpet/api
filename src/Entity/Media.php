@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\MediaRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Ramsey\Uuid\Uuid;
 
 /**
  * @ORM\Entity(repositoryClass=MediaRepository::class)
@@ -31,6 +32,11 @@ class Media implements \JsonSerializable
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;
+
+    public function __construct()
+    {
+        $this->id = Uuid::uuid4()->toString();
+    }
 
     public function getId(): ?int
     {
