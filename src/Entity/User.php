@@ -74,7 +74,12 @@ class User implements UserInterface, \JsonSerializable
      */
     private $pets;
 
-    public function __construct(?string $slug=null, ?string $firstName = null, ?string $id = null)
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $city;
+
+    public function __construct(?string $slug = null, ?string $firstName = null, ?string $id = null)
     {
         if ($slug === null) {
             $this->generateSlug();
@@ -340,6 +345,18 @@ class User implements UserInterface, \JsonSerializable
                 $pet->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCity(): ?string
+    {
+        return $this->city;
+    }
+
+    public function setCity(?string $city): self
+    {
+        $this->city = $city;
 
         return $this;
     }

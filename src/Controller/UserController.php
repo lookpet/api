@@ -41,6 +41,10 @@ final class UserController extends AbstractController
             $user->setDescription($request->request->get('description'));
         }
 
+        if ($request->request->has('city')) {
+            $user->setCity($request->request->get('city'));
+        }
+
         if ($request->request->has('slug')) {
             $user->setSlug($request->request->get('slug'));
         }
