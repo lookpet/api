@@ -1,7 +1,7 @@
 NAMESPACE		=	641201314091.dkr.ecr.eu-central-1.amazonaws.com
 APP_ROOT		=	/app
 WORKING_DIR		=	$(CURDIR)
-PULL_IF_EXIST  ?= 	true
+PULL_IF_EXIST  ?= 	false
 AWS_REGION = eu-central-1
 
 BASE_PHP_IMAGE  =   641201314091.dkr.ecr.eu-central-1.amazonaws.com/php-base:cb5191475d444cb21e7b45a321c6edf61ad1ccbf
