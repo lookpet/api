@@ -314,6 +314,7 @@ class User implements UserInterface, \JsonSerializable
             'firstName' => $this->getFirstName(),
             'phone' => $this->getPhone(),
             'description' => $this->getDescription(),
+            'city' => $this->getDescription(),
             'avatar' => $this->getAvatarUrl(),
         ];
     }
