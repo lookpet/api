@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 final class PetController extends AbstractController
 {
     /**
-     * @Route("/api/v1/pet", methods={"POST"}, name="pet")
+     * @Route("/api/v1/pet", methods={"POST"}, name="pet_create")
      *
      * @param Request $request
      *
@@ -48,7 +48,7 @@ final class PetController extends AbstractController
     }
 
     /**
-     * @Route("/api/v1/pet/{slug}", methods={"POST"}, name="pet")
+     * @Route("/api/v1/pet/{slug}", methods={"POST"}, name="pet_update")
      *
      * @param string $slug
      * @param Request $request
@@ -77,7 +77,7 @@ final class PetController extends AbstractController
         $name = $request->request->get('name');
 
         $pet->setType($type);
-        $pet->setType($name);
+        $pet->setName($name);
 
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($pet);
@@ -91,6 +91,8 @@ final class PetController extends AbstractController
     /**
      * @Route("/api/v1/pet/{slug}", methods={"GET"})
      *
+     * @param string $slug
+     * @param PetRepository $petRepository
      * @return JsonResponse
      */
     public function getBySlug(string $slug, PetRepository $petRepository): JsonResponse
