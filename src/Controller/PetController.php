@@ -2,9 +2,15 @@
 
 namespace App\Controller;
 
+use App\Entity\Media;
 use App\Entity\Pet;
+use App\Entity\User;
 use App\Repository\PetRepository;
+use Gedmo\Sluggable\Util\Urlizer;
+use League\Flysystem\FilesystemInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,6 +18,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 final class PetController extends AbstractController
 {
+    private FilesystemInterface $filesystem;
+
+    public function __construct(FilesystemInterface $filesystem)
+    {
+        $this->filesystem = $filesystem;
+    }
+
     /**
      * @Route("/api/v1/pet", methods={"POST"}, name="pet_create")
      *
@@ -38,9 +51,12 @@ final class PetController extends AbstractController
         $name = $request->request->get('name');
 
         $pet = new Pet($type, $slug, $name, null, $this->getUser());
+
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($pet);
         $entityManager->flush();
+
+        $this->setPhotoIfExists($request, $pet);
 
         return new JsonResponse(
             $pet
@@ -89,7 +105,7 @@ final class PetController extends AbstractController
     }
 
     /**
-     * @Route("/api/v1/pet/{slug}", methods={"GET"})
+     * @Route("/api/v1/pet/{slug}", methods={"GET"}, name="public_pet_slug")
      *
      * @param string $slug
      * @param PetRepository $petRepository
@@ -132,5 +148,56 @@ final class PetController extends AbstractController
         return new JsonResponse([
             'pets' => $pets,
         ]);
+    }
+
+    private function setPhotoIfExists(Request $request, Pet $pet): void
+    {
+        if (!$request->files->has('photo')) {
+            return;
+        }
+
+        $newPhotos = $request->files->get('photo');
+
+        if (count($newPhotos) === 0) {
+            return;
+        }
+        $entityManager = $this->getDoctrine()->getManager();
+        foreach ($newPhotos as $newPhoto) {
+            $newFile = $this->uploadFile($newPhoto);
+            $media = new Media();
+            $media->setPublicUrl($newFile);
+            $media->setUser($this->getUser());
+            $media->setSize('original');
+            $pet->addMedia($media);
+            $entityManager->persist($media);
+            $entityManager->persist($pet);
+            $entityManager->flush();
+        }
+    }
+
+    private function uploadFile(File $file, string $destination = null): string
+    {
+        if ($destination === null) {
+            $destination = '/pets/uploads/';
+        }
+
+        if ($file instanceof UploadedFile) {
+            $originalFilename = $file->getClientOriginalName();
+        } else {
+            $originalFilename = $file->getFilename();
+        }
+
+        $newFilename = Urlizer::urlize(pathinfo($originalFilename, PATHINFO_FILENAME)) . '-' . uniqid('', true) . '.' . $file->guessExtension();
+
+        $stream = fopen($file->getPathname(), 'rb');
+        $this->filesystem->write(
+            $destination . $newFilename,
+            $stream
+        );
+        if (is_resource($stream)) {
+            fclose($stream);
+        }
+
+        return $destination . $newFilename;
     }
 }

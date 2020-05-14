@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\PetRepository;
 use Cocur\Slugify\Slugify;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -79,6 +81,11 @@ class Pet implements \JsonSerializable
      */
     private $user;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Media::class)
+     */
+    private $media;
+
     public function __construct(string $type, string $slug, ?string $name = null, ?string $id = null, ?UserInterface $user = null)
     {
         $this->user = $user;
@@ -96,9 +103,10 @@ class Pet implements \JsonSerializable
         } else {
             $this->id = $id;
         }
+        $this->media = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -253,6 +261,7 @@ class Pet implements \JsonSerializable
             'type' => $this->getType(),
             'slug' => $this->getSlug(),
             'name' => $this->getName(),
+            'media' => $this->getMedia()
         ];
     }
 
@@ -261,5 +270,31 @@ class Pet implements \JsonSerializable
         $slugify = new Slugify();
         $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
         $this->slug = $slugify->slugify(implode('-', [$slugEntropy]));
+    }
+
+    /**
+     * @return Collection|Media[]
+     */
+    public function getMedia(): Collection
+    {
+        return $this->media;
+    }
+
+    public function addMedia(Media $medium): self
+    {
+        if (!$this->media->contains($medium)) {
+            $this->media[] = $medium;
+        }
+
+        return $this;
+    }
+
+    public function removeMedia(Media $medium): self
+    {
+        if ($this->media->contains($medium)) {
+            $this->media->removeElement($medium);
+        }
+
+        return $this;
     }
 }
