@@ -19,42 +19,42 @@ class Pet implements \JsonSerializable
      * @ORM\Id()
      * @ORM\Column(type="string")
      */
-    private string $id;
+    private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, unique=true)
      */
-    private string $slug;
+    private $slug;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
      */
-    private bool $isAlive;
+    private $isAlive;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private ?string $name;
+    private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private string $type;
+    private $type;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private ?string $gender;
+    private $gender;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private ?string $breed;
+    private $breed;
 
     /**
      * @ORM\Column(type="text", nullable=true)
      */
-    private ?string $about;
+    private $about;
 
     /**
      * @ORM\Column(type="boolean")
@@ -69,12 +69,12 @@ class Pet implements \JsonSerializable
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private ?string $color;
+    private $color;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private ?string $eyeColor;
+    private $eyeColor;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="pets")
@@ -83,6 +83,9 @@ class Pet implements \JsonSerializable
 
     /**
      * @ORM\ManyToMany(targetEntity=Media::class)
+     * @ORM\JoinTable(name="pet_media",
+     *      joinColumns={@ORM\JoinColumn(name="pet_id", referencedColumnName="id")},
+     * )
      */
     private $media;
 
@@ -261,15 +264,12 @@ class Pet implements \JsonSerializable
             'type' => $this->getType(),
             'slug' => $this->getSlug(),
             'name' => $this->getName(),
-            'media' => $this->getMedia()
+            'breed' => $this->getBreed(),
+            'color' => $this->getColor(),
+            'eyeColor' => $this->getEyeColor(),
+            'dateOfBirth' => $this->getDateOfBirth(),
+            'media' => $this->getMedia()->getValues(),
         ];
-    }
-
-    private function generateSlug(): void
-    {
-        $slugify = new Slugify();
-        $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
-        $this->slug = $slugify->slugify(implode('-', [$slugEntropy]));
     }
 
     /**
@@ -296,5 +296,12 @@ class Pet implements \JsonSerializable
         }
 
         return $this;
+    }
+
+    private function generateSlug(): void
+    {
+        $slugify = new Slugify();
+        $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
+        $this->slug = $slugify->slugify(implode('-', [$slugEntropy]));
     }
 }

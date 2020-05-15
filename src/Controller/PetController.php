@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Media;
 use App\Entity\Pet;
-use App\Entity\User;
 use App\Repository\PetRepository;
 use Gedmo\Sluggable\Util\Urlizer;
 use League\Flysystem\FilesystemInterface;
@@ -34,33 +33,55 @@ final class PetController extends AbstractController
      */
     public function create(Request $request): JsonResponse
     {
-        if (!$request->request->has('type')) {
+        try{
+            if (!$request->request->has('type')) {
+                return new JsonResponse([
+                    'message' => 'Empty type',
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            if (!$request->request->has('slug')) {
+                return new JsonResponse([
+                    'message' => 'Empty slug',
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            $slug = $request->request->get('slug');
+            $type = $request->request->get('type');
+            $name = $request->request->get('name');
+
+            $pet = new Pet($type, $slug, $name, null, $this->getUser());
+
+            if ($request->request->has('breed')) {
+                $pet->setBreed($request->request->get('breed'));
+            }
+
+            if ($request->request->has('color')) {
+                $pet->setColor($request->request->get('color'));
+            }
+
+            if ($request->request->has('eyeColor')) {
+                $pet->setEyeColor($request->request->get('color'));
+            }
+
+            if ($request->request->has('dateOfBirth')) {
+                $pet->setDateOfBirth(new \DateTime($request->request->get('dateOfBirth')));
+            }
+
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($pet);
+            $entityManager->flush();
+
+            $this->setPhotoIfExists($request, $pet);
+
+            return new JsonResponse(
+                $pet
+            );
+        } catch (\Exception $exception) {
             return new JsonResponse([
-                'message' => 'Empty type',
+                'message' => $exception->getMessage(),
             ], Response::HTTP_BAD_REQUEST);
         }
-
-        if (!$request->request->has('slug')) {
-            return new JsonResponse([
-                'message' => 'Empty slug',
-            ], Response::HTTP_BAD_REQUEST);
-        }
-
-        $slug = $request->request->get('slug');
-        $type = $request->request->get('type');
-        $name = $request->request->get('name');
-
-        $pet = new Pet($type, $slug, $name, null, $this->getUser());
-
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($pet);
-        $entityManager->flush();
-
-        $this->setPhotoIfExists($request, $pet);
-
-        return new JsonResponse(
-            $pet
-        );
     }
 
     /**
@@ -73,35 +94,57 @@ final class PetController extends AbstractController
      */
     public function update(string $slug, Request $request, PetRepository $petRepository): JsonResponse
     {
-        if (!$request->request->has('type')) {
+        try{
+            if (!$request->request->has('type')) {
+                return new JsonResponse([
+                    'message' => 'Empty type',
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            $pet = $petRepository->findOneBy([
+                'slug' => $slug,
+            ]);
+
+            if ($pet === null) {
+                return new JsonResponse([
+                    'message' => 'Pet not exist',
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            $type = $request->request->get('type');
+            $name = $request->request->get('name');
+
+            $pet->setType($type);
+            $pet->setName($name);
+
+            if ($request->request->has('breed')) {
+                $pet->setBreed($request->request->get('breed'));
+            }
+
+            if ($request->request->has('color')) {
+                $pet->setColor($request->request->get('color'));
+            }
+
+            if ($request->request->has('eyeColor')) {
+                $pet->setEyeColor($request->request->get('color'));
+            }
+
+            if ($request->request->has('dateOfBirth')) {
+                $pet->setDateOfBirth(new \DateTime($request->request->get('dateOfBirth')));
+            }
+
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($pet);
+            $entityManager->flush();
+
+            return new JsonResponse(
+                $pet
+            );
+        } catch (\Exception $exception) {
             return new JsonResponse([
-                'message' => 'Empty type',
+                'message' => $exception->getMessage(),
             ], Response::HTTP_BAD_REQUEST);
         }
-
-        $pet = $petRepository->findOneBy([
-            'slug' => $slug,
-        ]);
-
-        if ($pet === null) {
-            return new JsonResponse([
-                'message' => 'Pet not exist',
-            ], Response::HTTP_BAD_REQUEST);
-        }
-
-        $type = $request->request->get('type');
-        $name = $request->request->get('name');
-
-        $pet->setType($type);
-        $pet->setName($name);
-
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($pet);
-        $entityManager->flush();
-
-        return new JsonResponse(
-            $pet
-        );
     }
 
     /**
@@ -109,6 +152,7 @@ final class PetController extends AbstractController
      *
      * @param string $slug
      * @param PetRepository $petRepository
+     *
      * @return JsonResponse
      */
     public function getBySlug(string $slug, PetRepository $petRepository): JsonResponse
