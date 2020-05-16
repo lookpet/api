@@ -40,12 +40,6 @@ final class PetController extends AbstractController
                 ], Response::HTTP_BAD_REQUEST);
             }
 
-            if (!$request->request->has('slug')) {
-                return new JsonResponse([
-                    'message' => 'Empty slug',
-                ], Response::HTTP_BAD_REQUEST);
-            }
-
             $slug = $request->request->get('slug');
             $type = $request->request->get('type');
             $name = $request->request->get('name');

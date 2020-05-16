@@ -10,6 +10,7 @@
         "gedmo/doctrine-extensions": "^2.4",
         "league/flysystem-aws-s3-v3": "^1.0",
         "league/flysystem-bundle": "^1.5",
+        "liip/test-fixtures-bundle": "^1.9",
         "nelmio/api-doc-bundle": "^3.6",
         "nelmio/cors-bundle": "^2.0",
         "oneup/flysystem-bundle": "^3.4",
@@ -27,7 +28,6 @@
         "symfony/yaml": "5.0.*"
     },
     "require-dev": {
-        "dama/doctrine-test-bundle": "^6.3",
         "doctrine/doctrine-fixtures-bundle": "^3.3",
         "fzaninotto/faker": "^1.9",
         "liip/functional-test-bundle": "^4.0.0",

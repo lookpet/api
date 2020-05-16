@@ -7,7 +7,7 @@ use App\Entity\User;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
-class UserFixture extends BaseFixture
+final class UserFixture extends BaseFixture
 {
     private const DEFAULT_PASSWORD = 'engage';
     private UserPasswordEncoderInterface $passwordEncoder;
@@ -17,7 +17,7 @@ class UserFixture extends BaseFixture
         $this->passwordEncoder = $passwordEncoder;
     }
 
-    protected function loadData(ObjectManager $manager)
+    protected function loadData(ObjectManager $manager): void
     {
         $this->createMany(10, 'main_users', function ($i) use ($manager) {
             $user = new User();

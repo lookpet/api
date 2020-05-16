@@ -23,7 +23,7 @@ final class ApiTokenAuthenticator extends AbstractGuardAuthenticator
 
     public function supports(Request $request): bool
     {
-        return !in_array($request->attributes->get('_route'), ['api_login', 'api_register', 'public_pet_slug']) && $request->headers->has('Authorization')
+        return !in_array($request->attributes->get('_route'), ['api_login', 'api_register', 'public_pet_slug', 'user_pets']) && $request->headers->has('Authorization')
             && 0 === mb_strpos($request->headers->get('Authorization'), 'Bearer ');
     }
 

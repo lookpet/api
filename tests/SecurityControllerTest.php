@@ -3,6 +3,7 @@
 namespace App\Tests;
 
 use GuzzleHttp\Client;
+use Liip\TestFixturesBundle\Test\FixturesTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,11 +13,13 @@ use Symfony\Component\HttpFoundation\Response;
  */
 final class SecurityControllerTest extends WebTestCase
 {
+    use FixturesTrait;
     private const REGISTER_URL = '/api/v1/authentication/register';
 
     public function testSuccessRegister(): void
     {
         $client = static::createClient();
+        $this->loadFixtures();
 
         $client->request(
             Request::METHOD_POST,
@@ -43,8 +46,6 @@ final class SecurityControllerTest extends WebTestCase
 //                    'password' => '1234',
 //            ]),
 //        ]);
-
-        dd($response);
 
         self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
     }

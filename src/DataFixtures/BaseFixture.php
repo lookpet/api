@@ -24,7 +24,7 @@ abstract class BaseFixture extends Fixture
         $this->loadData($manager);
     }
 
-    abstract protected function loadData(ObjectManager $manager);
+    abstract protected function loadData(ObjectManager $manager): void;
 
     /**
      * Create many objects at once:.

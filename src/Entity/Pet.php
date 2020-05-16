@@ -89,7 +89,7 @@ class Pet implements \JsonSerializable
      */
     private $media;
 
-    public function __construct(string $type, string $slug, ?string $name = null, ?string $id = null, ?UserInterface $user = null)
+    public function __construct(string $type, ?string $slug, ?string $name = null, ?string $id = null, ?UserInterface $user = null)
     {
         $this->user = $user;
         $this->type = $type;

@@ -111,7 +111,7 @@ final class UserController extends AbstractController
     }
 
     /**
-     * @Route("/api/v1/user/{slug}/pets", methods={"GET"})
+     * @Route("/api/v1/user/{slug}/pets", methods={"GET"}, name="user_pets")
      *
      * @return JsonResponse
      */
