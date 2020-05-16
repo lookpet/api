@@ -39,7 +39,7 @@ class ApiToken
         $this->id = Uuid::uuid4()->toString();
         $this->token = bin2hex(random_bytes(60));
         $this->user = $user;
-        $this->expiresAt = new \DateTime('+12 hours');
+        $this->expiresAt = new \DateTime('+1 week');
     }
 
     public function getId(): ?int
