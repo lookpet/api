@@ -62,6 +62,14 @@ final class PetController extends AbstractController
                 $pet->setDateOfBirth(new \DateTime($request->request->get('dateOfBirth')));
             }
 
+            if ($request->request->has('gender')) {
+                $pet->setGender($request->request->get('gender'));
+            }
+
+            if ($request->request->has('isLookingForNewOwner')) {
+                $pet->setGender($request->request->get('isLookingForNewOwner'));
+            }
+
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($pet);
             $entityManager->flush();
@@ -125,6 +133,14 @@ final class PetController extends AbstractController
 
             if ($request->request->has('dateOfBirth')) {
                 $pet->setDateOfBirth(new \DateTime($request->request->get('dateOfBirth')));
+            }
+
+            if ($request->request->has('gender')) {
+                $pet->setGender($request->request->get('gender'));
+            }
+
+            if ($request->request->has('isLookingForNewOwner')) {
+                $pet->setGender($request->request->get('isLookingForNewOwner'));
             }
 
             $entityManager = $this->getDoctrine()->getManager();

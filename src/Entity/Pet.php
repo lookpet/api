@@ -268,8 +268,10 @@ class Pet implements \JsonSerializable
             'color' => $this->getColor(),
             'eyeColor' => $this->getEyeColor(),
             'dateOfBirth' => $this->getDateOfBirth(),
-            'media' => $this->getMedia()->getValues(),
             'about' => $this->getAbout(),
+            'gender' => $this->getGender(),
+            'isLookingForNewOwner' => $this->getIsLookingForOwner(),
+            'media' => $this->getMedia()->getValues(),
         ];
     }
 
