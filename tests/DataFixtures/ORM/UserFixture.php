@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DataFixtures;
+namespace tests\DataFixtures\ORM;
 
 use App\Entity\ApiToken;
 use App\Entity\User;
@@ -9,12 +9,29 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 final class UserFixture extends BaseFixture
 {
-    private const DEFAULT_PASSWORD = 'engage';
+    public const DEFAULT_PASSWORD = 'engage';
+    public const TEST_USER_EMAIL = 'igor@look.pet';
+
     private UserPasswordEncoderInterface $passwordEncoder;
 
     public function __construct(UserPasswordEncoderInterface $passwordEncoder)
     {
         $this->passwordEncoder = $passwordEncoder;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function load(ObjectManager $manager): void
+    {
+        $user = new User();
+        $user->setEmail(self::TEST_USER_EMAIL);
+        $user->setPassword($this->passwordEncoder->encodePassword(
+            $user,
+            self::DEFAULT_PASSWORD
+        ));
+        $manager->persist($user);
+        $manager->flush();
     }
 
     protected function loadData(ObjectManager $manager): void

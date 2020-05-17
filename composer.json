@@ -50,7 +50,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "App\\Tests\\": "tests/"
+            "tests\\": "tests/"
         }
     },
     "replace": {

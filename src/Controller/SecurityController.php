@@ -16,17 +16,25 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 final class SecurityController extends AbstractController
 {
     /**
+     * @var UserRepository
+     */
+    private UserRepository $userRepository;
+
+    public function __construct(UserRepository $userRepository)
+    {
+        $this->userRepository = $userRepository;
+    }
+
+    /**
      * @Route("/api/v1/authentication/login", methods={"POST"}, name="api_login")
      *
      * @param Request $request
-     * @param UserRepository $userRepository
      * @param UserPasswordEncoderInterface $passwordEncoder
      * @param EntityManagerInterface $entityManager
      *
      * @return JsonResponse
      */
     public function login(Request $request,
-                          UserRepository $userRepository,
                           UserPasswordEncoderInterface $passwordEncoder,
                           EntityManagerInterface $entityManager): JsonResponse
     {
@@ -46,7 +54,7 @@ final class SecurityController extends AbstractController
             ], 400);
         }
 
-        $user = $userRepository->findOneBy([
+        $user = $this->userRepository->findOneBy([
             'email' => $email,
         ]);
 
@@ -92,11 +100,35 @@ final class SecurityController extends AbstractController
         EntityManagerInterface $entityManager): JsonResponse
     {
         try {
+            if (!$request->request->has('email')) {
+                return new JsonResponse([
+                    'message' => 'Empty email',
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            if (!$request->request->has('password')) {
+                return new JsonResponse([
+                    'message' => 'Empty password',
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            $email = $request->request->get('email');
+
             /** @todo use form validation with DTO */
             $user = new User();
             $user->setFirstName($request->request->get('firstName'));
             $user->setEmail($request->request->get('email'));
             $user->setPassword($passwordEncoder->encodePassword($user, $request->request->get('password')));
+
+            $userExist = $this->userRepository->findOneBy([
+                'email' => $email,
+            ]);
+
+            if ($userExist !== null) {
+                return new JsonResponse([
+                    'message' => 'User already exist',
+                ], Response::HTTP_BAD_REQUEST);
+            }
 
             $entityManager->persist($user);
             $entityManager->flush();
