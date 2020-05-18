@@ -2,20 +2,20 @@
 
 namespace App\Controller;
 
+use App\Dto\AuthenticationUserLoginDto;
+use App\Dto\AuthenticationUserRegistrationDto;
 use App\Entity\ApiToken;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Swagger\Annotations as SWG;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Swagger\Annotations as SWG;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use App\Dto\AuthenticationUserRegistrationDto;
-use App\Dto\AuthenticationUserLoginDto;
 
 final class SecurityController extends AbstractController
 {
@@ -37,7 +37,6 @@ final class SecurityController extends AbstractController
      * @param EntityManagerInterface $entityManager
      *
      * @return JsonResponse
-     *
      *
      * @SWG\Post(path="/api/v1/authentication/login",
      *   tags={"Authentication"},

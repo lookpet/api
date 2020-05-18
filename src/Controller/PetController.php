@@ -2,11 +2,14 @@
 
 namespace App\Controller;
 
+use App\Dto\PetDto;
 use App\Entity\Media;
 use App\Entity\Pet;
 use App\Repository\PetRepository;
 use Gedmo\Sluggable\Util\Urlizer;
 use League\Flysystem\FilesystemInterface;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Swagger\Annotations as SWG;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -30,6 +33,63 @@ final class PetController extends AbstractController
      * @param Request $request
      *
      * @return JsonResponse
+     *
+     * @SWG\Post(path="/api/v1/pet",
+     *   tags={"Pet"},
+     *   summary="Lets user to create new pet profile",
+     *   description="",
+     *   operationId="petCreate",
+     *   produces={"application/json"},
+     *   @SWG\Parameter(
+     *     in="body",
+     *     name="body",
+     *     description="Lets login and get token",
+     *     required=true,
+     *     @SWG\Schema(ref=@Model(type=PetDto::class))
+     *   ),
+     *   @SWG\Response(response=400, description="User already exist; empty email or password",
+     *     examples={
+     *      "application/json": {
+     *          "message":"Pet with same slug already exist"
+     *      }
+     *    }
+     *  ),
+     *   @SWG\Response(
+     *     response=200,
+     *     description="OK",
+     *     examples={
+     *     "application/json": {
+     *           "type": "dog",
+     *           "slug": "fedor1",
+     *           "name": "Fedor",
+     *           "breed": "Siberian Husky",
+     *           "color": "Gray and white",
+     *           "eyeColor": "Gray and white",
+     *               "dateOfBirth": {
+     *               "date": "2019-01-01 00:00:00.000000",
+     *               "timezone_type": 3,
+     *               "timezone": "Europe/London"
+     *           },
+     *           "about": null,
+     *           "gender": "true",
+     *           "createdAt": {
+     *               "date": "2020-05-18 16:41:33.000000",
+     *               "timezone_type": 3,
+     *               "timezone": "Europe/London"
+     *           },
+     *           "isLookingForNewOwner": false,
+     *           "user": {
+     *              "slug": "1jesj0h3nm6l5",
+     *              "firstName": "Princess",
+     *              "phone": null,
+     *              "description": null,
+     *              "city": null,
+     *              "avatar": "https://dev-lookpet.s3.eu-central-1.amazonaws.com/pets/uploads/image-2020-04-05-16-48-56-5ec2acb4894d98.68714269.png"
+     *           }
+     *          }
+     *       }
+     *    )
+     * )
      */
     public function create(Request $request): JsonResponse
     {
@@ -93,6 +153,63 @@ final class PetController extends AbstractController
      * @param Request $request
      *
      * @return JsonResponse
+     *
+     * @SWG\Post(path="/api/v1/pet/{slug}",
+     *   tags={"Pet"},
+     *   summary="Lets user to update pet profile",
+     *   description="",
+     *   operationId="petUpdate",
+     *   produces={"application/json"},
+     *   @SWG\Parameter(
+     *     in="body",
+     *     name="body",
+     *     description="Lets login and get token",
+     *     required=true,
+     *     @SWG\Schema(ref=@Model(type=PetDto::class))
+     *   ),
+     *   @SWG\Response(response=400, description="User already exist; empty email or password",
+     *     examples={
+     *      "application/json": {
+     *          "message":"Pet with same slug already exist"
+     *      }
+     *    }
+     *  ),
+     *   @SWG\Response(
+     *     response=200,
+     *     description="OK",
+     *     examples={
+     *     "application/json": {
+     *           "type": "dog",
+     *           "slug": "fedor1",
+     *           "name": "Fedor",
+     *           "breed": "Siberian Husky",
+     *           "color": "Gray and white",
+     *           "eyeColor": "Gray and white",
+     *               "dateOfBirth": {
+     *               "date": "2019-01-01 00:00:00.000000",
+     *               "timezone_type": 3,
+     *               "timezone": "Europe/London"
+     *           },
+     *           "about": null,
+     *           "gender": "true",
+     *           "createdAt": {
+     *               "date": "2020-05-18 16:41:33.000000",
+     *               "timezone_type": 3,
+     *               "timezone": "Europe/London"
+     *           },
+     *           "isLookingForNewOwner": false,
+     *           "user": {
+     *              "slug": "1jesj0h3nm6l5",
+     *              "firstName": "Princess",
+     *              "phone": null,
+     *              "description": null,
+     *              "city": null,
+     *              "avatar": "https://dev-lookpet.s3.eu-central-1.amazonaws.com/pets/uploads/image-2020-04-05-16-48-56-5ec2acb4894d98.68714269.png"
+     *           }
+     *          }
+     *       }
+     *    )
+     * )
      */
     public function update(string $slug, Request $request, PetRepository $petRepository): JsonResponse
     {
