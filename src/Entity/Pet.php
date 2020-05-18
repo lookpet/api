@@ -279,7 +279,7 @@ class Pet implements \JsonSerializable
             'createdAt' => $this->getCreatedAt(),
             'isLookingForNewOwner' => $this->getIsLookingForOwner(),
             'media' => $this->getMedia()->getValues(),
-            'user' => $this->getUser() === null ?: $this->getUser(),
+            'user' => $this->getUser(),
         ];
     }
 

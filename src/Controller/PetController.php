@@ -130,7 +130,7 @@ final class PetController extends AbstractController
             }
 
             if ($request->request->has('eyeColor')) {
-                $pet->setEyeColor($request->request->get('color'));
+                $pet->setEyeColor($request->request->get('eyeColor'));
             }
 
             if ($request->request->has('dateOfBirth')) {
@@ -139,6 +139,10 @@ final class PetController extends AbstractController
 
             if ($request->request->has('gender')) {
                 $pet->setGender($request->request->get('gender'));
+            }
+
+            if ($request->request->has('about')) {
+                $pet->setAbout($request->request->get('about'));
             }
 
             if ($request->request->has('isLookingForNewOwner')) {
