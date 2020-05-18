@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
+namespace Functional\V1\Authentication;
 
-namespace Functional\V1;
-
-
+use Doctrine\Common\Annotations\Annotation\IgnoreAnnotation;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Liip\TestFixturesBundle\Test\FixturesTrait;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,57 +15,38 @@ use tests\DataFixtures\ORM\UserFixture;
  * @group functional
  * @IgnoreAnnotation("dataProvider")
  */
-final class RegistrationTest extends WebTestCase
+final class LoginTest extends WebTestCase
 {
     use FixturesTrait;
-    private const REGISTER_URL = '/api/v1/authentication/register';
 
-    private const TEST_EMAIL = 'igor@look.pet';
+    private const LOGIN_URL = '/api/v1/authentication/login';
 
-    public function testRegistrationSuccess(): void
+    public function testLoginSuccess(): void
     {
         $client = static::createClient();
-        $this->loadFixtures();
+        $this->loadFixtures([UserFixture::class]);
 
         $client->request(
             Request::METHOD_POST,
-            self::REGISTER_URL,
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            (string) json_encode([
-                'email' => self::TEST_EMAIL,
-                'password' => '1234',
-            ])
-        );
-        $response = $client->getResponse();
-
-        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
-    }
-
-    public function testRegistrationFailsBecauseUserWithSameEmailExists(): void
-    {
-        $client = static::createClient();
-        $this->loadFixtures([
-            UserFixture::class
-        ]);
-
-        $client->request(
-            Request::METHOD_POST,
-            self::REGISTER_URL,
+            self::LOGIN_URL,
             [],
             [],
             ['CONTENT_TYPE' => 'application/json'],
             (string) json_encode([
                 'email' => UserFixture::TEST_USER_EMAIL,
-                'password' => '1234',
+                'password' => UserFixture::DEFAULT_PASSWORD,
             ])
         );
         $response = $client->getResponse();
         $content = json_decode($response->getContent(), true);
 
-        self::assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        self::assertEquals('User already exist', $content['message']);
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        self::assertSame(UserFixture::TEST_USER_FIRST_NAME, $content['user']['firstName']);
+        self::assertNotEmpty($content['token']);
+        self::assertNotEmpty($content['expires_at']);
+        self::assertEqualsWithDelta(new \DateTimeImmutable('+ 1 week'), new \DateTimeImmutable($content['expires_at']), 1);
+//        self::assertSame(3, $content['expires_at']['timezone_type']);
+//        self::assertSame('Europe/London', $content['expires_at']['timezone']);
     }
 
     /**
@@ -75,14 +55,14 @@ final class RegistrationTest extends WebTestCase
      * @param array $requestData
      * @param string $responseMessage
      */
-    public function testRegistrationFailsBecauseInputDataIsNotSet(array $requestData, string $responseMessage): void
+    public function testLoginFailsBecauseInputDataIsNotSet(array $requestData, string $responseMessage): void
     {
         $client = static::createClient();
         $this->loadFixtures();
 
         $client->request(
             Request::METHOD_POST,
-            self::REGISTER_URL,
+            self::LOGIN_URL,
             [],
             [],
             ['CONTENT_TYPE' => 'application/json'],
@@ -102,14 +82,14 @@ final class RegistrationTest extends WebTestCase
                 [
                     'password' => UserFixture::DEFAULT_PASSWORD,
                 ],
-                'Empty email'
+                'Empty email',
             ],
             [
                 [
                     'email' => UserFixture::TEST_USER_EMAIL,
                 ],
-                'Empty password'
-            ]
+                'Empty password',
+            ],
         ];
     }
 }

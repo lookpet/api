@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Entity\Traits\LifecycleCallbackTrait;
+use App\Entity\Traits\TimestampTrait;
 use App\Repository\ApiTokenRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
@@ -9,9 +11,13 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=ApiTokenRepository::class)
+ * @ORM\HasLifecycleCallbacks
  */
 class ApiToken
 {
+    use LifecycleCallbackTrait;
+    use TimestampTrait;
+
     /**
      * @ORM\Id()
      * @ORM\Column(type="string")

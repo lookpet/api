@@ -9,6 +9,7 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 final class UserFixture extends BaseFixture
 {
+    public const TEST_USER_FIRST_NAME = 'Igor';
     public const DEFAULT_PASSWORD = 'engage';
     public const TEST_USER_EMAIL = 'igor@look.pet';
 
@@ -20,7 +21,7 @@ final class UserFixture extends BaseFixture
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function load(ObjectManager $manager): void
     {
@@ -30,6 +31,7 @@ final class UserFixture extends BaseFixture
             $user,
             self::DEFAULT_PASSWORD
         ));
+        $user->setFirstName(self::TEST_USER_FIRST_NAME);
         $manager->persist($user);
         $manager->flush();
     }
