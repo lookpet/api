@@ -119,6 +119,8 @@ final class PetController extends AbstractController
             $pet->setType($type);
             $pet->setName($name);
 
+            $this->setPhotoIfExists($request, $pet);
+
             if ($request->request->has('breed')) {
                 $pet->setBreed($request->request->get('breed'));
             }
