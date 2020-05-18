@@ -2,15 +2,21 @@
 
 namespace App\Entity;
 
+use App\Entity\Traits\LifecycleCallbackTrait;
+use App\Entity\Traits\TimestampTrait;
 use App\Repository\MediaRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 
 /**
  * @ORM\Entity(repositoryClass=MediaRepository::class)
+ * @ORM\HasLifecycleCallbacks
  */
 class Media implements \JsonSerializable
 {
+    use LifecycleCallbackTrait;
+    use TimestampTrait;
+
     /**
      * @ORM\Id()
      * @ORM\Column(type="string")

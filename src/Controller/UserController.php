@@ -139,7 +139,9 @@ final class UserController extends AbstractController
      */
     public function search(UserRepository $userRepository): JsonResponse
     {
-        $users = $userRepository->findAll();
+        $users = $userRepository->findBy([], [
+            'createdAt' => 'desc',
+        ]);
 
         return new JsonResponse([
             'pets' => $users,

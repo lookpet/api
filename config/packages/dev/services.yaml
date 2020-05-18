@@ -1,0 +1,10 @@
+services:
+  _defaults:
+    autoconfigure: true
+    autowire: true
+    public: false
+
+  tests\DataFixtures\ORM\:
+    resource: '%kernel.project_dir%/tests/DataFixtures/ORM/'
+    tags:
+      - { name: doctrine.fixture.orm }

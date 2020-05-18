@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Entity\Traits\LifecycleCallbackTrait;
+use App\Entity\Traits\TimestampTrait;
 use App\Repository\PetRepository;
 use Cocur\Slugify\Slugify;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -12,9 +14,13 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=PetRepository::class)
+ * @ORM\HasLifecycleCallbacks
  */
 class Pet implements \JsonSerializable
 {
+    use TimestampTrait;
+    use LifecycleCallbackTrait;
+
     /**
      * @ORM\Id()
      * @ORM\Column(type="string")
@@ -270,8 +276,10 @@ class Pet implements \JsonSerializable
             'dateOfBirth' => $this->getDateOfBirth(),
             'about' => $this->getAbout(),
             'gender' => $this->getGender(),
+            'createdAt' => $this->getCreatedAt(),
             'isLookingForNewOwner' => $this->getIsLookingForOwner(),
             'media' => $this->getMedia()->getValues(),
+            'user' => $this->getUser() === null ?: $this->getUser()->getSlug(),
         ];
     }
 

@@ -33,7 +33,7 @@ final class PetController extends AbstractController
      */
     public function create(Request $request): JsonResponse
     {
-        try{
+        try {
             if (!$request->request->has('type')) {
                 return new JsonResponse([
                     'message' => 'Empty type',
@@ -96,7 +96,7 @@ final class PetController extends AbstractController
      */
     public function update(string $slug, Request $request, PetRepository $petRepository): JsonResponse
     {
-        try{
+        try {
             if (!$request->request->has('type')) {
                 return new JsonResponse([
                     'message' => 'Empty type',
@@ -118,6 +118,8 @@ final class PetController extends AbstractController
 
             $pet->setType($type);
             $pet->setName($name);
+
+            $this->setPhotoIfExists($request, $pet);
 
             if ($request->request->has('breed')) {
                 $pet->setBreed($request->request->get('breed'));
@@ -175,6 +177,8 @@ final class PetController extends AbstractController
 
         $pet = $petRepository->findOneBy([
             'slug' => $slug,
+        ], [
+            'createdAt' => 'desc',
         ]);
 
         if ($pet === null) {
@@ -197,7 +201,9 @@ final class PetController extends AbstractController
      */
     public function search(PetRepository $petRepository): JsonResponse
     {
-        $pets = $petRepository->findAll();
+        $pets = $petRepository->findBy([], [
+            'createdAt' => 'desc',
+        ]);
 
         return new JsonResponse([
             'pets' => $pets,

@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Entity\Traits\LifecycleCallbackTrait;
+use App\Entity\Traits\TimestampTrait;
 use App\Repository\UserRepository;
 use Cocur\Slugify\Slugify;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -13,9 +15,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @ORM\HasLifecycleCallbacks
  */
 class User implements UserInterface, \JsonSerializable
 {
+    use LifecycleCallbackTrait;
+    use TimestampTrait;
+
     /**
      * @ORM\Id()
      * @ORM\Column(type="string")
