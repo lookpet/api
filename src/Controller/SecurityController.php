@@ -156,10 +156,10 @@ final class SecurityController extends AbstractController
      *     required=true,
      *     @SWG\Schema(ref=@Model(type=AuthenticationUserRegistrationDto::class))
      *   ),
-     *   @SWG\Response(response=400, description="Invalid email or password",
+     *   @SWG\Response(response=400, description="User already exist; empty email or password",
      *     examples={
      *      "application/json": {
-     *          "message":"Invalid email or password"
+     *          "message":"User already exist"
      *      }
      *    }
      *  ),
