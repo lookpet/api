@@ -127,7 +127,7 @@ final class PetController extends AbstractController
             }
 
             if ($request->request->has('isLookingForNewOwner')) {
-                $pet->setGender($request->request->get('isLookingForNewOwner'));
+                $pet->setIsLookingForOwner($request->request->get('isLookingForNewOwner'));
             }
 
             $entityManager = $this->getDoctrine()->getManager();
@@ -230,11 +230,12 @@ final class PetController extends AbstractController
                 ], Response::HTTP_BAD_REQUEST);
             }
 
-            $type = $request->request->get('type');
-            $name = $request->request->get('name');
-
-            $pet->setType($type);
-            $pet->setName($name);
+            if ($request->request->has('type')) {
+                $pet->setType($request->request->get('type'));
+            }
+            if ($request->request->has('name')) {
+                $pet->setName($request->request->get('name'));
+            }
 
             $this->setPhotoIfExists($request, $pet);
 
@@ -263,7 +264,7 @@ final class PetController extends AbstractController
             }
 
             if ($request->request->has('isLookingForNewOwner')) {
-                $pet->setGender($request->request->get('isLookingForNewOwner'));
+                $pet->setIsLookingForOwner($request->request->get('isLookingForNewOwner'));
             }
 
             $entityManager = $this->getDoctrine()->getManager();
