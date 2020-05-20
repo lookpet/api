@@ -214,12 +214,6 @@ final class PetController extends AbstractController
     public function update(string $slug, Request $request, PetRepository $petRepository): JsonResponse
     {
         try {
-            if (!$request->request->has('type')) {
-                return new JsonResponse([
-                    'message' => 'Empty type',
-                ], Response::HTTP_BAD_REQUEST);
-            }
-
             $pet = $petRepository->findOneBy([
                 'slug' => $slug,
             ]);
@@ -227,6 +221,12 @@ final class PetController extends AbstractController
             if ($pet === null) {
                 return new JsonResponse([
                     'message' => 'Pet not exist',
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            if ($request->request->has('type') && empty($request->request->get('type'))) {
+                return new JsonResponse([
+                    'message' => 'Empty type',
                 ], Response::HTTP_BAD_REQUEST);
             }
 
@@ -315,7 +315,7 @@ final class PetController extends AbstractController
     }
 
     /**
-     * @Route("/api/v1/pets", methods={"GET"})
+     * @Route("/api/v1/pets", methods={"GET"}, name="public_pet_pets")
      *
      * @param PetRepository $petRepository
      *
