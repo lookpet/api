@@ -14,6 +14,13 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 
 final class ApiTokenAuthenticator extends AbstractGuardAuthenticator
 {
+    private const PUBLIC_ROUTES = [
+        'api_login',
+        'api_register',
+        'public_pet_slug',
+        'user_pets',
+        'public_pet_pets',
+    ];
     private ApiTokenRepository $apiTokenRepository;
 
     public function __construct(ApiTokenRepository $apiTokenRepository)
@@ -24,7 +31,7 @@ final class ApiTokenAuthenticator extends AbstractGuardAuthenticator
     public function supports(Request $request): bool
     {
         //@TODO test if Authorization header not set forbidden
-        return !in_array($request->attributes->get('_route'), ['api_login', 'api_register', 'public_pet_slug', 'user_pets', 'public_pet_pets']) && $request->headers->has('Authorization')
+        return !in_array($request->attributes->get('_route'), self::PUBLIC_ROUTES, true) && $request->headers->has('Authorization')
             && 0 === mb_strpos($request->headers->get('Authorization'), 'Bearer ');
     }
 
