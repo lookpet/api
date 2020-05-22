@@ -35,7 +35,7 @@ final class PetRepository extends ServiceEntityRepository
             $queryBuilder->andWhere($queryBuilder->expr()->eq('p.type', $queryBuilder->expr()->literal($type)));
         }
 
-        return $queryBuilder->orderBy('p.createdAt', 'ASC')
+        return $queryBuilder->orderBy('p.updatedAt', 'DESC')
             ->setMaxResults(10)
             ->getQuery()
             ->getResult();
