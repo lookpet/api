@@ -131,7 +131,7 @@ final class UserController extends AbstractController
     }
 
     /**
-     * @Route("/api/v1/users", methods={"GET"})
+     * @Route("/api/v1/users", methods={"GET"}, name="public_users")
      *
      * @param UserRepository $userRepository
      *

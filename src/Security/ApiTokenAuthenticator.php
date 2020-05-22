@@ -20,6 +20,12 @@ final class ApiTokenAuthenticator extends AbstractGuardAuthenticator
         'public_pet_slug',
         'user_pets',
         'public_pet_pets',
+        'search_pet',
+        'public_users',
+        'public_pet_types',
+        'public_dog_breeds',
+        'public_cat_breeds',
+        'api.swagger_ui',
     ];
     private ApiTokenRepository $apiTokenRepository;
 
@@ -30,13 +36,16 @@ final class ApiTokenAuthenticator extends AbstractGuardAuthenticator
 
     public function supports(Request $request): bool
     {
-        //@TODO test if Authorization header not set forbidden
-        return !in_array($request->attributes->get('_route'), self::PUBLIC_ROUTES, true) && $request->headers->has('Authorization')
-            && 0 === mb_strpos($request->headers->get('Authorization'), 'Bearer ');
+        return !in_array($request->attributes->get('_route'), self::PUBLIC_ROUTES, true);
     }
 
     public function getCredentials(Request $request): string
     {
+        if (!$request->headers->has('Authorization')
+            || 0 !== mb_strpos($request->headers->get('Authorization'), 'Bearer ')) {
+            throw new CustomUserMessageAuthenticationException('Invalid API token');
+        }
+
         $authorizationHeader = $request->headers->get('Authorization');
 
         return mb_substr($authorizationHeader, 7);

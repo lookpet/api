@@ -12,39 +12,32 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Pet[]    findAll()
  * @method Pet[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class PetRepository extends ServiceEntityRepository
+final class PetRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Pet::class);
     }
 
-    // /**
-    //  * @return Pet[] Returns an array of Pet objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findBySearch(?string $breed, ?string $type, ?string $city): iterable
     {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
+        $queryBuilder = $this->createQueryBuilder('p');
+
+        if ($breed !== null) {
+            $queryBuilder->andWhere($queryBuilder->expr()->eq('p.breed', $queryBuilder->expr()->literal($breed)));
+        }
+
+        if ($city !== null) {
+            $queryBuilder->andWhere($queryBuilder->expr()->eq('p.city', $queryBuilder->expr()->literal($city)));
+        }
+
+        if ($type !== null) {
+            $queryBuilder->andWhere($queryBuilder->expr()->eq('p.type', $queryBuilder->expr()->literal($type)));
+        }
+
+        return $queryBuilder->orderBy('p.createdAt', 'ASC')
             ->setMaxResults(10)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Pet
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

@@ -95,6 +95,11 @@ class Pet implements \JsonSerializable
      */
     private $media;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $city;
+
     public function __construct(string $type, ?string $slug, ?string $name = null, ?string $id = null, ?UserInterface $user = null)
     {
         $this->user = $user;
@@ -270,6 +275,7 @@ class Pet implements \JsonSerializable
             'type' => $this->getType(),
             'slug' => $this->getSlug(),
             'name' => $this->getName(),
+            'city' => $this->getCity(),
             'breed' => $this->getBreed(),
             'color' => $this->getColor(),
             'eyeColor' => $this->getEyeColor(),
@@ -305,6 +311,18 @@ class Pet implements \JsonSerializable
         if ($this->media->contains($medium)) {
             $this->media->removeElement($medium);
         }
+
+        return $this;
+    }
+
+    public function getCity(): ?string
+    {
+        return $this->city;
+    }
+
+    public function setCity(?string $city): self
+    {
+        $this->city = $city;
 
         return $this;
     }

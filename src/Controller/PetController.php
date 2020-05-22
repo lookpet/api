@@ -62,6 +62,7 @@ final class PetController extends AbstractController
      *           "type": "dog",
      *           "slug": "fedor1",
      *           "name": "Fedor",
+     *           "city": "Moscow",
      *           "breed": "Siberian Husky",
      *           "color": "Gray and white",
      *           "eyeColor": "Gray and white",
@@ -105,6 +106,10 @@ final class PetController extends AbstractController
             $name = $request->request->get('name');
 
             $pet = new Pet($type, $slug, $name, null, $this->getUser());
+
+            if ($request->request->has('city')) {
+                $pet->setCity($request->request->get('city'));
+            }
 
             if ($request->request->has('breed')) {
                 $pet->setBreed($request->request->get('breed'));
@@ -182,6 +187,7 @@ final class PetController extends AbstractController
      *           "type": "dog",
      *           "slug": "fedor1",
      *           "name": "Fedor",
+     *           "city": "Moscow",
      *           "breed": "Siberian Husky",
      *           "color": "Gray and white",
      *           "eyeColor": "Gray and white",
@@ -235,6 +241,10 @@ final class PetController extends AbstractController
             }
             if ($request->request->has('name')) {
                 $pet->setName($request->request->get('name'));
+            }
+
+            if ($request->request->has('city')) {
+                $pet->setCity($request->request->get('city'));
             }
 
             $this->setPhotoIfExists($request, $pet);

@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace App\Dto;
 
 use Swagger\Annotations as SWG;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class AuthenticationUserLoginDto
 {
     /**
+     * @Assert\NotBlank
+     * @Assert\Email
+     *
      * @SWG\Property(
      *     type="string",
      *     description="email for authentication",

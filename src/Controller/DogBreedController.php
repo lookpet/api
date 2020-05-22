@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 final class DogBreedController extends AbstractController
 {
     /**
-     * @Route("/api/v1/dog/breeds", methods={"GET"}, name="dog_breeds")
+     * @Route("/api/v1/dog/breeds", methods={"GET"}, name="public_dog_breeds")
      *
      * @return JsonResponse
      *

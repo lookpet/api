@@ -14,12 +14,12 @@ use Symfony\Component\Routing\Annotation\Route;
 final class CatBreedController extends AbstractController
 {
     /**
-     * @Route("/api/v1/cat/breeds", methods={"GET"}, name="cat_breeds")
+     * @Route("/api/v1/cat/breeds", methods={"GET"}, name="public_cat_breeds")
      *
      * @return JsonResponse
      *
      * @SWG\Get(path="/api/v1/cat/breeds",
-     *   tags={"cat"},
+     *   tags={"Cat"},
      *   summary="cat breed list",
      *   description="",
      *   produces={"application/json"},
