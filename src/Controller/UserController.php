@@ -57,6 +57,8 @@ final class UserController extends AbstractController
             $user->setSlug($request->request->get('slug'));
         }
 
+        $this->setPhotoIfExists($request, $user);
+
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($user);
         $entityManager->flush();
