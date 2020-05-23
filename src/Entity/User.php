@@ -322,6 +322,7 @@ class User implements UserInterface, \JsonSerializable
             'description' => $this->getDescription(),
             'city' => $this->getCity(),
             'avatar' => $this->getAvatarUrl(),
+            'media' => $this->getMedia()->getValues(),
         ];
     }
 
