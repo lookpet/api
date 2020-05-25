@@ -23,15 +23,15 @@ final class PetRepository extends ServiceEntityRepository
     {
         $queryBuilder = $this->createQueryBuilder('p');
 
-        if ($breed !== null) {
+        if (!empty($breed)) {
             $queryBuilder->andWhere($queryBuilder->expr()->eq('p.breed', $queryBuilder->expr()->literal($breed)));
         }
 
-        if ($city !== null) {
+        if (!empty($city)) {
             $queryBuilder->andWhere($queryBuilder->expr()->eq('p.city', $queryBuilder->expr()->literal($city)));
         }
 
-        if ($type !== null) {
+        if (!empty($type)) {
             $queryBuilder->andWhere($queryBuilder->expr()->eq('p.type', $queryBuilder->expr()->literal($type)));
         }
 
