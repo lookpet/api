@@ -84,7 +84,7 @@ final class PetDto
      * @SWG\Property(
      *     type="string",
      *     description="pet additional information",
-     *     example="male",
+     *     example="My pet is the Best!",
      * )
      */
     private ?string $about;
@@ -97,6 +97,24 @@ final class PetDto
      * )
      */
     private bool $isLookingForNewOwner = false;
+
+    /**
+     * @SWG\Property(
+     *     type="string",
+     *     description="pet father",
+     *     example="Husky Haven Super Father",
+     * )
+     */
+    private string $fatherName;
+
+    /**
+     * @SWG\Property(
+     *     type="string",
+     *     description="pet mother",
+     *     example="Husky Haven Super Mother",
+     * )
+     */
+    private string $motherName;
 
     public function getType(): string
     {
@@ -196,5 +214,25 @@ final class PetDto
     public function setIsLookingForNewOwner(bool $isLookingForNewOwner): void
     {
         $this->isLookingForNewOwner = $isLookingForNewOwner;
+    }
+
+    public function getFatherName(): string
+    {
+        return $this->fatherName;
+    }
+
+    public function setFatherName(string $fatherName): void
+    {
+        $this->fatherName = $fatherName;
+    }
+
+    public function getMotherName(): string
+    {
+        return $this->motherName;
+    }
+
+    public function setMotherName(string $motherName): void
+    {
+        $this->motherName = $motherName;
     }
 }
