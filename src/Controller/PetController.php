@@ -64,6 +64,8 @@ final class PetController extends AbstractController
      *           "name": "Fedor",
      *           "city": "Moscow",
      *           "breed": "Siberian Husky",
+     *           "fatherName": "Husky Haven Lord Of The Dance",
+     *           "motherName": "Husky Haven Princess",
      *           "color": "Gray and white",
      *           "eyeColor": "Gray and white",
      *               "dateOfBirth": {
@@ -72,7 +74,7 @@ final class PetController extends AbstractController
      *               "timezone": "Europe/London"
      *           },
      *           "about": null,
-     *           "gender": "true",
+     *           "gender": "male",
      *           "createdAt": {
      *               "date": "2020-05-18 16:41:33.000000",
      *               "timezone_type": 3,

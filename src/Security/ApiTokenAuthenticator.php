@@ -27,6 +27,7 @@ final class ApiTokenAuthenticator extends AbstractGuardAuthenticator
         'public_cat_breeds',
         'api.swagger_ui',
         'public_get_user',
+        'public_genders',
     ];
     private ApiTokenRepository $apiTokenRepository;
 

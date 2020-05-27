@@ -100,6 +100,16 @@ class Pet implements \JsonSerializable
      */
     private $city;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $fatherName;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $motherName;
+
     public function __construct(string $type, ?string $slug, ?string $name = null, ?string $id = null, ?UserInterface $user = null)
     {
         $this->user = $user;
@@ -277,6 +287,8 @@ class Pet implements \JsonSerializable
             'name' => $this->getName(),
             'city' => $this->getCity(),
             'breed' => $this->getBreed(),
+            'fatherName' => $this->getFatherName(),
+            'motherName' => $this->getMotherName(),
             'color' => $this->getColor(),
             'eyeColor' => $this->getEyeColor(),
             'dateOfBirth' => $this->getDateOfBirth(),
@@ -332,5 +344,29 @@ class Pet implements \JsonSerializable
         $slugify = new Slugify();
         $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
         $this->slug = $slugify->slugify(implode('-', [$slugEntropy]));
+    }
+
+    public function getFatherName(): ?string
+    {
+        return $this->fatherName;
+    }
+
+    public function setFatherName(?string $fatherName): self
+    {
+        $this->fatherName = $fatherName;
+
+        return $this;
+    }
+
+    public function getMotherName(): ?string
+    {
+        return $this->motherName;
+    }
+
+    public function setMotherName(?string $motherName): self
+    {
+        $this->motherName = $motherName;
+
+        return $this;
     }
 }
