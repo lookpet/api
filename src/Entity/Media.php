@@ -90,7 +90,7 @@ class Media implements \JsonSerializable
         return [
             'size' => $this->getSize(),
             'publicUrl' => $this->getPublicUrl(),
-            'created_at' => $this->getCreatedAt()
+            'created_at' => $this->getCreatedAt(),
         ];
     }
 }

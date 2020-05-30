@@ -110,6 +110,16 @@ class Pet implements \JsonSerializable
      */
     private $motherName;
 
+    /**
+     * @ORM\OneToMany(targetEntity=PetLike::class, mappedBy="pet")
+     */
+    private $likes;
+
+    /**
+     * @ORM\OneToMany(targetEntity=PetComment::class, mappedBy="pet", orphanRemoval=true)
+     */
+    private $comments;
+
     public function __construct(string $type, ?string $slug, ?string $name = null, ?string $id = null, ?UserInterface $user = null)
     {
         $this->user = $user;
@@ -128,6 +138,8 @@ class Pet implements \JsonSerializable
             $this->id = $id;
         }
         $this->media = new ArrayCollection();
+        $this->likes = new ArrayCollection();
+        $this->comments = new ArrayCollection();
     }
 
     public function getId(): ?string
@@ -294,6 +306,8 @@ class Pet implements \JsonSerializable
             'dateOfBirth' => $this->getDateOfBirth(),
             'about' => $this->getAbout(),
             'gender' => $this->getGender(),
+            'likes' => count($this->getLikes()),
+            'comments' => $this->getComments(),
             'createdAt' => $this->getCreatedAt(),
             'isLookingForNewOwner' => $this->getIsLookingForOwner(),
             'media' => $this->getMedia()->getValues(),
@@ -339,13 +353,6 @@ class Pet implements \JsonSerializable
         return $this;
     }
 
-    private function generateSlug(): void
-    {
-        $slugify = new Slugify();
-        $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
-        $this->slug = $slugify->slugify(implode('-', [$slugEntropy]));
-    }
-
     public function getFatherName(): ?string
     {
         return $this->fatherName;
@@ -368,5 +375,73 @@ class Pet implements \JsonSerializable
         $this->motherName = $motherName;
 
         return $this;
+    }
+
+    /**
+     * @return Collection|PetLike[]
+     */
+    public function getLikes(): Collection
+    {
+        return $this->likes;
+    }
+
+    public function addLike(PetLike $like): self
+    {
+        if (!$this->likes->contains($like)) {
+            $this->likes[] = $like;
+        }
+
+        return $this;
+    }
+
+    public function hasLike(UserInterface $user): bool
+    {
+        foreach ($this->likes as $currentLike) {
+            if ($currentLike->getUser() === $user) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function removeLike(PetLike ...$like): self
+    {
+        if ($this->likes->contains($like)) {
+            $this->likes->removeElement($like);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|PetComment[]
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(PetComment $comment): self
+    {
+        $this->comments[] = $comment;
+
+        return $this;
+    }
+
+    public function removeComment(PetComment $comment): self
+    {
+        if ($this->comments->contains($comment)) {
+            $this->comments->removeElement($comment);
+        }
+
+        return $this;
+    }
+
+    private function generateSlug(): void
+    {
+        $slugify = new Slugify();
+        $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
+        $this->slug = $slugify->slugify(implode('-', [$slugEntropy]));
     }
 }

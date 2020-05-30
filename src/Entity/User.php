@@ -85,6 +85,16 @@ class User implements UserInterface, \JsonSerializable
      */
     private $city;
 
+    /**
+     * @ORM\OneToMany(targetEntity=PetComment::class, mappedBy="user")
+     */
+    private $petComments;
+
+    /**
+     * @ORM\OneToMany(targetEntity=PetLike::class, mappedBy="user", orphanRemoval=true)
+     */
+    private $petLikes;
+
     public function __construct(?string $slug = null, ?string $firstName = null, ?string $id = null)
     {
         if ($slug === null) {
@@ -103,6 +113,8 @@ class User implements UserInterface, \JsonSerializable
         $this->apiTokens = new ArrayCollection();
         $this->media = new ArrayCollection();
         $this->pets = new ArrayCollection();
+        $this->petComments = new ArrayCollection();
+        $this->petLikes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -365,6 +377,68 @@ class User implements UserInterface, \JsonSerializable
     public function setCity(?string $city): self
     {
         $this->city = $city;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|PetComment[]
+     */
+    public function getPetComments(): Collection
+    {
+        return $this->petComments;
+    }
+
+    public function addPetComment(PetComment $petComment): self
+    {
+        if (!$this->petComments->contains($petComment)) {
+            $this->petComments[] = $petComment;
+            $petComment->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePetComment(PetComment $petComment): self
+    {
+        if ($this->petComments->contains($petComment)) {
+            $this->petComments->removeElement($petComment);
+            // set the owning side to null (unless already changed)
+            if ($petComment->getUser() === $this) {
+                $petComment->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|PetLike[]
+     */
+    public function getPetLikes(): Collection
+    {
+        return $this->petLikes;
+    }
+
+    public function addPetLike(PetLike $petLike): self
+    {
+        if (!$this->petLikes->contains($petLike)) {
+            $this->petLikes[] = $petLike;
+            $petLike->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePetLike(PetLike $petLike): self
+    {
+        if ($this->petLikes->contains($petLike)) {
+            $this->petLikes->removeElement($petLike);
+            // set the owning side to null (unless already changed)
+            if ($petLike->getUser() === $this) {
+                $petLike->setUser(null);
+            }
+        }
 
         return $this;
     }
