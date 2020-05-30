@@ -307,7 +307,7 @@ class Pet implements \JsonSerializable
             'about' => $this->getAbout(),
             'gender' => $this->getGender(),
             'likes' => count($this->getLikes()),
-            'comments' => $this->getComments(),
+            'comments' => $this->getComments()->toArray(),
             'createdAt' => $this->getCreatedAt(),
             'isLookingForNewOwner' => $this->getIsLookingForOwner(),
             'media' => $this->getMedia()->getValues(),
