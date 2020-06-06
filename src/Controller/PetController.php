@@ -128,6 +128,10 @@ final class PetController extends AbstractController
                 $pet->setColor($request->request->get('color'));
             }
 
+            if ($request->request->has('about')) {
+                $pet->setAbout($request->request->get('about'));
+            }
+
             if ($request->request->has('eyeColor')) {
                 $pet->setEyeColor($request->request->get('color'));
             }
