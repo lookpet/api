@@ -312,6 +312,32 @@ final class PetController extends AbstractController
     }
 
     /**
+     * @Route("/api/v1/pet/{slug}", methods={"DELETE"}, name="delete_pet_slug")
+     *
+     * @param string $slug
+     * @param PetRepository $petRepository
+     * @return JsonResponse
+     */
+    public function delete(string $slug, PetRepository $petRepository): JsonResponse
+    {
+        $pet = $petRepository->findOneBy([
+            'slug' => $slug,
+        ], [
+            'createdAt' => 'desc',
+        ]);
+
+        if ($pet === null) {
+            return new JsonResponse([
+                'message' => 'No pet was found',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $this->getDoctrine()->getManager()->remove($pet);
+        $this->getDoctrine()->getManager()->flush();
+        return new JsonResponse();
+    }
+
+    /**
      * @Route("/api/v1/pet/{slug}", methods={"GET"}, name="public_pet_slug")
      *
      * @param string $slug
