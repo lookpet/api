@@ -137,7 +137,12 @@ final class PetController extends AbstractController
             }
 
             if ($request->request->has('dateOfBirth')) {
-                $pet->setDateOfBirth(new \DateTime($request->request->get('dateOfBirth')));
+                try{
+                    $dateOfBirth = new \DateTime($request->request->get('dateOfBirth'));
+                } catch (\Exception $exception) {
+                    $dateOfBirth = null;
+                }
+                $pet->setDateOfBirth($dateOfBirth);
             }
 
             if ($request->request->has('gender')) {
@@ -282,7 +287,12 @@ final class PetController extends AbstractController
             }
 
             if ($request->request->has('dateOfBirth')) {
-                $pet->setDateOfBirth(new \DateTime($request->request->get('dateOfBirth')));
+                try{
+                    $dateOfBirth = new \DateTime($request->request->get('dateOfBirth'));
+                } catch (\Exception $exception) {
+                    $dateOfBirth = null;
+                }
+                $pet->setDateOfBirth($dateOfBirth);
             }
 
             if ($request->request->has('gender')) {
