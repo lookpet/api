@@ -37,6 +37,7 @@ final class UserController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
+        $entityManager = $this->getDoctrine()->getManager();
 
         if ($request->request->has('firstName')) {
             $user->setFirstName($request->request->get('firstName'));
@@ -56,9 +57,12 @@ final class UserController extends AbstractController
 
         if ($request->request->has('breeder')) {
             $breeder = $user->hasBreeder() ? $user->getBreeder() : new Breeder($request->request->get('breeder'));
+            $breeder->setName($request->request->get('breeder'));
             $user->setBreeder(
                 $breeder
             );
+
+            $entityManager->persist($breeder);
         }
 
         if ($request->request->has('slug')) {
@@ -67,7 +71,7 @@ final class UserController extends AbstractController
 
         $this->setPhotoIfExists($request, $user);
 
-        $entityManager = $this->getDoctrine()->getManager();
+
         $entityManager->persist($user);
         $entityManager->flush();
 

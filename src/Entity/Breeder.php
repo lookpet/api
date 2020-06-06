@@ -12,6 +12,7 @@ use Ramsey\Uuid\Uuid;
 
 /**
  * @ORM\Entity(repositoryClass=BreederRepository::class)
+ * @ORM\HasLifecycleCallbacks
  */
 class Breeder implements \JsonSerializable
 {
