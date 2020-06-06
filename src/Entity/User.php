@@ -95,6 +95,11 @@ class User implements UserInterface, \JsonSerializable
      */
     private $petLikes;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Breeder::class, inversedBy="users")
+     */
+    private $breeder;
+
     public function __construct(?string $slug = null, ?string $firstName = null, ?string $id = null)
     {
         if ($slug === null) {
@@ -335,6 +340,7 @@ class User implements UserInterface, \JsonSerializable
             'city' => $this->getCity(),
             'avatar' => $this->getAvatarUrl(),
             'media' => $this->getMedia()->getValues(),
+            'breeder' => $this->getBreeder(),
         ];
     }
 
@@ -439,6 +445,23 @@ class User implements UserInterface, \JsonSerializable
                 $petLike->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function hasBreeder(): bool
+    {
+        return $this->breeder !== null;
+    }
+
+    public function getBreeder(): ?Breeder
+    {
+        return $this->breeder;
+    }
+
+    public function setBreeder(?Breeder $breeder): self
+    {
+        $this->breeder = $breeder;
 
         return $this;
     }

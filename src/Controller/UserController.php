@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\Breeder;
 use App\Entity\Media;
 use App\Entity\User;
 use App\Repository\PetRepository;
@@ -51,6 +52,13 @@ final class UserController extends AbstractController
 
         if ($request->request->has('city')) {
             $user->setCity($request->request->get('city'));
+        }
+
+        if ($request->request->has('breeder')) {
+            $breeder = $user->hasBreeder() ? $user->getBreeder() : new Breeder($request->request->get('breeder'));
+            $user->setBreeder(
+                $breeder
+            );
         }
 
         if ($request->request->has('slug')) {

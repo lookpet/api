@@ -120,6 +120,11 @@ class Pet implements \JsonSerializable
      */
     private $comments;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Breeder::class, inversedBy="pets")
+     */
+    private $breeder;
+
     public function __construct(string $type, ?string $slug, ?string $name = null, ?string $id = null, ?UserInterface $user = null)
     {
         $this->user = $user;
@@ -312,6 +317,7 @@ class Pet implements \JsonSerializable
             'isLookingForNewOwner' => $this->getIsLookingForOwner(),
             'media' => $this->getMedia()->getValues(),
             'user' => $this->getUser(),
+            'breeder' => $this->getBreeder(),
         ];
     }
 
@@ -434,6 +440,18 @@ class Pet implements \JsonSerializable
         if ($this->comments->contains($comment)) {
             $this->comments->removeElement($comment);
         }
+
+        return $this;
+    }
+
+    public function getBreeder(): ?Breeder
+    {
+        return $this->breeder;
+    }
+
+    public function setBreeder(?Breeder $breeder): self
+    {
+        $this->breeder = $breeder;
 
         return $this;
     }
