@@ -9,6 +9,7 @@ use App\Entity\Media;
 use App\Entity\User;
 use App\Repository\PetRepository;
 use App\Repository\UserRepository;
+use App\Service\PetResponseBuilder;
 use Gedmo\Sluggable\Util\Urlizer;
 use League\Flysystem\FilesystemInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -70,7 +71,6 @@ final class UserController extends AbstractController
         }
 
         $this->setPhotoIfExists($request, $user);
-
 
         $entityManager->persist($user);
         $entityManager->flush();
@@ -139,9 +139,7 @@ final class UserController extends AbstractController
             'user' => $user,
         ]);
 
-        return new JsonResponse([
-            'pets' => $pets,
-        ]);
+        return PetResponseBuilder::buildResponse($pets, $user);
     }
 
     /**

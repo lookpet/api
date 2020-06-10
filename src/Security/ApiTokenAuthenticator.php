@@ -38,13 +38,12 @@ final class ApiTokenAuthenticator extends AbstractGuardAuthenticator
 
     public function supports(Request $request): bool
     {
-        return !in_array($request->attributes->get('_route'), self::PUBLIC_ROUTES, true);
+        return $this->hasAuthorizationParam($request) || !in_array($request->attributes->get('_route'), self::PUBLIC_ROUTES, true);
     }
 
     public function getCredentials(Request $request): string
     {
-        if (!$request->headers->has('Authorization')
-            || 0 !== mb_strpos($request->headers->get('Authorization'), 'Bearer ')) {
+        if (!$this->hasAuthorizationParam($request)) {
             throw new CustomUserMessageAuthenticationException('Invalid API token');
         }
 
@@ -91,5 +90,11 @@ final class ApiTokenAuthenticator extends AbstractGuardAuthenticator
     public function supportsRememberMe(): bool
     {
         return false;
+    }
+
+    private function hasAuthorizationParam(Request $request): bool
+    {
+        return $request->headers->has('Authorization')
+            && 0 === mb_strpos($request->headers->get('Authorization'), 'Bearer ');
     }
 }
