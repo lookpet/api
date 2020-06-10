@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Repository\PetRepository;
+use App\Service\PetResponseBuilder;
 use Swagger\Annotations as SWG;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -62,8 +63,6 @@ final class SearchController extends AbstractController
             $request->query->get('city'),
         );
 
-        return new JsonResponse([
-            $pets,
-        ], Response::HTTP_OK);
+        return PetResponseBuilder::buildResponse($pets, $this->getUser());
     }
 }

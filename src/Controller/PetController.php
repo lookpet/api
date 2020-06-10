@@ -6,6 +6,7 @@ use App\Dto\PetDto;
 use App\Entity\Media;
 use App\Entity\Pet;
 use App\Repository\PetRepository;
+use App\Service\PetResponseBuilder;
 use Gedmo\Sluggable\Util\Urlizer;
 use League\Flysystem\FilesystemInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -374,10 +375,8 @@ final class PetController extends AbstractController
                 'message' => 'No pet was found',
             ], Response::HTTP_BAD_REQUEST);
         }
-        //commit
-        return new JsonResponse(
-            $pet
-        );
+
+        return PetResponseBuilder::buildSingle($pet, $this->getUser());
     }
 
     /**
@@ -390,12 +389,10 @@ final class PetController extends AbstractController
     public function search(PetRepository $petRepository): JsonResponse
     {
         $pets = $petRepository->findBy([], [
-            'createdAt' => 'desc',
+            'updatedAt' => 'desc',
         ]);
 
-        return new JsonResponse([
-            'pets' => $pets,
-        ]);
+        return PetResponseBuilder::buildResponse($pets, $this->getUser());
     }
 
     private function setPhotoIfExists(Request $request, Pet $pet): void
