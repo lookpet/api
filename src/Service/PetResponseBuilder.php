@@ -26,7 +26,7 @@ final class PetResponseBuilder
         }
 
         return new JsonResponse([
-            $result,
+            'pets' => $result,
         ]);
     }
 
