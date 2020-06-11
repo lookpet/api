@@ -19,7 +19,7 @@ final class PetResponseBuilder
                 $result[] = array_merge(
                     $pet->jsonSerialize(),
                     [
-                        'hasLike' => $pet->hasLike($user)
+                        'hasLike' => $pet->hasLike($user),
                     ]
                 );
             }
@@ -35,7 +35,7 @@ final class PetResponseBuilder
         return new JsonResponse(array_merge(
             $pet->jsonSerialize(),
             [
-                'hasLike' => $pet->hasLike($user)
+                'hasLike' => $pet->hasLike($user),
             ]
         ));
     }

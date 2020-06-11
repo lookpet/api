@@ -138,7 +138,7 @@ final class PetController extends AbstractController
             }
 
             if ($request->request->has('dateOfBirth')) {
-                try{
+                try {
                     $dateOfBirth = new \DateTime($request->request->get('dateOfBirth'));
                 } catch (\Exception $exception) {
                     $dateOfBirth = null;
@@ -288,7 +288,7 @@ final class PetController extends AbstractController
             }
 
             if ($request->request->has('dateOfBirth')) {
-                try{
+                try {
                     $dateOfBirth = new \DateTime($request->request->get('dateOfBirth'));
                 } catch (\Exception $exception) {
                     $dateOfBirth = null;
@@ -327,6 +327,7 @@ final class PetController extends AbstractController
      *
      * @param string $slug
      * @param PetRepository $petRepository
+     *
      * @return JsonResponse
      */
     public function delete(string $slug, PetRepository $petRepository): JsonResponse
@@ -345,6 +346,7 @@ final class PetController extends AbstractController
 
         $this->getDoctrine()->getManager()->remove($pet);
         $this->getDoctrine()->getManager()->flush();
+
         return new JsonResponse();
     }
 
