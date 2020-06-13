@@ -32,18 +32,18 @@ class User implements UserInterface, \JsonSerializable
      * @ORM\Column(type="string", length=180, unique=true)
      * @Groups("main")
      */
-    private string $email;
+    private $email;
 
     /**
      * @ORM\Column(type="json")
      */
-    private array $roles = [];
+    private $roles = [];
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("main")
      */
-    private ?string $firstName;
+    private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
