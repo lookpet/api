@@ -151,7 +151,8 @@ final class PetController extends AbstractController
             }
 
             if ($request->request->has('isLookingForNewOwner')) {
-                $pet->setIsLookingForOwner($request->request->get('isLookingForNewOwner'));
+                $isLookingForNewOwner = $request->request->get('isLookingForNewOwner') === 'true';
+                $pet->setIsLookingForOwner($isLookingForNewOwner);
             }
 
             $entityManager = $this->getDoctrine()->getManager();
@@ -305,7 +306,8 @@ final class PetController extends AbstractController
             }
 
             if ($request->request->has('isLookingForNewOwner')) {
-                $pet->setIsLookingForOwner($request->request->get('isLookingForNewOwner'));
+                $isLookingForNewOwner = $request->request->get('isLookingForNewOwner') === 'true';
+                $pet->setIsLookingForOwner($isLookingForNewOwner);
             }
 
             $entityManager = $this->getDoctrine()->getManager();

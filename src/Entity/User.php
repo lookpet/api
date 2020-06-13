@@ -341,6 +341,7 @@ class User implements UserInterface, \JsonSerializable
             'avatar' => $this->getAvatarUrl(),
             'media' => $this->getMedia()->getValues(),
             'breeder' => $this->getBreeder(),
+            'hasPets' => count($this->getPets()) === 0 ? false : true,
         ];
     }
 

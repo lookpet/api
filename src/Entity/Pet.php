@@ -117,6 +117,7 @@ class Pet implements \JsonSerializable
 
     /**
      * @ORM\OneToMany(targetEntity=PetComment::class, mappedBy="pet", orphanRemoval=true)
+     * @ORM\OrderBy({"createdAt" = "DESC"})
      */
     private $comments;
 

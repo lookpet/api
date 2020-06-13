@@ -13,7 +13,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @ORM\Entity(repositoryClass=PetLikeRepository::class)
  * @ORM\HasLifecycleCallbacks
  */
-class PetLike
+class PetLike implements \JsonSerializable
 {
     use LifecycleCallbackTrait;
     use TimestampTrait;
@@ -47,13 +47,24 @@ class PetLike
         return $this->id;
     }
 
-    public function getPet(): ?Pet
+    public function getPet(): Pet
     {
         return $this->pet;
     }
 
-    public function getUser(): ?UserInterface
+    public function getUser(): UserInterface
     {
         return $this->user;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return array_merge(
+            $this->getPet()->jsonSerialize(),
+            [
+            'likeCreatedAt' => $this->createdAt,
+            'likeUpdatedAt' => $this->updatedAt,
+            ]
+        );
     }
 }
