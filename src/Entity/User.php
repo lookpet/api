@@ -103,7 +103,7 @@ class User implements UserInterface, \JsonSerializable
     public function __construct(?string $slug = null, ?string $firstName = null, ?string $id = null)
     {
         if ($slug === null) {
-            $this->generateSlug();
+            $this->generateSlug($firstName);
         } else {
             $this->slug = $slug;
         }
@@ -467,10 +467,11 @@ class User implements UserInterface, \JsonSerializable
         return $this;
     }
 
-    private function generateSlug(): void
+    private function generateSlug(?string $firstName): void
     {
+        $firstName = mb_strtolower($firstName);
         $slugify = new Slugify();
         $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
-        $this->slug = $slugify->slugify(implode('-', [$slugEntropy]));
+        $this->slug = $slugify->slugify(implode('-', [$firstName, $slugEntropy]));
     }
 }

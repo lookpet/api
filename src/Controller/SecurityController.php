@@ -203,8 +203,10 @@ final class SecurityController extends AbstractController
             $email = $request->request->get('email');
 
             /** @todo use form validation with DTO */
-            $user = new User();
-            $user->setFirstName($request->request->get('firstName'));
+            $user = new User(
+                null,
+                $request->request->get('firstName')
+            );
             $user->setEmail($request->request->get('email'));
             $user->setPassword($passwordEncoder->encodePassword($user, $request->request->get('password')));
 

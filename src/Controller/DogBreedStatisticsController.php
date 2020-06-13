@@ -6,7 +6,6 @@ namespace App\Controller;
 
 use App\PetDomain\Dog\DogBreedList;
 use App\Repository\PetRepository;
-use Swagger\Annotations as SWG;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,7 +17,6 @@ final class DogBreedStatisticsController extends AbstractController
      * @Route("/api/v1/dog/breeds/exist", methods={"GET"}, name="public_dog_breeds_exist")
      *
      * @return JsonResponse
-     *
      */
     public function getBreedList(PetRepository $petRepository): JsonResponse
     {
