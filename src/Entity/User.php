@@ -100,6 +100,26 @@ class User implements UserInterface, \JsonSerializable
      */
     private $breeder;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $lastName;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $name;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $provider;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $providerId;
+
     public function __construct(?string $slug = null, ?string $firstName = null, ?string $id = null)
     {
         if ($slug === null) {
@@ -335,6 +355,10 @@ class User implements UserInterface, \JsonSerializable
         return [
             'slug' => $this->getSlug(),
             'firstName' => $this->getFirstName(),
+            'lastName' => $this->getLastName(),
+            'name' => $this->getName(),
+            'provider' => $this->getProvider(),
+            'providerId' => $this->getProviderId(),
             'phone' => $this->getPhone(),
             'description' => $this->getDescription(),
             'city' => $this->getCity(),
@@ -473,5 +497,53 @@ class User implements UserInterface, \JsonSerializable
         $slugify = new Slugify();
         $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
         $this->slug = $slugify->slugify(implode('-', [$firstName, $slugEntropy]));
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(?string $lastName): self
+    {
+        $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getProvider(): ?string
+    {
+        return $this->provider;
+    }
+
+    public function setProvider(?string $provider): self
+    {
+        $this->provider = $provider;
+
+        return $this;
+    }
+
+    public function getProviderId(): ?string
+    {
+        return $this->providerId;
+    }
+
+    public function setProviderId(?string $providerId): self
+    {
+        $this->providerId = $providerId;
+
+        return $this;
     }
 }
