@@ -28,6 +28,7 @@ final class ApiTokenAuthenticator extends AbstractGuardAuthenticator
         'api.swagger_ui',
         'public_get_user',
         'public_genders',
+        'public_authentication_facebook',
     ];
     private ApiTokenRepository $apiTokenRepository;
 

@@ -27,7 +27,7 @@ class FaceBookController extends AbstractController
     }
 
     /**
-     * @Route("/api/v1/authentication/facebook", methods={"POST"}, name="authentication_facebook")
+     * @Route("/api/v1/authentication/facebook", methods={"POST"}, name="public_authentication_facebook")
      * @param Request $request
      * @param EntityManagerInterface $entityManager
      * @return JsonResponse
