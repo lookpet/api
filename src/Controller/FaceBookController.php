@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;;
 use Swagger\Annotations as SWG;
 
@@ -35,20 +36,35 @@ class FaceBookController extends AbstractController
     public function facebook(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         if ($request->request->has('userID')) {
-            $user = $this->userRepository->findOneBy([
-                'provider' => 'facebook',
-                'providerId' => $request->request->get('userID'),
-            ]);
+            $user = null;
+
+            if ($request->request->has('email')) {
+                $user = $this->userRepository->findOneBy([
+                    'email' => $request->request->get('email'),
+                ]);
+            }
+
+            if ($user === null) {
+                $user = $this->userRepository->findOneBy([
+                    'provider' => 'facebook',
+                    'providerId' => $request->request->get('userID'),
+                ]);
+            }
 
             if ($user === null) {
                 $user = new User();
                 $user->setEmail($request->request->get('email'));
                 $user->setName($request->request->get('name'));
+                $name = explode(' ', $request->request->get('name'));
+                $user->setFirstName(isset($name[0]) ? $name[0] : null);
+                $user->setLastName(isset($name[1]) ? $name[1] : null);
                 $user->setProvider('facebook');
                 $user->setProviderId($request->request->get('userID'));
-                $entityManager->persist($user);
-                $entityManager->flush();
             }
+
+            $user->setProviderLastResponse($request->getContent());
+            $entityManager->persist($user);
+            $entityManager->flush();
 
             $activeToken = $user->getActiveApiToken();
 
@@ -64,5 +80,7 @@ class FaceBookController extends AbstractController
                 'expires_at' => $activeToken->getExpiresAt(),
             ]);
         }
+
+        return new JsonResponse([], Response::HTTP_NOT_FOUND);
     }
 }

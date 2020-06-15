@@ -120,6 +120,11 @@ class User implements UserInterface, \JsonSerializable
      */
     private $providerId;
 
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $providerLastResponse;
+
     public function __construct(?string $slug = null, ?string $firstName = null, ?string $id = null)
     {
         if ($slug === null) {
@@ -345,9 +350,19 @@ class User implements UserInterface, \JsonSerializable
     {
         if ($this->media->count() !== 0) {
             return $this->media->first()->getPublicUrl();
+        } elseif ($this->isFaceBook()){
+            $lastResponse = $this->getProviderLastResponse();
+            if (isset($lastResponse['picture']['data']['url'])) {
+                return $lastResponse['picture']['data']['url'];
+            }
         }
 
         return null;
+    }
+
+    public function isFaceBook(): bool
+    {
+        return $this->provider === 'facebook';
     }
 
     public function jsonSerialize(): array
@@ -543,6 +558,21 @@ class User implements UserInterface, \JsonSerializable
     public function setProviderId(?string $providerId): self
     {
         $this->providerId = $providerId;
+
+        return $this;
+    }
+
+    public function getProviderLastResponse(): ?array
+    {
+        if ($this->providerLastResponse !== null) {
+            return json_decode($this->providerLastResponse, true);
+        }
+        return null;
+    }
+
+    public function setProviderLastResponse(?string $providerLastResponse): self
+    {
+        $this->providerLastResponse = $providerLastResponse;
 
         return $this;
     }
