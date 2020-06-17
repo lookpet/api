@@ -1,0 +1,40 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "volumes": [
+    {
+      "name": "php"
+    },
+    {
+      "name": "nginx"
+    }
+  ],
+  "containerDefinitions": [
+    {
+      "name": "php",
+      "image": "641201314091.dkr.ecr.eu-central-1.amazonaws.com/api-php:develop",
+      "environment": [
+        {
+          "name": "Container",
+          "value": "PHP"
+        }
+      ],
+      "essential": true,
+      "memory": 128
+    },
+    {
+      "name": "nginx",
+      "image": "641201314091.dkr.ecr.eu-central-1.amazonaws.com/nginx:develop",
+      "essential": true,
+      "memory": 128,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 80
+        }
+      ],
+      "links": [
+        "php"
+      ]
+    }
+  ]
+}
