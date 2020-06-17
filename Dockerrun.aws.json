@@ -11,7 +11,7 @@
   "containerDefinitions": [
     {
       "name": "php",
-      "image": "641201314091.dkr.ecr.eu-central-1.amazonaws.com/api-php-dev:latest",
+      "image": "641201314091.dkr.ecr.eu-central-1.amazonaws.com/api-php:develop",
       "environment": [
         {
           "name": "Container",
@@ -28,7 +28,7 @@
     },
     {
       "name": "nginx",
-      "image": "641201314091.dkr.ecr.eu-central-1.amazonaws.com/nginx:latest",
+      "image": "641201314091.dkr.ecr.eu-central-1.amazonaws.com/nginx:develop",
       "essential": true,
       "memory": 128,
       "portMappings": [
