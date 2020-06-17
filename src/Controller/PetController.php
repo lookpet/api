@@ -386,15 +386,43 @@ final class PetController extends AbstractController
     /**
      * @Route("/api/v1/pets", methods={"GET"}, name="public_pet_pets")
      *
+     * @SWG\Get(path="/api/v1/pets",
+     *   tags={"Pet"},
+     *   summary="pet all profiles feed",
+     *   description="",
+     *   produces={"application/json"},
+     *
+     *   @SWG\Parameter(
+     *     name="p",
+     *     description="page",
+     *     in="query",
+     *     type="string",
+     *   ),
+     *
+     *   @SWG\Response(
+     *     response=200,
+     *     description="OK",
+     *     examples={
+     *     "application/json": {
+     *           {"pets list"}
+     *     }
+     *       }
+     *    )
+     * )
+     *
      * @param PetRepository $petRepository
+     * @param Request $request
      *
      * @return JsonResponse
      */
-    public function search(PetRepository $petRepository): JsonResponse
+    public function search(PetRepository $petRepository, Request $request): JsonResponse
     {
+        $page = $request->get('p', 1);
+        $limit = 10;
+        $offset = $limit * $page;
         $pets = $petRepository->findBy([], [
             'updatedAt' => 'desc',
-        ]);
+        ], $limit, $offset);
 
         return PetResponseBuilder::buildResponse($pets, $this->getUser());
     }

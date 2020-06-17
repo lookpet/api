@@ -12,8 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;;
-use Swagger\Annotations as SWG;
+use Symfony\Component\Routing\Annotation\Route;
 
 class FaceBookController extends AbstractController
 {
@@ -29,8 +28,10 @@ class FaceBookController extends AbstractController
 
     /**
      * @Route("/api/v1/authentication/facebook", methods={"POST"}, name="public_authentication_facebook")
+     *
      * @param Request $request
      * @param EntityManagerInterface $entityManager
+     *
      * @return JsonResponse
      */
     public function facebook(Request $request, EntityManagerInterface $entityManager): JsonResponse

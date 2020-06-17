@@ -29,6 +29,10 @@ final class ApiTokenAuthenticator extends AbstractGuardAuthenticator
         'public_get_user',
         'public_genders',
         'public_authentication_facebook',
+        'public_dog_breeds_exist',
+        'public_cat_breeds_exist',
+        'public_dog_city_exist',
+        'public_cat_city_exist',
     ];
     private ApiTokenRepository $apiTokenRepository;
 

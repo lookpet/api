@@ -6,11 +6,14 @@ namespace App\PetDomain;
 
 final class PetTypes
 {
+    public const DOG = 'dog';
+    public const CAT = 'cat';
+
     public static function getList(): array
     {
         return [
-            'dog' => 'собака',
-            'cat' => 'кот/кошка',
+            self::DOG => 'собака',
+            self::CAT => 'кот/кошка',
         ];
     }
 }

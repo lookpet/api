@@ -12,7 +12,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Pet[]    findAll()
  * @method Pet[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-final class PetRepository extends ServiceEntityRepository
+final class PetRepository extends ServiceEntityRepository implements PetRepositoryInterface
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -37,6 +37,32 @@ final class PetRepository extends ServiceEntityRepository
 
         return $queryBuilder->orderBy('p.updatedAt', 'DESC')
             ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getExistBreeds($petType): iterable
+    {
+        $queryBuilder = $this->createQueryBuilder('p');
+
+        return $queryBuilder->select('pet.breed')
+            ->from(Pet::class, 'pet')
+            ->groupBy('pet.breed')
+            ->where($queryBuilder->expr()->eq('pet.type', $queryBuilder->expr()->literal($petType)))
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getExistCities($petType): iterable
+    {
+        $queryBuilder = $this->createQueryBuilder('p');
+
+        return $queryBuilder->select('pet.city')
+            ->from(Pet::class, 'pet')
+            ->groupBy('pet.city')
+            ->where($queryBuilder->expr()->eq('pet.type', $queryBuilder->expr()->literal($petType)))
+            ->andWhere($queryBuilder->expr()->isNotNull('pet.city'))
+            ->andWhere($queryBuilder->expr()->neq('pet.city', "''"))
             ->getQuery()
             ->getResult();
     }

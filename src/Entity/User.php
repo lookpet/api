@@ -350,7 +350,7 @@ class User implements UserInterface, \JsonSerializable
     {
         if ($this->media->count() !== 0) {
             return $this->media->first()->getPublicUrl();
-        } elseif ($this->isFaceBook()){
+        } elseif ($this->isFaceBook()) {
             $lastResponse = $this->getProviderLastResponse();
             if (isset($lastResponse['picture']['data']['url'])) {
                 return $lastResponse['picture']['data']['url'];
@@ -506,14 +506,6 @@ class User implements UserInterface, \JsonSerializable
         return $this;
     }
 
-    private function generateSlug(?string $firstName): void
-    {
-        $firstName = mb_strtolower($firstName);
-        $slugify = new Slugify();
-        $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
-        $this->slug = $slugify->slugify(implode('-', [$firstName, $slugEntropy]));
-    }
-
     public function getLastName(): ?string
     {
         return $this->lastName;
@@ -567,6 +559,7 @@ class User implements UserInterface, \JsonSerializable
         if ($this->providerLastResponse !== null) {
             return json_decode($this->providerLastResponse, true);
         }
+
         return null;
     }
 
@@ -575,5 +568,13 @@ class User implements UserInterface, \JsonSerializable
         $this->providerLastResponse = $providerLastResponse;
 
         return $this;
+    }
+
+    private function generateSlug(?string $firstName): void
+    {
+        $firstName = mb_strtolower($firstName);
+        $slugify = new Slugify();
+        $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
+        $this->slug = $slugify->slugify(implode('-', [$firstName, $slugEntropy]));
     }
 }
