@@ -62,8 +62,9 @@ class PetLike implements \JsonSerializable
         return array_merge(
             $this->getPet()->jsonSerialize(),
             [
-            'likeCreatedAt' => $this->createdAt,
-            'likeUpdatedAt' => $this->updatedAt,
+                'hasLike' => $this->getPet()->hasLike($this->getUser()),
+                'likeCreatedAt' => $this->createdAt,
+                'likeUpdatedAt' => $this->updatedAt,
             ]
         );
     }
