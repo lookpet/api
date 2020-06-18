@@ -319,6 +319,7 @@ class Pet implements \JsonSerializable
             'media' => $this->getMedia()->getValues(),
             'user' => $this->getUser(),
             'breeder' => $this->getBreeder(),
+            'isAlive' => true,
         ];
     }
 
