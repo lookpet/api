@@ -29,7 +29,7 @@ class User implements UserInterface, \JsonSerializable
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=180, unique=true)
+     * @ORM\Column(type="string", length=180, unique=true, nullable=true)
      * @Groups("main")
      */
     private $email;
@@ -157,7 +157,7 @@ class User implements UserInterface, \JsonSerializable
         return $this->email;
     }
 
-    public function setEmail(string $email): self
+    public function setEmail(?string $email): self
     {
         $this->email = $email;
 
