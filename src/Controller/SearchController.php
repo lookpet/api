@@ -43,7 +43,7 @@ final class SearchController extends AbstractController
      *     type="string",
      *   ),
      *   @SWG\Parameter(
-     *     name="isLookingForNewOwner",
+     *     name="isLookingForOwner",
      *     in="query",
      *     type="boolean",
      *   ),
@@ -66,7 +66,7 @@ final class SearchController extends AbstractController
             $request->query->get('breed'),
             $request->query->get('type'),
             $request->query->get('city'),
-            $request->query->get('isLookingForNewOwner'),
+            (bool) $request->query->get('isLookingForOwner'),
         );
 
         return PetResponseBuilder::buildResponse($pets, $this->getUser());
