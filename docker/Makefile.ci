@@ -27,8 +27,8 @@ build-prod-php:
 	docker tag $(NAMESPACE)/api-php:$(GIT_SHA) $(NAMESPACE)/api-php:$(VERSION)
 	docker tag $(NAMESPACE)/api-php:$(GIT_SHA) $(NAMESPACE)/api-php:latest
 
-deploy-digital:
-	ssh root@157.230.29.214 "cd /root/api-deploy && make deploy"
+build-deploy-eb:
+	ssh root@157.230.29.214 "cd /root/api-deploy && make git-pull && make deploy"
 
 deploy-prod:
 	eb deploy

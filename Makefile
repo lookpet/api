@@ -101,3 +101,6 @@ clear:
 	docker-compose down --remove-orphans --volumes
 
 fix: fix-cs
+
+git-pull:
+	git pull

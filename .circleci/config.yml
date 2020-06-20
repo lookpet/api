@@ -4,9 +4,8 @@ jobs:
     machine:
       image: ubuntu-1604:201903-01
     steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "67:7b:62:bb:6f:d9:3d:e6:d1:d6:e0:00:6b:f0:e2:7d"
       - checkout
-      - run: make aws-v1-login
-      - run: make build-dev-all
-      - run: make fix-cs
-      - run: make build-push
-      - run: make deploy-prod
+      - run: make build-deploy-eb

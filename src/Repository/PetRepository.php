@@ -19,9 +19,11 @@ final class PetRepository extends ServiceEntityRepository implements PetReposito
         parent::__construct($registry, Pet::class);
     }
 
-    public function findBySearch(?string $breed, ?string $type, ?string $city): iterable
+    public function findBySearch(?string $breed, ?string $type, ?string $city, $isLookingForNewOwner = false): iterable
     {
         $queryBuilder = $this->createQueryBuilder('p');
+
+        $queryBuilder->andWhere($queryBuilder->expr()->eq('p.isLookingForNewOwner', $isLookingForNewOwner));
 
         if (!empty($breed)) {
             $queryBuilder->andWhere($queryBuilder->expr()->eq('p.breed', $queryBuilder->expr()->literal($breed)));
