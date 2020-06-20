@@ -66,7 +66,7 @@ final class SearchController extends AbstractController
             $request->query->get('breed'),
             $request->query->get('type'),
             $request->query->get('city'),
-            (bool) $request->query->get('isLookingForOwner'),
+            (bool) $request->query->get('isLookingForNewOwner'),
         );
 
         return PetResponseBuilder::buildResponse($pets, $this->getUser());

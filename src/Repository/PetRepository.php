@@ -27,7 +27,6 @@ final class PetRepository extends ServiceEntityRepository implements PetReposito
         $queryBuilder->andWhere($queryBuilder->expr()->eq('p.isLookingForOwner', ':isLookingForOwner'));
         $queryBuilder->setParameter('isLookingForOwner', $isLookingForNewOwner);
 
-
         if (!empty($breed)) {
             $queryBuilder->andWhere($queryBuilder->expr()->eq('p.breed', $queryBuilder->expr()->literal($breed)));
         }
