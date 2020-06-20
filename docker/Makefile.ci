@@ -34,3 +34,6 @@ deploy-prod:
 	eb deploy
 
 run-deploy: aws-v2-login build-push deploy-prod
+
+git-pull:
+	git pull
