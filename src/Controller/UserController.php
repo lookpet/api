@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\CloudinaryBridge\Service\UploadService;
 use App\Entity\Breeder;
 use App\Entity\Media;
 use App\Entity\MediaUser;
 use App\Entity\User;
 use App\Repository\PetRepository;
 use App\Repository\UserRepository;
+use App\Service\MediaCloudinaryBuilder;
 use App\Service\PetResponseBuilder;
 use Gedmo\Sluggable\Util\Urlizer;
 use League\Flysystem\FilesystemInterface;
@@ -169,12 +171,15 @@ final class UserController extends AbstractController
 
         $newPhoto = $request->files->get('photo');
         $entityManager = $this->getDoctrine()->getManager();
+
         if ($newPhoto) {
-            $newFile = $this->uploadFile($newPhoto);
-            $media = new Media();
-            $media->setPublicUrl($newFile);
-            $media->setUser($user);
-            $media->setSize('original');
+            $cloudinaryUpload = UploadService::upload(
+                $newPhoto->getPathname()
+            );
+            $media = MediaCloudinaryBuilder::build(
+                $cloudinaryUpload,
+                $this->getUser()
+            );
 
             $mediaUser = new MediaUser($media, $this->getUser());
             $entityManager->persist($media);

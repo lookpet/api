@@ -8,6 +8,9 @@
     "brick/math": {
         "version": "0.8.15"
     },
+    "cloudinary/cloudinary_php": {
+        "version": "1.17.0"
+    },
     "clue/stream-filter": {
         "version": "v1.4.1"
     },

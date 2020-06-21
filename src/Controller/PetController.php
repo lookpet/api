@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
+use App\CloudinaryBridge\Service\UploadService;
 use App\Dto\PetDto;
 use App\Entity\Media;
 use App\Entity\Pet;
 use App\Repository\PetRepository;
+use App\Service\MediaCloudinaryBuilder;
 use App\Service\PetResponseBuilder;
 use Gedmo\Sluggable\Util\Urlizer;
 use League\Flysystem\FilesystemInterface;
@@ -21,13 +23,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 final class PetController extends AbstractController
 {
-    private FilesystemInterface $filesystem;
-
-    public function __construct(FilesystemInterface $filesystem)
-    {
-        $this->filesystem = $filesystem;
-    }
-
     /**
      * @Route("/api/v1/pet", methods={"POST"}, name="pet_create")
      *
@@ -440,41 +435,17 @@ final class PetController extends AbstractController
         }
         $entityManager = $this->getDoctrine()->getManager();
         foreach ($newPhotos as $newPhoto) {
-            $newFile = $this->uploadFile($newPhoto);
-            $media = new Media();
-            $media->setPublicUrl($newFile);
-            $media->setUser($this->getUser());
-            $media->setSize('original');
+            $cloudinaryUpload = UploadService::upload(
+                $newPhoto->getPathname()
+            );
+            $media = MediaCloudinaryBuilder::build(
+                $cloudinaryUpload,
+                $this->getUser()
+            );
             $pet->addMedia($media);
             $entityManager->persist($media);
             $entityManager->persist($pet);
             $entityManager->flush();
         }
-    }
-
-    private function uploadFile(File $file, string $destination = null): string
-    {
-        if ($destination === null) {
-            $destination = '/pets/uploads/';
-        }
-
-        if ($file instanceof UploadedFile) {
-            $originalFilename = $file->getClientOriginalName();
-        } else {
-            $originalFilename = $file->getFilename();
-        }
-
-        $newFilename = Urlizer::urlize(pathinfo($originalFilename, PATHINFO_FILENAME)) . '-' . uniqid('', true) . '.' . $file->guessExtension();
-
-        $stream = fopen($file->getPathname(), 'rb');
-        $this->filesystem->write(
-            $destination . $newFilename,
-            $stream
-        );
-        if (is_resource($stream)) {
-            fclose($stream);
-        }
-
-        return $destination . $newFilename;
     }
 }

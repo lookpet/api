@@ -39,6 +39,31 @@ class Media implements \JsonSerializable
      */
     private $user;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $cloudinaryPublicId;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isPublished;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $height;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $width;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $cloudinaryResponse;
+
     public function __construct()
     {
         $this->id = Uuid::uuid4()->toString();
@@ -51,7 +76,7 @@ class Media implements \JsonSerializable
 
     public function getPublicUrl(): ?string
     {
-        return $_ENV['AWS_S3_PATH'] . $this->publicUrl;
+        return $this->publicUrl;
     }
 
     public function setPublicUrl(string $publicUrl): self
@@ -89,8 +114,71 @@ class Media implements \JsonSerializable
     {
         return [
             'size' => $this->getSize(),
+            'width' => $this->getWidth(),
+            'height' => $this->getHeight(),
+            'publicId' => $this->getCloudinaryPublicId(),
             'publicUrl' => $this->getPublicUrl(),
             'created_at' => $this->getCreatedAt(),
         ];
+    }
+
+    public function getCloudinaryPublicId(): ?string
+    {
+        return $this->cloudinaryPublicId;
+    }
+
+    public function setCloudinaryPublicId(?string $cloudinaryPublicId): self
+    {
+        $this->cloudinaryPublicId = $cloudinaryPublicId;
+
+        return $this;
+    }
+
+    public function getIsPublished(): ?bool
+    {
+        return $this->isPublished;
+    }
+
+    public function setIsPublished(bool $isPublished): self
+    {
+        $this->isPublished = $isPublished;
+
+        return $this;
+    }
+
+    public function getHeight(): ?int
+    {
+        return $this->height;
+    }
+
+    public function setHeight(?int $height): self
+    {
+        $this->height = $height;
+
+        return $this;
+    }
+
+    public function getWidth(): ?int
+    {
+        return $this->width;
+    }
+
+    public function setWidth(?int $width): self
+    {
+        $this->width = $width;
+
+        return $this;
+    }
+
+    public function getCloudinaryResponse(): ?string
+    {
+        return $this->cloudinaryResponse;
+    }
+
+    public function setCloudinaryResponse(?string $cloudinaryResponse): self
+    {
+        $this->cloudinaryResponse = $cloudinaryResponse;
+
+        return $this;
     }
 }
