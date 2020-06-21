@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Entity\Breeder;
 use App\Entity\Media;
+use App\Entity\MediaUser;
 use App\Entity\User;
 use App\Repository\PetRepository;
 use App\Repository\UserRepository;
@@ -174,7 +175,10 @@ final class UserController extends AbstractController
             $media->setPublicUrl($newFile);
             $media->setUser($user);
             $media->setSize('original');
+
+            $mediaUser = new MediaUser($media, $this->getUser());
             $entityManager->persist($media);
+            $entityManager->persist($mediaUser);
             $entityManager->flush();
 
             return new JsonResponse($media);

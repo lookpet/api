@@ -70,10 +70,6 @@ class User implements UserInterface, \JsonSerializable
      */
     private $description;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Media::class, mappedBy="user")
-     */
-    private $media;
 
     /**
      * @ORM\OneToMany(targetEntity=Pet::class, mappedBy="user")
@@ -125,6 +121,11 @@ class User implements UserInterface, \JsonSerializable
      */
     private $providerLastResponse;
 
+    /**
+     * @ORM\OneToMany(targetEntity=MediaUser::class, mappedBy="user")
+     */
+    private $media;
+
     public function __construct(?string $slug = null, ?string $firstName = null, ?string $id = null)
     {
         if ($slug === null) {
@@ -145,6 +146,7 @@ class User implements UserInterface, \JsonSerializable
         $this->pets = new ArrayCollection();
         $this->petComments = new ArrayCollection();
         $this->petLikes = new ArrayCollection();
+        $this->media = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -315,41 +317,10 @@ class User implements UserInterface, \JsonSerializable
         return $this;
     }
 
-    /**
-     * @return Collection|Media[]
-     */
-    public function getMedia(): Collection
-    {
-        return $this->media;
-    }
-
-    public function addMedia(Media $media): self
-    {
-        if (!$this->media->contains($media)) {
-            $this->media[] = $media;
-            $media->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removemedia(Media $media): self
-    {
-        if ($this->media->contains($media)) {
-            $this->media->removeElement($media);
-            // set the owning side to null (unless already changed)
-            if ($media->getUser() === $this) {
-                $media->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getAvatarUrl(): ?string
     {
         if ($this->media->count() !== 0) {
-            return $this->media->first()->getPublicUrl();
+            return $this->media->first()->getMedia()->getPublicUrl();
         } elseif ($this->isFaceBook()) {
             $lastResponse = $this->getProviderLastResponse();
             if (isset($lastResponse['picture']['data']['url'])) {
@@ -576,5 +547,36 @@ class User implements UserInterface, \JsonSerializable
         $slugify = new Slugify();
         $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
         $this->slug = $slugify->slugify(implode('-', [$firstName, $slugEntropy]));
+    }
+
+    /**
+     * @return Collection|MediaUser[]
+     */
+    public function getMedia(): Collection
+    {
+        return $this->media;
+    }
+
+    public function addMedia(MediaUser $mediaUser): self
+    {
+        if (!$this->media->contains($mediaUser)) {
+            $this->media[] = $mediaUser;
+            $mediaUser->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMedia(MediaUser $mediaUser): self
+    {
+        if ($this->media->contains($mediaUser)) {
+            $this->media->removeElement($mediaUser);
+            // set the owning side to null (unless already changed)
+            if ($mediaUser->getUser() === $this) {
+                $mediaUser->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }

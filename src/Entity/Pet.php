@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Traits\LifecycleCallbackTrait;
 use App\Entity\Traits\TimestampTrait;
+use App\PetDomain\VO\Age;
 use App\Repository\PetRepository;
 use Cocur\Slugify\Slugify;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -310,6 +311,7 @@ class Pet implements \JsonSerializable
             'color' => $this->getColor(),
             'eyeColor' => $this->getEyeColor(),
             'dateOfBirth' => $this->getDateOfBirth(),
+            'age' => $this->getAge(),
             'about' => $this->getAbout(),
             'gender' => $this->getGender(),
             'likes' => count($this->getLikes()),
@@ -460,6 +462,15 @@ class Pet implements \JsonSerializable
         $this->breeder = $breeder;
 
         return $this;
+    }
+
+    public function getAge(): ?Age
+    {
+        if ($this->dateOfBirth === null) {
+            return null;
+        }
+
+        return new Age($this->dateOfBirth);
     }
 
     private function generateSlug(): void
