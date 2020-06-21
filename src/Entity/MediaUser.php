@@ -20,7 +20,7 @@ class MediaUser implements \JsonSerializable
 
     /**
      * @ORM\Id()
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="mediaUsers")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="media")
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;
