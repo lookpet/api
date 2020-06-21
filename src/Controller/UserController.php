@@ -181,6 +181,7 @@ final class UserController extends AbstractController
                 $this->getUser()
             );
 
+
             $mediaUser = new MediaUser($media, $this->getUser());
             $entityManager->persist($media);
             $entityManager->persist($mediaUser);
