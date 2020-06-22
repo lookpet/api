@@ -310,6 +310,7 @@ class Pet implements \JsonSerializable
             'slug' => $this->getSlug(),
             'name' => $this->getName(),
             'city' => $this->getCity(),
+            'placeId' => $this->getPlaceId(),
             'breed' => $this->getBreed(),
             'fatherName' => $this->getFatherName(),
             'motherName' => $this->getMotherName(),
