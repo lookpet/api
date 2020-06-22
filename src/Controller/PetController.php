@@ -113,7 +113,7 @@ final class PetController extends AbstractController
             if ($request->request->has('city')) {
                 $pet->setCity($request->request->get('city'));
 
-                if($request->request->has('placeId')) {
+                if ($request->request->has('placeId')) {
                     $pet->setPlaceId($request->request->get('placeId'));
                 }
             }
@@ -270,7 +270,7 @@ final class PetController extends AbstractController
             if ($request->request->has('city')) {
                 $pet->setCity($request->request->get('city'));
 
-                if($request->request->has('placeId')) {
+                if ($request->request->has('placeId')) {
                     $pet->setPlaceId($request->request->get('placeId'));
                 }
             }

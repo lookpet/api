@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Repository\PetRepository;
-use App\Service\PetResponseBuilder;
+use App\Service\PetResponseBuilderInterface;
 use Swagger\Annotations as SWG;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,6 +15,16 @@ use Symfony\Component\Routing\Annotation\Route;
 
 final class SearchController extends AbstractController
 {
+    /**
+     * @var PetResponseBuilderInterface
+     */
+    private PetResponseBuilderInterface $petResponseBuilder;
+
+    public function __construct(PetResponseBuilderInterface $petResponseBuilder)
+    {
+        $this->petResponseBuilder = $petResponseBuilder;
+    }
+
     /**
      * @Route("/api/v1/search/pet", methods={"GET"}, name="search_pet")
      *
@@ -69,6 +79,6 @@ final class SearchController extends AbstractController
             (bool) $request->query->get('isLookingForNewOwner'),
         );
 
-        return PetResponseBuilder::buildResponse($pets, $this->getUser());
+        return $this->petResponseBuilder->build($this->getUser(), ...$pets);
     }
 }

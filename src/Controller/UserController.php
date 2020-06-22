@@ -11,7 +11,7 @@ use App\Entity\User;
 use App\Repository\PetRepository;
 use App\Repository\UserRepository;
 use App\Service\MediaCloudinaryBuilder;
-use App\Service\PetResponseBuilder;
+use App\Service\PetResponseBuilderInterface;
 use Gedmo\Sluggable\Util\Urlizer;
 use League\Flysystem\FilesystemInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,10 +25,15 @@ use Symfony\Component\Routing\Annotation\Route;
 final class UserController extends AbstractController
 {
     private FilesystemInterface $filesystem;
+    /**
+     * @var PetResponseBuilderInterface
+     */
+    private PetResponseBuilderInterface $petResponseBuilder;
 
-    public function __construct(FilesystemInterface $filesystem)
+    public function __construct(FilesystemInterface $filesystem, PetResponseBuilderInterface $petResponseBuilder)
     {
         $this->filesystem = $filesystem;
+        $this->petResponseBuilder = $petResponseBuilder;
     }
 
     /**
@@ -139,7 +144,7 @@ final class UserController extends AbstractController
             'user' => $user,
         ]);
 
-        return PetResponseBuilder::buildResponse($pets, $user);
+        return $this->petResponseBuilder->build($user, ...$pets);
     }
 
     /**
