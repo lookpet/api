@@ -127,6 +127,11 @@ class Pet implements \JsonSerializable
      */
     private $breeder;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $placeId;
+
     public function __construct(string $type, ?string $slug, ?string $name = null, ?string $id = null, ?UserInterface $user = null)
     {
         $this->user = $user;
@@ -311,7 +316,6 @@ class Pet implements \JsonSerializable
             'color' => $this->getColor(),
             'eyeColor' => $this->getEyeColor(),
             'dateOfBirth' => $this->getDateOfBirth(),
-            'age' => $this->getAge(),
             'about' => $this->getAbout(),
             'gender' => $this->getGender(),
             'likes' => count($this->getLikes()),
@@ -471,6 +475,18 @@ class Pet implements \JsonSerializable
         }
 
         return new Age($this->dateOfBirth);
+    }
+
+    public function getPlaceId(): ?string
+    {
+        return $this->placeId;
+    }
+
+    public function setPlaceId(?string $placeId): self
+    {
+        $this->placeId = $placeId;
+
+        return $this;
     }
 
     private function generateSlug(): void

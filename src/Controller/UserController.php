@@ -6,7 +6,6 @@ namespace App\Controller;
 
 use App\CloudinaryBridge\Service\UploadService;
 use App\Entity\Breeder;
-use App\Entity\Media;
 use App\Entity\MediaUser;
 use App\Entity\User;
 use App\Repository\PetRepository;
@@ -180,7 +179,6 @@ final class UserController extends AbstractController
                 $cloudinaryUpload,
                 $this->getUser()
             );
-
 
             $mediaUser = new MediaUser($media, $this->getUser());
             $entityManager->persist($media);

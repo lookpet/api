@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\Service;
-
 
 use App\Entity\Media;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -20,6 +18,7 @@ class MediaCloudinaryBuilder
         $media->setWidth($cloudinaryUpload['width']);
         $media->setCloudinaryPublicId($cloudinaryUpload['public_id']);
         $media->setSize('original');
+
         return $media;
     }
 }

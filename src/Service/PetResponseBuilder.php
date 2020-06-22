@@ -7,19 +7,31 @@ namespace App\Service;
 use App\Entity\Pet;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class PetResponseBuilder
+final class PetResponseBuilder implements PetResponseBuilderInterface
 {
-    public static function buildResponse(iterable $petsCollection, ?UserInterface $user): JsonResponse
+    /**
+     * @var AgeCalculatorInterface
+     */
+    private AgeCalculatorInterface $ageCalculator;
+
+    public function __construct(AgeCalculatorInterface $ageCalculator, TranslatorInterface $translator)
+    {
+        $this->ageCalculator = $ageCalculator;
+    }
+
+    public function build(?UserInterface $user, Pet ...$pets): JsonResponse
     {
         $result = [];
 
-        if (count($petsCollection) !== 0) {
-            foreach ($petsCollection as $pet) {
+        if (count($pets) !== 0) {
+            foreach ($pets as $pet) {
                 $result[] = array_merge(
                     $pet->jsonSerialize(),
                     [
                         'hasLike' => $pet->hasLike($user),
+                        'age' => $this->ageCalculator->getAge($pet),
                     ]
                 );
             }
@@ -28,15 +40,5 @@ final class PetResponseBuilder
         return new JsonResponse([
             'pets' => $result,
         ]);
-    }
-
-    public static function buildSingle(Pet $pet, ?UserInterface $user): JsonResponse
-    {
-        return new JsonResponse(array_merge(
-            $pet->jsonSerialize(),
-            [
-                'hasLike' => $pet->hasLike($user),
-            ]
-        ));
     }
 }

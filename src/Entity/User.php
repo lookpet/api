@@ -70,7 +70,6 @@ class User implements UserInterface, \JsonSerializable
      */
     private $description;
 
-
     /**
      * @ORM\OneToMany(targetEntity=Pet::class, mappedBy="user")
      */
@@ -125,6 +124,11 @@ class User implements UserInterface, \JsonSerializable
      * @ORM\OneToMany(targetEntity=MediaUser::class, mappedBy="user")
      */
     private $media;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $placeId;
 
     public function __construct(?string $slug = null, ?string $firstName = null, ?string $id = null)
     {
@@ -541,14 +545,6 @@ class User implements UserInterface, \JsonSerializable
         return $this;
     }
 
-    private function generateSlug(?string $firstName): void
-    {
-        $firstName = mb_strtolower($firstName);
-        $slugify = new Slugify();
-        $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
-        $this->slug = $slugify->slugify(implode('-', [$firstName, $slugEntropy]));
-    }
-
     /**
      * @return Collection|MediaUser[]
      */
@@ -578,5 +574,25 @@ class User implements UserInterface, \JsonSerializable
         }
 
         return $this;
+    }
+
+    public function getPlaceId(): ?string
+    {
+        return $this->placeId;
+    }
+
+    public function setPlaceId(?string $placeId): self
+    {
+        $this->placeId = $placeId;
+
+        return $this;
+    }
+
+    private function generateSlug(?string $firstName): void
+    {
+        $firstName = mb_strtolower($firstName);
+        $slugify = new Slugify();
+        $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
+        $this->slug = $slugify->slugify(implode('-', [$firstName, $slugEntropy]));
     }
 }

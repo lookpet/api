@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\Uploader;
-
 
 use Gedmo\Sluggable\Util\Urlizer;
 use League\Flysystem\FilesystemInterface;

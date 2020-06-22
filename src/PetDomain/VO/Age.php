@@ -4,14 +4,11 @@ namespace App\PetDomain\VO;
 
 final class Age implements \JsonSerializable
 {
-    /** @var \DateTimeImmutable */
-    private $dateTimeImmutable;
     /** @var \DateInterval */
     private $nowToDateInterval;
 
     public function __construct(\DateTimeInterface $dateTimeImmutable)
     {
-//        $this->dateTimeImmutable = $dateTimeImmutable;
         $this->nowToDateInterval = $dateTimeImmutable->diff(new \DateTimeImmutable('now'));
     }
 
@@ -52,6 +49,5 @@ final class Age implements \JsonSerializable
 //    {% endif %}
 //{% endif %}
 //        ';
-
     }
 }

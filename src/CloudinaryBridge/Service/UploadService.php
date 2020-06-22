@@ -10,6 +10,6 @@ class UploadService
     {
         \Cloudinary::config_from_url($_ENV['CLOUDINARY_URL']);
 
-       return Uploader::upload($filePath);
+        return Uploader::upload($filePath);
     }
 }

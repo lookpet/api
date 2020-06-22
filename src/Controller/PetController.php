@@ -4,18 +4,13 @@ namespace App\Controller;
 
 use App\CloudinaryBridge\Service\UploadService;
 use App\Dto\PetDto;
-use App\Entity\Media;
 use App\Entity\Pet;
 use App\Repository\PetRepository;
 use App\Service\MediaCloudinaryBuilder;
-use App\Service\PetResponseBuilder;
-use Gedmo\Sluggable\Util\Urlizer;
-use League\Flysystem\FilesystemInterface;
+use App\Service\PetResponseBuilderInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,6 +18,16 @@ use Symfony\Component\Routing\Annotation\Route;
 
 final class PetController extends AbstractController
 {
+    /**
+     * @var PetResponseBuilderInterface
+     */
+    private PetResponseBuilderInterface $petResponseBuilder;
+
+    public function __construct(PetResponseBuilderInterface $petResponseBuilder)
+    {
+        $this->petResponseBuilder = $petResponseBuilder;
+    }
+
     /**
      * @Route("/api/v1/pet", methods={"POST"}, name="pet_create")
      *
@@ -107,6 +112,10 @@ final class PetController extends AbstractController
 
             if ($request->request->has('city')) {
                 $pet->setCity($request->request->get('city'));
+
+                if($request->request->has('placeId')) {
+                    $pet->setPlaceId($request->request->get('placeId'));
+                }
             }
 
             if ($request->request->has('breed')) {
@@ -260,6 +269,10 @@ final class PetController extends AbstractController
 
             if ($request->request->has('city')) {
                 $pet->setCity($request->request->get('city'));
+
+                if($request->request->has('placeId')) {
+                    $pet->setPlaceId($request->request->get('placeId'));
+                }
             }
 
             $this->setPhotoIfExists($request, $pet);
@@ -375,7 +388,7 @@ final class PetController extends AbstractController
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        return PetResponseBuilder::buildSingle($pet, $this->getUser());
+        return $this->petResponseBuilder->build($this->getUser(), $pet);
     }
 
     /**
@@ -419,7 +432,7 @@ final class PetController extends AbstractController
             'updatedAt' => 'desc',
         ], $limit, $offset);
 
-        return PetResponseBuilder::buildResponse($pets, $this->getUser());
+        return $this->petResponseBuilder->build($this->getUser(), ...$pets);
     }
 
     private function setPhotoIfExists(Request $request, Pet $pet): void

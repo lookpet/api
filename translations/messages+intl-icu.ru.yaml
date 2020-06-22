@@ -1,0 +1,23 @@
+num_of_years: >-
+    {years, plural,
+        one   {# год}
+        few   {# года}
+        many   {# лет}
+        other {# лет}
+    }
+
+num_of_months: >-
+    {months, plural,
+        one   {# месяц}
+        few   {# месяца}
+        many   {# месяцев}
+        other {# месяцев}
+    }
+
+num_of_days: >-
+    {days, plural,
+        one   {# день}
+        few   {# дня}
+        many   {# дней}
+        other {# дней}
+    }
