@@ -388,7 +388,7 @@ final class PetController extends AbstractController
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->petResponseBuilder->build($this->getUser(), $pet);
+        return $this->petResponseBuilder->buildForOnePet($pet, $this->getUser());
     }
 
     /**

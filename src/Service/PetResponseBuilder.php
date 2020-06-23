@@ -21,6 +21,9 @@ final class PetResponseBuilder implements PetResponseBuilderInterface
         $this->ageCalculator = $ageCalculator;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function build(?UserInterface $user, Pet ...$pets): JsonResponse
     {
         $result = [];
@@ -40,5 +43,19 @@ final class PetResponseBuilder implements PetResponseBuilderInterface
         return new JsonResponse([
             'pets' => $result,
         ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildForOnePet(Pet $pet, ?UserInterface $user): JsonResponse
+    {
+        return new JsonResponse(array_merge(
+            $pet->jsonSerialize(),
+            [
+                'hasLike' => $pet->hasLike($user),
+                'age' => $this->ageCalculator->getAge($pet),
+            ]
+        ));
     }
 }
