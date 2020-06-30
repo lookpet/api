@@ -358,6 +358,7 @@ class User implements UserInterface, \JsonSerializable
             'media' => $this->getMedia()->getValues(),
             'breeder' => $this->getBreeder(),
             'hasPets' => count($this->getPets()) === 0 ? false : true,
+            'email' => $this->getEmail(),
         ];
     }
 
