@@ -93,6 +93,7 @@ class Pet implements \JsonSerializable
      * @ORM\JoinTable(name="pet_media",
      *      joinColumns={@ORM\JoinColumn(name="pet_id", referencedColumnName="id")},
      * )
+     * @ORM\OrderBy({"createdAt" = "DESC"})
      */
     private $media;
 

@@ -122,6 +122,7 @@ class User implements UserInterface, \JsonSerializable
 
     /**
      * @ORM\OneToMany(targetEntity=MediaUser::class, mappedBy="user")
+     * @ORM\OrderBy({"createdAt" = "DESC"})
      */
     private $media;
 

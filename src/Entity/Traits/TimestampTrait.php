@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace App\Entity\Traits;
 
+use Doctrine\ORM\Mapping as ORM;
+
 trait TimestampTrait
 {
     /**
-     * @var DateTime
+     * @var \DateTime
      * @ORM\Column(type="datetime", name="created_at", nullable=false)
      */
     protected $createdAt;
 
     /**
-     * @var DateTime
+     * @var \DateTime
      * @ORM\Column(type="datetime", name="updated_at", nullable=false)
      */
     protected $updatedAt;
