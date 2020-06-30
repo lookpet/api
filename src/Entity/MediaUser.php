@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Traits\TimestampTrait;
 use App\Repository\MediaUserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -11,6 +12,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class MediaUser implements \JsonSerializable
 {
+    use TimestampTrait;
+
     /**
      * @ORM\Id()
      * @ORM\OneToOne(targetEntity=Media::class, cascade={"persist", "remove"})
