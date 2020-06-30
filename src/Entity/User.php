@@ -72,6 +72,7 @@ class User implements UserInterface, \JsonSerializable
 
     /**
      * @ORM\OneToMany(targetEntity=Pet::class, mappedBy="user")
+     * @ORM\OrderBy({"updatedAt" = "DESC"})
      */
     private $pets;
 
