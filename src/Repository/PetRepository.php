@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Pet;
+use App\PetDomain\VO\Offset;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -19,7 +20,7 @@ final class PetRepository extends ServiceEntityRepository implements PetReposito
         parent::__construct($registry, Pet::class);
     }
 
-    public function findBySearch(?string $breed, ?string $type, ?string $city, ?bool $isLookingForNewOwner = false): iterable
+    public function findBySearch(?string $breed, ?string $type, ?string $city, ?bool $isLookingForNewOwner = false, ?Offset $offset = null): iterable
     {
         $isLookingForNewOwner = $isLookingForNewOwner === true;
         $queryBuilder = $this->createQueryBuilder('p');
@@ -39,7 +40,9 @@ final class PetRepository extends ServiceEntityRepository implements PetReposito
             $queryBuilder->andWhere($queryBuilder->expr()->eq('p.type', $queryBuilder->expr()->literal($type)));
         }
 
+
         return $queryBuilder->orderBy('p.updatedAt', 'DESC')
+            ->setFirstResult($offset->get())
             ->setMaxResults(10)
             ->getQuery()
             ->getResult();

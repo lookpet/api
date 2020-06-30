@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\PetDomain\VO\Limit;
+use App\PetDomain\VO\Offset;
+use App\PetDomain\VO\PageNumber;
 use App\Repository\PetRepository;
 use App\Service\PetResponseBuilderInterface;
 use Swagger\Annotations as SWG;
@@ -77,6 +80,12 @@ final class SearchController extends AbstractController
             $request->query->get('type'),
             $request->query->get('city'),
             (bool) $request->query->get('isLookingForNewOwner'),
+            new Offset(
+                new PageNumber(
+                    (int) $request->get('page')
+                ),
+                new Limit()
+            )
         );
 
         return $this->petResponseBuilder->build($this->getUser(), ...$pets);
