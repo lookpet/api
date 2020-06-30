@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Traits\LifecycleCallbackTrait;
 use App\Entity\Traits\TimestampTrait;
 use App\Repository\MediaUserRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -12,6 +13,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class MediaUser implements \JsonSerializable
 {
+    use LifecycleCallbackTrait;
     use TimestampTrait;
 
     /**
