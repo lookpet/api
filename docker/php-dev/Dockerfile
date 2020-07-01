@@ -18,6 +18,7 @@ COPY --from=composer /usr/bin/composer /usr/bin/composer
 RUN composer install --prefer-dist --dev
 
 RUN php bin/console cache:warmup -e dev
+RUN php bin/console assets:install
 RUN php bin/console lint:yaml $(find config src -type f \( -iname \*.yaml -o -iname \*.yml \)) --parse-tags -e dev
 CMD ["php-fpm"]
 EXPOSE 9000
