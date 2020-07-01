@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\PetDomain\VO\Gender;
 use App\PetDomain\VO\Limit;
 use App\PetDomain\VO\Offset;
 use App\PetDomain\VO\PageNumber;
@@ -75,11 +76,19 @@ final class SearchController extends AbstractController
      */
     public function search(Request $request, PetRepository $petRepository): JsonResponse
     {
+        $gender = null;
+
+        if ($request->query->has('gender')) {
+            $gender = new Gender($request->query->get('gender'));
+        }
+
+        $isLookingForNewOwner = $request->query->get('isLookingForNewOwner') === 'true';
         $pets = $petRepository->findBySearch(
             $request->query->get('breed'),
             $request->query->get('type'),
             $request->query->get('city'),
-            (bool) $request->query->get('isLookingForNewOwner'),
+            $isLookingForNewOwner,
+            $gender,
             new Offset(
                 new PageNumber(
                     (int) $request->get('page')

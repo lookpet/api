@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Pet;
+use App\PetDomain\VO\Gender;
 use App\PetDomain\VO\Offset;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -20,10 +21,14 @@ final class PetRepository extends ServiceEntityRepository implements PetReposito
         parent::__construct($registry, Pet::class);
     }
 
-    public function findBySearch(?string $breed, ?string $type, ?string $city, ?bool $isLookingForNewOwner = false, ?Offset $offset = null): iterable
+    public function findBySearch(?string $breed, ?string $type, ?string $city, ?bool $isLookingForNewOwner = false, ?Gender $gender = null, ?Offset $offset = null): iterable
     {
-        $isLookingForNewOwner = $isLookingForNewOwner === true;
         $queryBuilder = $this->createQueryBuilder('p');
+
+        if ($gender !== null) {
+            $queryBuilder->andWhere($queryBuilder->expr()->eq('p.gender', ':gender'));
+            $queryBuilder->setParameter('gender', $gender);
+        }
 
         $queryBuilder->andWhere($queryBuilder->expr()->eq('p.isLookingForOwner', ':isLookingForOwner'));
         $queryBuilder->setParameter('isLookingForOwner', $isLookingForNewOwner);
