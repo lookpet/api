@@ -10,6 +10,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\MediaUserRepository", repositoryClass=MediaUserRepository::class)
+ * @ORM\HasLifecycleCallbacks
  */
 class MediaUser implements \JsonSerializable
 {
