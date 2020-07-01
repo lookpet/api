@@ -24,6 +24,10 @@ class PageNumber
 
     public function previous(): int
     {
+        if($this->pageNumber === 0) {
+            return $this->pageNumber;
+        }
+
         return $this->pageNumber-1;
     }
 

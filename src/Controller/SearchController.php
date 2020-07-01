@@ -87,7 +87,6 @@ final class SearchController extends AbstractController
                 new Limit()
             )
         );
-
         return $this->petResponseBuilder->build($this->getUser(), ...$pets);
     }
 }
