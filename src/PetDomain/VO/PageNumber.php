@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\PetDomain\VO;
-
 
 class PageNumber
 {
@@ -24,11 +22,11 @@ class PageNumber
 
     public function previous(): int
     {
-        if($this->pageNumber === 0) {
+        if ($this->pageNumber === 0) {
             return $this->pageNumber;
         }
 
-        return $this->pageNumber-1;
+        return $this->pageNumber - 1;
     }
 
     public function get(): int

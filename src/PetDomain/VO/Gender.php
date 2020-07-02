@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\PetDomain\VO;
-
 
 class Gender implements \JsonSerializable
 {

@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\PetDomain\VO;
-
 
 class Offset
 {
@@ -15,12 +13,12 @@ class Offset
         $this->offset = 0;
         $this->pageNumber = $pageNumber;
         $this->limit = $limit;
-        if (!$this->pageNumber->isFirst()){
+        if (!$this->pageNumber->isFirst()) {
             $this->offset = $this->pageNumber->previous() * $this->limit->get();
         }
     }
 
-    public function get():int
+    public function get(): int
     {
         return $this->offset;
     }
