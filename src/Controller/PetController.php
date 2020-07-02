@@ -122,6 +122,10 @@ final class PetController extends AbstractController
                 $pet->setBreed($request->request->get('breed'));
             }
 
+            if ($request->request->has('price')) {
+                $pet->setPrice($request->request->get('price'));
+            }
+
             if ($request->request->has('fatherName')) {
                 $pet->setFatherName($request->request->get('fatherName'));
             }
@@ -279,6 +283,10 @@ final class PetController extends AbstractController
 
             if ($request->request->has('breed')) {
                 $pet->setBreed($request->request->get('breed'));
+            }
+
+            if ($request->request->has('price')) {
+                $pet->setPrice($request->request->get('price'));
             }
 
             if ($request->request->has('fatherName')) {

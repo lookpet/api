@@ -133,6 +133,11 @@ class Pet implements \JsonSerializable
      */
     private $placeId;
 
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $price;
+
     public function __construct(string $type, ?string $slug, ?string $name = null, ?string $id = null, ?UserInterface $user = null)
     {
         $this->user = $user;
@@ -324,6 +329,7 @@ class Pet implements \JsonSerializable
             'comments' => $this->getComments()->toArray(),
             'createdAt' => $this->getCreatedAt(),
             'isLookingForNewOwner' => $this->getIsLookingForOwner(),
+            'price' => $this->getPrice(),
             'media' => $this->getMedia()->getValues(),
             'user' => $this->getUser(),
             'breeder' => $this->getBreeder(),
@@ -496,5 +502,17 @@ class Pet implements \JsonSerializable
         $slugify = new Slugify();
         $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
         $this->slug = $slugify->slugify(implode('-', [$slugEntropy]));
+    }
+
+    public function getPrice(): ?string
+    {
+        return $this->price;
+    }
+
+    public function setPrice(?string $price): self
+    {
+        $this->price = $price;
+
+        return $this;
     }
 }
