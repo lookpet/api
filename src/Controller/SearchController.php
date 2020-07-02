@@ -78,7 +78,9 @@ final class SearchController extends AbstractController
     {
         $gender = null;
 
-        if ($request->query->has('gender')) {
+        if ($request->query->has('gender') && in_array(
+            Gender::ALL, $request->query->get('gender')
+            )) {
             $gender = new Gender($request->query->get('gender'));
         }
 

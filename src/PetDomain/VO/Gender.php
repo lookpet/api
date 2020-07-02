@@ -5,6 +5,9 @@ namespace App\PetDomain\VO;
 class Gender implements \JsonSerializable
 {
     private string $gender;
+    public const ALL = [
+        'male', 'female'
+    ];
 
     public function __construct(string $gender)
     {
