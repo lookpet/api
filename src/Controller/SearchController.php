@@ -85,7 +85,10 @@ final class SearchController extends AbstractController
         }
 
         $isLookingForNewOwner = null;
-        if ($request->query->has('isLookingForNewOwner')) {
+        if ($request->query->has('isLookingForNewOwner') && in_array(
+                $request->query->get('isLookingForNewOwner'),
+                ['true', 'false']
+            )) {
             $isLookingForNewOwner = $request->query->get('isLookingForNewOwner') === 'true';
         }
 
