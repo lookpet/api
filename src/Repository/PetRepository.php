@@ -21,7 +21,7 @@ final class PetRepository extends ServiceEntityRepository implements PetReposito
         parent::__construct($registry, Pet::class);
     }
 
-    public function findBySearch(?string $breed, ?string $type, ?string $city, ?bool $isLookingForNewOwner = false, ?Gender $gender = null, ?Offset $offset = null): iterable
+    public function findBySearch(?string $breed, ?string $type, ?string $city, ?bool $isLookingForNewOwner = null, ?Gender $gender = null, ?Offset $offset = null): iterable
     {
         $queryBuilder = $this->createQueryBuilder('p');
 
@@ -30,8 +30,10 @@ final class PetRepository extends ServiceEntityRepository implements PetReposito
             $queryBuilder->setParameter('gender', $gender);
         }
 
-        $queryBuilder->andWhere($queryBuilder->expr()->eq('p.isLookingForOwner', ':isLookingForOwner'));
-        $queryBuilder->setParameter('isLookingForOwner', $isLookingForNewOwner);
+        if ($isLookingForNewOwner !== null) {
+            $queryBuilder->andWhere($queryBuilder->expr()->eq('p.isLookingForOwner', ':isLookingForOwner'));
+            $queryBuilder->setParameter('isLookingForOwner', $isLookingForNewOwner);
+        }
 
         if (!empty($breed)) {
             $queryBuilder->andWhere($queryBuilder->expr()->eq('p.breed', $queryBuilder->expr()->literal($breed)));

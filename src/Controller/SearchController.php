@@ -82,7 +82,11 @@ final class SearchController extends AbstractController
             $gender = new Gender($request->query->get('gender'));
         }
 
-        $isLookingForNewOwner = $request->query->get('isLookingForNewOwner') === 'true';
+        $isLookingForNewOwner = null;
+        if ($request->query->has('isLookingForNewOwner')) {
+            $isLookingForNewOwner = $request->query->get('isLookingForNewOwner') === 'true';
+        }
+
         $pets = $petRepository->findBySearch(
             $request->query->get('breed'),
             $request->query->get('type'),
