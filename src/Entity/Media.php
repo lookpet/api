@@ -74,7 +74,7 @@ class Media implements \JsonSerializable
         return $this->id;
     }
 
-    public function getPublicUrl(): ?string
+    public function getPublicUrl(): string
     {
         return $this->publicUrl;
     }
@@ -117,7 +117,7 @@ class Media implements \JsonSerializable
             'width' => $this->getWidth(),
             'height' => $this->getHeight(),
             'publicId' => $this->getCloudinaryPublicId(),
-            'publicUrl' => $this->getPublicUrl(),
+            'publicUrl' => $this->getOptimizedImageUrl(),
             'created_at' => $this->getCreatedAt(),
         ];
     }
@@ -180,5 +180,11 @@ class Media implements \JsonSerializable
         $this->cloudinaryResponse = $cloudinaryResponse;
 
         return $this;
+    }
+
+    public function getOptimizedImageUrl(): string
+    {
+        $resize = 'https://res.cloudinary.com/look-pet/image/fetch/f_auto,q_auto:low/';
+        return $resize.$this->publicUrl;
     }
 }
