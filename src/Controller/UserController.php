@@ -132,6 +132,9 @@ final class UserController extends AbstractController
     /**
      * @Route("/api/v1/user/{slug}/pets", methods={"GET"}, name="user_pets")
      *
+     * @param string $slug
+     * @param PetRepository $petRepository
+     * @param UserRepository $userRepository
      * @return JsonResponse
      */
     public function getPets(string $slug, PetRepository $petRepository, UserRepository $userRepository): JsonResponse
@@ -142,6 +145,8 @@ final class UserController extends AbstractController
 
         $pets = $petRepository->findBy([
             'user' => $user,
+        ], [
+            'updated_at' => 'desc',
         ]);
 
         return $this->petResponseBuilder->build($user, ...$pets);
@@ -157,7 +162,7 @@ final class UserController extends AbstractController
     public function search(UserRepository $userRepository): JsonResponse
     {
         $users = $userRepository->findBy([], [
-            'createdAt' => 'desc',
+            'updated_at' => 'desc',
         ]);
 
         return new JsonResponse([
