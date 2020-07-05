@@ -146,7 +146,7 @@ final class UserController extends AbstractController
         $pets = $petRepository->findBy([
             'user' => $user,
         ], [
-            'updated_at' => 'desc',
+            'updatedAt' => 'desc',
         ]);
 
         return $this->petResponseBuilder->build($user, ...$pets);
@@ -162,7 +162,7 @@ final class UserController extends AbstractController
     public function search(UserRepository $userRepository): JsonResponse
     {
         $users = $userRepository->findBy([], [
-            'updated_at' => 'desc',
+            'updatedAt' => 'desc',
         ]);
 
         return new JsonResponse([
