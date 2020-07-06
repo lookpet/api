@@ -135,6 +135,7 @@ final class UserController extends AbstractController
      * @param string $slug
      * @param PetRepository $petRepository
      * @param UserRepository $userRepository
+     *
      * @return JsonResponse
      */
     public function getPets(string $slug, PetRepository $petRepository, UserRepository $userRepository): JsonResponse

@@ -10,8 +10,10 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 final class UserFixture extends BaseFixture
 {
     public const TEST_USER_FIRST_NAME = 'Igor';
-    public const DEFAULT_PASSWORD = 'engage';
+    public const PASSWORD_GOOD = 'engage';
+    public const PASSWORD_BAD = '12345';
     public const TEST_USER_EMAIL = 'igor@look.pet';
+    public const TEST_USER_BAD_EMAIL = 'igor.ru';
 
     private UserPasswordEncoderInterface $passwordEncoder;
 
@@ -29,7 +31,7 @@ final class UserFixture extends BaseFixture
         $user->setEmail(self::TEST_USER_EMAIL);
         $user->setPassword($this->passwordEncoder->encodePassword(
             $user,
-            self::DEFAULT_PASSWORD
+            self::PASSWORD_GOOD
         ));
         $user->setFirstName(self::TEST_USER_FIRST_NAME);
         $manager->persist($user);
@@ -44,7 +46,7 @@ final class UserFixture extends BaseFixture
             $user->setFirstName($this->faker->firstName);
             $user->setPassword($this->passwordEncoder->encodePassword(
                 $user,
-                self::DEFAULT_PASSWORD
+                self::PASSWORD_GOOD
             ));
             $apiToken1 = new ApiToken($user);
             $apiToken2 = new ApiToken($user);

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Functional\V1\Authentication;
+namespace Tests\Functional\V1\Authentication;
 
 use Doctrine\Common\Annotations\Annotation\IgnoreAnnotation;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
@@ -34,7 +34,7 @@ final class LoginTest extends WebTestCase
             ['CONTENT_TYPE' => 'application/json'],
             (string) json_encode([
                 'email' => UserFixture::TEST_USER_EMAIL,
-                'password' => UserFixture::DEFAULT_PASSWORD,
+                'password' => UserFixture::PASSWORD_GOOD,
             ])
         );
         $response = $client->getResponse();
@@ -80,7 +80,7 @@ final class LoginTest extends WebTestCase
         return [
             [
                 [
-                    'password' => UserFixture::DEFAULT_PASSWORD,
+                    'password' => UserFixture::PASSWORD_GOOD,
                 ],
                 'Empty email',
             ],
@@ -89,6 +89,13 @@ final class LoginTest extends WebTestCase
                     'email' => UserFixture::TEST_USER_EMAIL,
                 ],
                 'Empty password',
+            ],
+            [
+                [
+                    'email' => UserFixture::TEST_USER_BAD_EMAIL,
+                    'password' => UserFixture::PASSWORD_GOOD,
+                ],
+                'Invalid email address',
             ],
         ];
     }

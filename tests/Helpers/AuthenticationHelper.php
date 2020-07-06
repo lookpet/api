@@ -21,7 +21,7 @@ final class AuthenticationHelper
             ['CONTENT_TYPE' => 'application/json'],
             (string) json_encode([
                 'email' => UserFixture::TEST_USER_EMAIL,
-                'password' => UserFixture::DEFAULT_PASSWORD,
+                'password' => UserFixture::PASSWORD_GOOD,
             ])
         );
         $response = $client->getResponse();

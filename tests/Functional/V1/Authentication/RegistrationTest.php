@@ -105,7 +105,7 @@ final class RegistrationTest extends WebTestCase
         return [
             [
                 [
-                    'password' => UserFixture::DEFAULT_PASSWORD,
+                    'password' => UserFixture::PASSWORD_GOOD,
                 ],
                 'Empty email',
             ],
@@ -114,6 +114,20 @@ final class RegistrationTest extends WebTestCase
                     'email' => UserFixture::TEST_USER_EMAIL,
                 ],
                 'Empty password',
+            ],
+            [
+                [
+                    'email' => UserFixture::TEST_USER_BAD_EMAIL,
+                    'password' => UserFixture::PASSWORD_GOOD,
+                ],
+                'Invalid email address',
+            ],
+            [
+                [
+                    'email' => UserFixture::TEST_USER_EMAIL,
+                    'password' => UserFixture::PASSWORD_BAD,
+                ],
+                'Password too short min length is 6',
             ],
         ];
     }

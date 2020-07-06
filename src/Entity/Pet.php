@@ -497,13 +497,6 @@ class Pet implements \JsonSerializable
         return $this;
     }
 
-    private function generateSlug(): void
-    {
-        $slugify = new Slugify();
-        $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
-        $this->slug = $slugify->slugify(implode('-', [$slugEntropy]));
-    }
-
     public function getPrice(): ?string
     {
         return $this->price;
@@ -514,5 +507,12 @@ class Pet implements \JsonSerializable
         $this->price = $price;
 
         return $this;
+    }
+
+    private function generateSlug(): void
+    {
+        $slugify = new Slugify();
+        $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
+        $this->slug = $slugify->slugify(implode('-', [$slugEntropy]));
     }
 }

@@ -185,6 +185,7 @@ class Media implements \JsonSerializable
     public function getOptimizedImageUrl(): string
     {
         $resize = 'https://res.cloudinary.com/look-pet/image/fetch/w_1080,f_auto,q_auto:low/';
-        return $resize.$this->publicUrl;
+
+        return $resize . $this->publicUrl;
     }
 }

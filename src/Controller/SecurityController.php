@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class SecurityController extends AbstractController
 {
@@ -23,10 +25,15 @@ final class SecurityController extends AbstractController
      * @var UserRepository
      */
     private UserRepository $userRepository;
+    /**
+     * @var ValidatorInterface
+     */
+    private ValidatorInterface $validator;
 
-    public function __construct(UserRepository $userRepository)
+    public function __construct(UserRepository $userRepository, ValidatorInterface $validator)
     {
         $this->userRepository = $userRepository;
+        $this->validator = $validator;
     }
 
     /**
@@ -35,6 +42,7 @@ final class SecurityController extends AbstractController
      * @param Request $request
      * @param UserPasswordEncoderInterface $passwordEncoder
      * @param EntityManagerInterface $entityManager
+     * @param ValidatorInterface $validator
      *
      * @return JsonResponse
      *
@@ -91,7 +99,15 @@ final class SecurityController extends AbstractController
         if ($email === null) {
             return new JsonResponse([
                 'message' => 'Empty email',
-            ], 400);
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        if (!$this->isValidEmail($email)) {
+            new JsonResponse(
+                [
+                    'message' => 'Invalid email address',
+                ], Response::HTTP_BAD_REQUEST
+            );
         }
 
         $password = $request->request->get('password');
@@ -202,13 +218,31 @@ final class SecurityController extends AbstractController
 
             $email = $request->request->get('email');
 
+            if (!$this->isValidEmail($email)) {
+                return new JsonResponse(
+                    [
+                        'message' => 'Invalid email address',
+                    ], Response::HTTP_BAD_REQUEST
+                );
+            }
+
+            $password = $request->request->get('password');
+
+            if (!$this->isValidPassword($password)) {
+                return new JsonResponse(
+                    [
+                        'message' => 'Password too short min length is 6',
+                    ], Response::HTTP_BAD_REQUEST
+                );
+            }
+
             /** @todo use form validation with DTO */
             $user = new User(
                 null,
                 $request->request->get('firstName')
             );
             $user->setEmail($request->request->get('email'));
-            $user->setPassword($passwordEncoder->encodePassword($user, $request->request->get('password')));
+            $user->setPassword($passwordEncoder->encodePassword($user, $password));
 
             $userExist = $this->userRepository->findOneBy([
                 'email' => $email,
@@ -239,5 +273,32 @@ final class SecurityController extends AbstractController
                 'expires_at' => $apiToken->getExpiresAt(),
             ]
         );
+    }
+
+    private function isValidEmail(string $email): bool
+    {
+        $emailConstraint = new Assert\Email();
+        $emailConstraint->message = 'Invalid email address';
+
+        $errors = $this->validator->validate(
+            $email,
+            $emailConstraint
+        );
+
+        return count($errors) === 0;
+    }
+
+    private function isValidPassword(string $password): bool
+    {
+        $passwordConstraint = new Assert\Length([
+            'min' => 6,
+        ]);
+
+        $errors = $this->validator->validate(
+            $password,
+            $passwordConstraint
+        );
+
+        return count($errors) === 0;
     }
 }
