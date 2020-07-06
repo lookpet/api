@@ -1,6 +1,6 @@
 <?php
 
-namespace tests\DataFixtures\ORM;
+namespace Tests\DataFixtures\ORM;
 
 use App\Entity\ApiToken;
 use App\Entity\User;

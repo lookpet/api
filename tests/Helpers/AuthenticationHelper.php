@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace tests\Helpers;
 
 use Symfony\Component\HttpFoundation\Request;
-use tests\DataFixtures\ORM\UserFixture;
+use Tests\DataFixtures\ORM\UserFixture;
 
 final class AuthenticationHelper
 {

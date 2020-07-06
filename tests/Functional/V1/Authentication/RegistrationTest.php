@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Functional\V1\Authentication;
+namespace Tests\Functional\V1\Authentication;
 
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Liip\TestFixturesBundle\Test\FixturesTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use tests\DataFixtures\ORM\UserFixture;
+use Tests\DataFixtures\ORM\UserFixture;
 
 /**
  * @group functional

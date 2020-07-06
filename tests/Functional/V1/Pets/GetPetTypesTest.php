@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Functional\V1\Pets;
+namespace Tests\Functional\V1\Pets;
 
 use App\PetDomain\PetTypes;
 use Liip\FunctionalTestBundle\Test\WebTestCase;

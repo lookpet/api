@@ -9,7 +9,7 @@ use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Liip\TestFixturesBundle\Test\FixturesTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use tests\DataFixtures\ORM\UserFixture;
+use Tests\DataFixtures\ORM\UserFixture;
 
 /**
  * @group functional
