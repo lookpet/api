@@ -36,6 +36,10 @@ class FaceBookController extends AbstractController
      */
     public function facebook(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
+        return new JsonResponse([
+            'Fuck Svetoslav'
+        ], Response::HTTP_FORBIDDEN);
+
         if ($request->request->has('userID')) {
             $user = null;
 
