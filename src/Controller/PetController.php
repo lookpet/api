@@ -8,6 +8,7 @@ use App\Entity\Pet;
 use App\Repository\PetRepository;
 use App\Service\MediaCloudinaryBuilder;
 use App\Service\PetResponseBuilderInterface;
+use Cocur\Slugify\Slugify;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -105,6 +106,17 @@ final class PetController extends AbstractController
             }
 
             $slug = $request->request->get('slug');
+            if (!$request->request->has('slug')) {
+                $slugify = new Slugify();
+                $slug = $slugify->slugify(
+                    implode('-', [
+                        $request->request->get('name'),
+                        random_int(1000, 1000000),
+                    ])
+                );
+            }
+
+
             $type = $request->request->get('type');
             $name = $request->request->get('name');
 
