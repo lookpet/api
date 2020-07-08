@@ -329,8 +329,8 @@ class User implements UserInterface, \JsonSerializable
             return $this->media->first()->getMedia()->getPublicUrl();
         } elseif ($this->isFaceBook()) {
             $lastResponse = $this->getProviderLastResponse();
-            if (isset($lastResponse['picture']['data']['url'])) {
-                return $lastResponse['picture']['data']['url'];
+            if (isset($lastResponse['profile']['picture']['data']['url'])) {
+                return $lastResponse['profile']['picture']['data']['url'];
             }
         }
 
