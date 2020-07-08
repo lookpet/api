@@ -36,6 +36,7 @@ class FaceBookController extends AbstractController
      */
     public function facebook(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
+        var_dump($request);
         if ($request->request->has('userID')) {
             $user = null;
 
