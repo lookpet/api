@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Pet;
+use App\PetDomain\VO\Age;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AgeCalculator implements AgeCalculatorInterface
@@ -17,9 +18,10 @@ class AgeCalculator implements AgeCalculatorInterface
         $this->translator = $translator;
     }
 
-    public function getAge(Pet $pet): ?string
+    public function getAge(\DateTimeInterface $dateTime): ?string
     {
-        $age = $pet->getAge();
+        $age = new Age($dateTime);
+
         if ($age === null) {
             return null;
         }
@@ -35,6 +37,12 @@ class AgeCalculator implements AgeCalculatorInterface
         if ($age->hasMonths()) {
             $result[] = $this->translator->trans('num_of_months', [
                 'months' => $age->getMonths(),
+            ]);
+        }
+
+        if (!$age->hasYears() && !$age->hasMonths() && $age->hasDays()) {
+            $result[] = $this->translator->trans('num_of_days', [
+                'days' => $age->getDays(),
             ]);
         }
 

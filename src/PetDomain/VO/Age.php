@@ -2,10 +2,9 @@
 
 namespace App\PetDomain\VO;
 
-final class Age implements \JsonSerializable
+final class Age
 {
-    /** @var \DateInterval */
-    private $nowToDateInterval;
+    private \DateInterval $nowToDateInterval;
 
     public function __construct(\DateTimeInterface $dateTimeImmutable)
     {
@@ -22,7 +21,7 @@ final class Age implements \JsonSerializable
         return $this->nowToDateInterval->y;
     }
 
-    public function hasMonths(): int
+    public function hasMonths(): bool
     {
         return (bool) $this->nowToDateInterval->m > 0;
     }
@@ -32,22 +31,13 @@ final class Age implements \JsonSerializable
         return $this->nowToDateInterval->m;
     }
 
-    public function jsonSerialize()
+    public function hasDays(): bool
     {
-        return '3 года 6 месяцев';
-//        '
-//        {% if pet.age is not null and pet.isAlive == true %}
-//    {% if pet.age.hasYears == true %}
-//        {{ \'num_of_years\' | trans({
-//            \'%years%\': pet.age.years
-//        }) }}
-//    {% endif %}
-//    {% if pet.age.hasMonths == true %}
-//        {{ \'num_of_months\' | trans({
-//            \'%months%\': pet.age.months
-//        }) }}
-//    {% endif %}
-//{% endif %}
-//        ';
+        return (bool) $this->nowToDateInterval->d > 0;
+    }
+
+    public function getDays(): int
+    {
+        return $this->nowToDateInterval->d;
     }
 }

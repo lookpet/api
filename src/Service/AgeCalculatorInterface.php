@@ -6,5 +6,5 @@ use App\Entity\Pet;
 
 interface AgeCalculatorInterface
 {
-    public function getAge(Pet $pet): ?string;
+    public function getAge(\DateTimeInterface $dateTime): ?string;
 }
