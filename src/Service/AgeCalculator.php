@@ -18,8 +18,12 @@ class AgeCalculator implements AgeCalculatorInterface
         $this->translator = $translator;
     }
 
-    public function getAge(\DateTimeInterface $dateTime): ?string
+    public function getAge(?\DateTimeInterface $dateTime): ?string
     {
+        if ($dateTime === null) {
+            return null;
+        }
+
         $age = new Age($dateTime);
 
         if ($age === null) {
