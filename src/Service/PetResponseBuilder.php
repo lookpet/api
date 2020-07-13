@@ -54,7 +54,7 @@ final class PetResponseBuilder implements PetResponseBuilderInterface
             $pet->jsonSerialize(),
             [
                 'hasLike' => $pet->hasLike($user),
-                'age' => $this->ageCalculator->getAge($pet),
+                'age' => $this->ageCalculator->getAge($pet->getDateOfBirth()),
             ]
         ));
     }
