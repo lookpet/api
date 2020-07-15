@@ -9,7 +9,7 @@ use Doctrine\DBAL\Types\Type;
 
 class Height extends Type
 {
-    private const HEIGHT = 'height';
+    private const NAME = 'height';
 
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
     {
@@ -28,6 +28,6 @@ class Height extends Type
 
     public function getName()
     {
-        return self::HEIGHT;
+        return self::NAME;
     }
 }

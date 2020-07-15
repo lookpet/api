@@ -16,7 +16,7 @@ class Url extends Type
         return $platform->getVarcharTypeDeclarationSQL($fieldDeclaration);
     }
 
-    public function convertToPHPValue($value, AbstractPlatform $platform): \App\PetDomain\VO\url
+    public function convertToPHPValue($value, AbstractPlatform $platform): \App\PetDomain\VO\Url
     {
         return new \App\PetDomain\VO\Url($value);
     }

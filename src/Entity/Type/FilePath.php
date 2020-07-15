@@ -7,18 +7,18 @@ namespace App\Entity\Type;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
 
-class Width extends Type
+class FilePath extends Type
 {
-    private const NAME = 'width';
+    private const NAME = 'file_path';
 
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
     {
         return $platform->getVarcharTypeDeclarationSQL($fieldDeclaration);
     }
 
-    public function convertToPHPValue($value, AbstractPlatform $platform): \App\PetDomain\VO\Width
+    public function convertToPHPValue($value, AbstractPlatform $platform): \App\PetDomain\VO\FilePath
     {
-        return new \App\PetDomain\VO\Width($value);
+        return new \App\PetDomain\VO\FilePath($value);
     }
 
     public function convertToDatabaseValue($value, AbstractPlatform $platform)

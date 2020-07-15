@@ -4,7 +4,9 @@ namespace App\Entity;
 
 use App\Entity\Traits\LifecycleCallbackTrait;
 use App\Entity\Traits\TimestampTrait;
+use App\PetDomain\VO\FilePath;
 use App\PetDomain\VO\Height;
+use App\PetDomain\VO\Mime;
 use App\PetDomain\VO\Url;
 use App\PetDomain\VO\Width;
 use App\Repository\MediaRepository;
@@ -48,17 +50,31 @@ class Media implements \JsonSerializable
      */
     private $width;
 
+    /**
+     * @ORM\Column(type="file_path", length=255)
+     */
+    private $path;
+
+    /**
+     * @ORM\Column(type="mime", length=255)
+     */
+    private $mime;
+
     public function __construct(
         UserInterface $user,
+        FilePath $filePath,
         Url $publicUrl,
+        Mime $mime,
         Width $width,
         Height $height
     ) {
         $this->id = Uuid::uuid4()->toString();
         $this->user = $user;
+        $this->path = $filePath;
         $this->publicUrl = $publicUrl;
         $this->width = $width;
         $this->height = $height;
+        $this->mime = $mime;
     }
 
     public function getId(): string
@@ -95,5 +111,15 @@ class Media implements \JsonSerializable
     public function getWidth(): Width
     {
         return $this->width;
+    }
+
+    public function getPath(): FilePath
+    {
+        return $this->path;
+    }
+
+    public function getMime(): Mime
+    {
+        return $this->mime;
     }
 }
