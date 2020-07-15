@@ -4,9 +4,13 @@ namespace App\Entity;
 
 use App\Entity\Traits\LifecycleCallbackTrait;
 use App\Entity\Traits\TimestampTrait;
+use App\PetDomain\VO\Height;
+use App\PetDomain\VO\Url;
+use App\PetDomain\VO\Width;
 use App\Repository\MediaRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=MediaRepository::class)
@@ -24,14 +28,9 @@ class Media implements \JsonSerializable
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="url", length=255)
      */
     private $publicUrl;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $size;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="media")
@@ -40,152 +39,61 @@ class Media implements \JsonSerializable
     private $user;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $cloudinaryPublicId;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $isPublished;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="height", length=255, nullable=true)
      */
     private $height;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="width", length=255, nullable=true)
      */
     private $width;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    private $cloudinaryResponse;
-
-    public function __construct()
-    {
+    public function __construct(
+        UserInterface $user,
+        Url $publicUrl,
+        Width $width,
+        Height $height
+    ) {
         $this->id = Uuid::uuid4()->toString();
+        $this->user = $user;
+        $this->publicUrl = $publicUrl;
+        $this->width = $width;
+        $this->height = $height;
     }
 
-    public function getId(): ?int
+    public function getId(): string
     {
         return $this->id;
     }
 
-    public function getPublicUrl(): string
+    public function getPublicUrl(): Url
     {
         return $this->publicUrl;
     }
 
-    public function setPublicUrl(string $publicUrl): self
-    {
-        $this->publicUrl = $publicUrl;
-
-        return $this;
-    }
-
-    public function getSize(): ?string
-    {
-        return $this->size;
-    }
-
-    public function setSize(string $size): self
-    {
-        $this->size = $size;
-
-        return $this;
-    }
-
-    public function getUser(): ?User
+    public function getUser(): UserInterface
     {
         return $this->user;
-    }
-
-    public function setUser(?User $user): self
-    {
-        $this->user = $user;
-
-        return $this;
     }
 
     public function jsonSerialize(): array
     {
         return [
-            'size' => $this->getSize(),
+            'id' => $this->getId(),
             'width' => $this->getWidth(),
             'height' => $this->getHeight(),
-            'publicId' => $this->getCloudinaryPublicId(),
-            'publicUrl' => $this->getOptimizedImageUrl(),
+            'publicUrl' => $this->getPublicUrl(),
             'created_at' => $this->getCreatedAt(),
         ];
     }
 
-    public function getCloudinaryPublicId(): ?string
-    {
-        return $this->cloudinaryPublicId;
-    }
-
-    public function setCloudinaryPublicId(?string $cloudinaryPublicId): self
-    {
-        $this->cloudinaryPublicId = $cloudinaryPublicId;
-
-        return $this;
-    }
-
-    public function getIsPublished(): ?bool
-    {
-        return $this->isPublished;
-    }
-
-    public function setIsPublished(bool $isPublished): self
-    {
-        $this->isPublished = $isPublished;
-
-        return $this;
-    }
-
-    public function getHeight(): ?int
+    public function getHeight(): Height
     {
         return $this->height;
     }
 
-    public function setHeight(?int $height): self
-    {
-        $this->height = $height;
-
-        return $this;
-    }
-
-    public function getWidth(): ?int
+    public function getWidth(): Width
     {
         return $this->width;
-    }
-
-    public function setWidth(?int $width): self
-    {
-        $this->width = $width;
-
-        return $this;
-    }
-
-    public function getCloudinaryResponse(): ?string
-    {
-        return $this->cloudinaryResponse;
-    }
-
-    public function setCloudinaryResponse(?string $cloudinaryResponse): self
-    {
-        $this->cloudinaryResponse = $cloudinaryResponse;
-
-        return $this;
-    }
-
-    public function getOptimizedImageUrl(): string
-    {
-        $resize = 'https://res.cloudinary.com/look-pet/image/fetch/w_1080,f_auto,q_auto:low/';
-
-        return $resize . $this->publicUrl;
     }
 }

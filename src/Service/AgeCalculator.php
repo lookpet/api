@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use App\Entity\Pet;
 use App\PetDomain\VO\Age;
 use Symfony\Contracts\Translation\TranslatorInterface;
 

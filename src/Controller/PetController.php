@@ -2,11 +2,10 @@
 
 namespace App\Controller;
 
-use App\CloudinaryBridge\Service\UploadService;
 use App\Dto\PetDto;
 use App\Entity\Pet;
 use App\Repository\PetRepository;
-use App\Service\MediaCloudinaryBuilder;
+use App\Service\MediaUploaderInterface;
 use App\Service\PetResponseBuilderInterface;
 use Cocur\Slugify\Slugify;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -23,10 +22,17 @@ final class PetController extends AbstractController
      * @var PetResponseBuilderInterface
      */
     private PetResponseBuilderInterface $petResponseBuilder;
+    /**
+     * @var MediaUploaderInterface
+     */
+    private MediaUploaderInterface $mediaUploader;
 
-    public function __construct(PetResponseBuilderInterface $petResponseBuilder)
-    {
+    public function __construct(
+        PetResponseBuilderInterface $petResponseBuilder,
+        MediaUploaderInterface $mediaUploader
+    ) {
         $this->petResponseBuilder = $petResponseBuilder;
+        $this->mediaUploader = $mediaUploader;
     }
 
     /**
@@ -116,7 +122,6 @@ final class PetController extends AbstractController
                 );
             }
 
-
             $type = $request->request->get('type');
             $name = $request->request->get('name');
 
@@ -175,11 +180,20 @@ final class PetController extends AbstractController
                 $pet->setIsLookingForOwner($isLookingForNewOwner);
             }
 
+            if ($request->request->has('isFree')) {
+                $isFree = $request->request->get('isFree') === 'true';
+                $pet->setIsFree($isFree);
+            }
+
+            if ($request->request->has('isSold')) {
+                $isSold = $request->request->get('isSold') === 'true';
+                $pet->setIsSold($isSold);
+            }
+
+            $this->setPhotoIfExists($request, $pet);
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($pet);
             $entityManager->flush();
-
-            $this->setPhotoIfExists($request, $pet);
 
             return new JsonResponse(
                 $pet
@@ -196,6 +210,7 @@ final class PetController extends AbstractController
      *
      * @param string $slug
      * @param Request $request
+     * @param PetRepository $petRepository
      *
      * @return JsonResponse
      *
@@ -344,6 +359,16 @@ final class PetController extends AbstractController
                 $pet->setIsLookingForOwner($isLookingForNewOwner);
             }
 
+            if ($request->request->has('isFree')) {
+                $isFree = $request->request->get('isFree') === 'true';
+                $pet->setIsFree($isFree);
+            }
+
+            if ($request->request->has('isSold')) {
+                $isSold = $request->request->get('isSold') === 'true';
+                $pet->setIsSold($isSold);
+            }
+
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($pet);
             $entityManager->flush();
@@ -463,28 +488,10 @@ final class PetController extends AbstractController
 
     private function setPhotoIfExists(Request $request, Pet $pet): void
     {
-        if (!$request->files->has('photo')) {
-            return;
-        }
-
-        $newPhotos = $request->files->get('photo');
-
-        if (count($newPhotos) === 0) {
-            return;
-        }
-        $entityManager = $this->getDoctrine()->getManager();
-        foreach ($newPhotos as $newPhoto) {
-            $cloudinaryUpload = UploadService::upload(
-                $newPhoto->getPathname()
-            );
-            $media = MediaCloudinaryBuilder::build(
-                $cloudinaryUpload,
-                $this->getUser()
-            );
-            $pet->addMedia($media);
-            $entityManager->persist($media);
-            $entityManager->persist($pet);
-            $entityManager->flush();
-        }
+        $mediaCollection = $this->mediaUploader->uploadByRequest(
+            $this->getUser(),
+            $request
+        );
+        $pet->addMedia(...$mediaCollection);
     }
 }

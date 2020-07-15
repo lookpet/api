@@ -138,6 +138,16 @@ class Pet implements \JsonSerializable
      */
     private $price;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $isFree;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $isSold;
+
     public function __construct(string $type, ?string $slug, ?string $name = null, ?string $id = null, ?UserInterface $user = null)
     {
         $this->user = $user;
@@ -330,10 +340,13 @@ class Pet implements \JsonSerializable
             'createdAt' => $this->getCreatedAt(),
             'isLookingForNewOwner' => $this->getIsLookingForOwner(),
             'price' => $this->getPrice(),
+            'isFree' => $this->isFree(),
+            'isSold' => $this->isSold(),
             'media' => $this->getMedia()->getValues(),
             'user' => $this->getUser(),
             'breeder' => $this->getBreeder(),
             'isAlive' => true,
+//            'description' => $this->des
         ];
     }
 
@@ -345,10 +358,12 @@ class Pet implements \JsonSerializable
         return $this->media;
     }
 
-    public function addMedia(Media $medium): self
+    public function addMedia(Media ...$mediaCollection): self
     {
-        if (!$this->media->contains($medium)) {
-            $this->media[] = $medium;
+        foreach ($mediaCollection as $media) {
+            if (!$this->media->contains($media)) {
+                $this->media[] = $media;
+            }
         }
 
         return $this;
@@ -509,10 +524,39 @@ class Pet implements \JsonSerializable
         return $this;
     }
 
+    public function isFree(): ?bool
+    {
+        return $this->isFree;
+    }
+
+    public function setIsFree(?bool $isFree): self
+    {
+        $this->isFree = $isFree;
+
+        return $this;
+    }
+
+    public function isSold(): ?bool
+    {
+        return $this->isSold;
+    }
+
+    public function setIsSold(?bool $isSold): self
+    {
+        $this->isSold = $isSold;
+
+        if ($this->isSold === true) {
+            $this->isLookingForOwner = false;
+            $this->isFree = false;
+        }
+
+        return $this;
+    }
+
     private function generateSlug(): void
     {
         $slugify = new Slugify();
-        $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
-        $this->slug = $slugify->slugify(implode('-', [$slugEntropy]));
+        $slugEntropy = random_int(10, 100000);
+        $this->slug = $slugify->slugify(implode('-', [$this->name, $slugEntropy]));
     }
 }
