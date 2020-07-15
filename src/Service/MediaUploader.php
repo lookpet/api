@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\CloudinaryBridge\Service\MediaUploaderInterface as CloudinaryMediaUploader;
+use App\CloudinaryBridge\Service\CloudinaryClientInterface as CloudinaryMediaUploader;
 use App\CloudinaryBridge\Service\PhotoTransformerInterface;
 use App\Entity\Media;
 use App\PetDomain\VO\Height;
@@ -66,20 +66,20 @@ class MediaUploader implements MediaUploaderInterface
 
         foreach ($newPhotos as $newPhoto) {
             $startXCoordinate = 0;
-            if ($request->request->has('startXCoordinate')) {
-                $startXCoordinate = $request->request->get('startXCoordinate');
+            if ($request->request->has('x')) {
+                $startXCoordinate = $request->request->get('x');
             }
             $startYCoordinate = 0;
-            if ($request->request->has('startYCoordinate')) {
-                $startYCoordinate = $request->request->get('startYCoordinate');
+            if ($request->request->has('x')) {
+                $startYCoordinate = $request->request->get('y');
             }
             $cropWidth = 1080;
-            if ($request->request->has('cropWidth')) {
-                $cropWidth = $request->request->get('cropWidth');
+            if ($request->request->has('width')) {
+                $cropWidth = $request->request->get('width');
             }
             $cropHeight = 1080;
-            if ($request->request->has('cropHeight')) {
-                $cropHeight = $request->request->get('cropHeight');
+            if ($request->request->has('height')) {
+                $cropHeight = $request->request->get('height');
             }
 
             $cloudinaryUpload = $this->cloudinaryUploader->upload(
@@ -89,9 +89,10 @@ class MediaUploader implements MediaUploaderInterface
                     'format' => 'jpg',
                 ]
             );
+            $publicId = $cloudinaryUpload['public_id'];
 
             $cloudinaryTransformUrl = $this->photoTransformer->resizeCrop(
-                $cloudinaryUpload['public_id'],
+                $publicId,
                 $cropWidth,
                 $cropHeight,
                 $startXCoordinate,
@@ -100,7 +101,7 @@ class MediaUploader implements MediaUploaderInterface
 
             $stream = fopen($cloudinaryTransformUrl, 'rb');
             $this->filesystem->write(
-                '/pets/uploads/' . $cloudinaryUpload['public_id'],
+                '/pets/uploads/' . $publicId,
                 $stream
             );
             if (is_resource($stream)) {
@@ -119,6 +120,7 @@ class MediaUploader implements MediaUploaderInterface
             $mediaCollection[] = $media;
             $this->entityManager->persist($media);
             $this->entityManager->flush();
+            $this->cloudinaryUploader->delete($publicId);
         }
 
         return $mediaCollection;

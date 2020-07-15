@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\CloudinaryBridge\Service\MediaUploader;
+use App\CloudinaryBridge\Service\CloudinaryClient;
 use App\Entity\Breeder;
 use App\Entity\MediaUser;
 use App\Entity\User;
@@ -183,7 +183,7 @@ final class UserController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
 
         if ($newPhoto) {
-            $cloudinaryUpload = MediaUploader::upload(
+            $cloudinaryUpload = CloudinaryClient::upload(
                 $newPhoto->getPathname()
             );
             $media = MediaCloudinaryBuilder::build(
