@@ -18,7 +18,7 @@ class Url extends Type
 
     public function convertToPHPValue($value, AbstractPlatform $platform): \App\PetDomain\VO\url
     {
-        return new \App\PetDomain\VO\url($value);
+        return new \App\PetDomain\VO\Url($value);
     }
 
     public function convertToDatabaseValue($value, AbstractPlatform $platform)

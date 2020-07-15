@@ -2,6 +2,8 @@ version: "3.3"
 
 services:
   database:
+    ports:
+      - "3306:3306"
     build:
       context: docker/database
     environment:
