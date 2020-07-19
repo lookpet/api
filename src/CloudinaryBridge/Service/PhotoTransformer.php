@@ -31,8 +31,10 @@ class PhotoTransformer implements PhotoTransformerInterface
         return cloudinary_url($publicId, [
             'width' => $width->get(),
             'height' => $height->get(),
-            'crop' => 'imagga_scale',
+            'crop' => 'fill',
             'quality' => 'auto',
+            'aspect_ratio' => '4:3',
+            'effect' => 'sharpen',
         ]);
     }
 }
