@@ -15,7 +15,7 @@ use Ramsey\Uuid\Uuid;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * @ORM\Entity(repositoryClass=MediaRepository::class)
+ * @ORM\Entity(repositoryClass="App\Repository\MediaRepository", repositoryClass=MediaRepository::class)
  * @ORM\HasLifecycleCallbacks
  */
 class Media implements \JsonSerializable
@@ -51,7 +51,7 @@ class Media implements \JsonSerializable
     private $width;
 
     /**
-     * @ORM\Column(type="file_path", length=255)
+     * @ORM\Column(type="file_path", length=255, nullable=true)
      */
     private $path;
 
@@ -60,13 +60,43 @@ class Media implements \JsonSerializable
      */
     private $mime;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $cloudinaryId;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $cloudinaryUrl;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isS3Saved = false;
+
+    /**
+     * Media constructor.
+     * @param UserInterface $user
+     * @param FilePath $filePath
+     * @param Url $publicUrl
+     * @param Mime $mime
+     * @param Width $width
+     * @param Height $height
+     * @param string|null $cloudinaryId
+     * @param Url|null $cloudinaryUrl
+     * @param bool $isS3Saved
+     */
     public function __construct(
         UserInterface $user,
         FilePath $filePath,
         Url $publicUrl,
         Mime $mime,
         Width $width,
-        Height $height
+        Height $height,
+        ?string $cloudinaryId = null,
+        ?Url $cloudinaryUrl = null,
+        bool $isS3Saved = false
     ) {
         $this->id = Uuid::uuid4()->toString();
         $this->user = $user;
@@ -75,6 +105,9 @@ class Media implements \JsonSerializable
         $this->width = $width;
         $this->height = $height;
         $this->mime = $mime;
+        $this->cloudinaryUrl = $cloudinaryUrl;
+        $this->cloudinaryId = $cloudinaryId;
+        $this->isS3Saved = $isS3Saved;
     }
 
     public function getId(): string
@@ -121,5 +154,41 @@ class Media implements \JsonSerializable
     public function getMime(): Mime
     {
         return $this->mime;
+    }
+
+    public function getCloudinaryId(): ?string
+    {
+        return $this->cloudinaryId;
+    }
+
+    public function setCloudinaryId(?string $cloudinaryId): self
+    {
+        $this->cloudinaryId = $cloudinaryId;
+
+        return $this;
+    }
+
+    public function getCloudinaryUrl(): ?string
+    {
+        return $this->cloudinaryUrl;
+    }
+
+    public function setCloudinaryUrl(?string $cloudinaryUrl): self
+    {
+        $this->cloudinaryUrl = $cloudinaryUrl;
+
+        return $this;
+    }
+
+    public function getIsS3Saved(): ?bool
+    {
+        return $this->isS3Saved;
+    }
+
+    public function setIsS3Saved(bool $isS3Saved): self
+    {
+        $this->isS3Saved = $isS3Saved;
+
+        return $this;
     }
 }

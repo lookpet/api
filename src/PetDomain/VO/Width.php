@@ -20,4 +20,9 @@ class Width implements \JsonSerializable
     {
         return $this->__toString();
     }
+
+    public function get():float
+    {
+        return floatval($this->width);
+    }
 }

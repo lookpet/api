@@ -67,6 +67,7 @@ class MediaUploader implements MediaUploaderInterface
         $mediaCollection = [];
 
         foreach ($newPhotos as $newPhoto) {
+            $imageSize = getimagesize($newPhoto->getPathname());
             $startXCoordinate = 0;
             if ($request->request->has('x')) {
                 $startXCoordinate = $request->request->get('x');
@@ -75,11 +76,11 @@ class MediaUploader implements MediaUploaderInterface
             if ($request->request->has('x')) {
                 $startYCoordinate = $request->request->get('y');
             }
-            $cropWidth = 1080;
+            $cropWidth = $imageSize[0];
             if ($request->request->has('width')) {
                 $cropWidth = $request->request->get('width');
             }
-            $cropHeight = 1080;
+            $cropHeight = $imageSize[1];
             if ($request->request->has('height')) {
                 $cropHeight = $request->request->get('height');
             }
@@ -93,32 +94,45 @@ class MediaUploader implements MediaUploaderInterface
             );
             $publicId = $cloudinaryUpload['public_id'];
 
-            $cloudinaryTransformUrl = $this->photoTransformer->resizeCrop(
-                $publicId,
-                $cropWidth,
-                $cropHeight,
-                $startXCoordinate,
-                $startYCoordinate
-            );
-
-            $stream = fopen($cloudinaryTransformUrl, 'rb');
-            $this->filesystem->write(
-                '/pets/uploads/' . $publicId,
-                $stream
-            );
-            if (is_resource($stream)) {
-                fclose($stream);
+            if ($request->request->has('width') && $request->request->has('height')) {
+                $cloudinaryTransformUrl = $this->photoTransformer->resizeCrop(
+                    $publicId,
+                    $cropWidth,
+                    $cropHeight,
+                    $startXCoordinate,
+                    $startYCoordinate
+                );
+            } else {
+                $cloudinaryTransformUrl =  $this->photoTransformer->crop(
+                    $publicId,
+                    new Width((string) 1080),
+                    new Height((string) 1080)
+                );
             }
 
+            //@todo job for cache to s3
+
+//            $stream = fopen($cloudinaryTransformUrl, 'rb');
+//            $this->filesystem->write(
+//                '/pets/uploads/' . $publicId,
+//                $stream
+//            );
+//            if (is_resource($stream)) {
+//                fclose($stream);
+//            }
+
             $imageSize = getimagesize($cloudinaryTransformUrl);
+//            new Url($_ENV['AWS_S3_PATH'] . '/pets/uploads/' . $cloudinaryUpload['public_id']),
 
             $media = new Media(
                 $user,
                 new FilePath('/pets/uploads/' . $cloudinaryUpload['public_id']),
-                new Url($_ENV['AWS_S3_PATH'] . '/pets/uploads/' . $cloudinaryUpload['public_id']),
+                new Url($cloudinaryTransformUrl),
                 new Mime($imageSize['mime']),
-                new Width($imageSize[0]),
-                new Height($imageSize[1])
+                new Width((string) $imageSize[0]),
+                new Height((string) $imageSize[1]),
+                $publicId,
+                new Url($cloudinaryTransformUrl)
             );
 
             $mediaCollection[] = $media;
