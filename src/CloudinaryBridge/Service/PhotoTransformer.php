@@ -32,7 +32,6 @@ class PhotoTransformer implements PhotoTransformerInterface
             'width' => $width->get(),
             'height' => $height->get(),
             'crop' => 'fill',
-            'quality' => 'auto',
             'aspect_ratio' => '4:3',
             'effect' => 'sharpen',
         ]);
