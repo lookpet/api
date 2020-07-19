@@ -76,6 +76,7 @@ final class PetRepository extends ServiceEntityRepository implements PetReposito
             ->where($queryBuilder->expr()->eq('pet.type', $queryBuilder->expr()->literal($petType)))
             ->andWhere($queryBuilder->expr()->isNotNull('pet.city'))
             ->andWhere($queryBuilder->expr()->neq('pet.city', "''"))
+            ->andWhere($queryBuilder->expr()->neq('pet.city', 'undefined'))
             ->getQuery()
             ->getResult();
     }
