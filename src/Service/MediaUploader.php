@@ -85,7 +85,6 @@ class MediaUploader implements MediaUploaderInterface
                 $newPhoto->getPathname()
             );
             $resizer->freecrop($cropWidth, $cropHeight, $startXCoordinate, $startYCoordinate);
-            $resizer->resizeToBestFit(1080,1080);
             $fileName = Uuid::uuid4()->toString().'.jpg';
             $filePath = '/tmp/'.$fileName;
             $resizer->save(
