@@ -65,51 +65,31 @@ class MediaUploader implements MediaUploaderInterface
            $imageCropParams = $request->get('imageCrop');
         }
 
-        if ($request->get('debug')) {
-            throw new \Exception(serialize($imageCropParams));
-        }
-
         foreach ($newPhotos as $key => $newPhoto) {
             $imageSize = getimagesize($newPhoto->getPathname());
             $startXCoordinate = 0;
-            if ($request->request->has('x')) {
-                $startXCoordinate = $imageCropParams[$key];
-            }
             $startYCoordinate = 0;
-            if ($request->request->has('y')) {
-                $startYCoordinate = $request->request->get('y');
-            }
             $cropWidth = $imageSize[0];
-            if ($request->request->has('width')) {
-                $cropWidth = $request->request->get('width');
-            }
             $cropHeight = $imageSize[1];
-            if ($request->request->has('height')) {
-                $cropHeight = $request->request->get('height');
+            if (isset($imageCropParams[$key])) {
+                [
+                    $startXCoordinate,
+                    $startYCoordinate,
+                    $cropWidth,
+                    $cropHeight
+                ] = implode(',', $imageCropParams[$key]);
             }
 
-
-
-            if ($request->request->has('width') && $request->request->has('height')) {
-                $resizer = new ImageResize(
-                    $newPhoto->getPathname()
-                );
-                $resizer->freecrop($cropWidth, $cropHeight, $startXCoordinate, $startYCoordinate);
-                $fileName = sha1(microtime()).'.jpg';
-                $resizer->save(
-                    $fileName
-                );
-            } else {
-                $resizer = new ImageResize(
-                    $newPhoto->getPathname()
-                );
-                $resizer->crop(1080, 1080);
-                $fileName = sha1(microtime()).'.jpg';
-                $filePath = '/tmp/'.$fileName;
-                $resizer->save(
-                    $filePath
-                );
-            }
+            $resizer = new ImageResize(
+                $newPhoto->getPathname()
+            );
+            $resizer->freecrop($cropWidth, $cropHeight, $startXCoordinate, $startYCoordinate);
+            $resizer->resizeToBestFit(1080,1080);
+            $fileName = sha1(microtime()).'.jpg';
+            $filePath = '/tmp/'.$fileName;
+            $resizer->save(
+                $filePath
+            );
 
             $imageSize = getimagesize($filePath);
 
@@ -123,6 +103,7 @@ class MediaUploader implements MediaUploaderInterface
             }
 
             unlink($filePath);
+            unlink($newPhoto->getPathname());
 
             $media = new Media(
                 $user,
