@@ -113,7 +113,7 @@ class MediaUploader implements MediaUploaderInterface
                 fclose($stream);
             }
 
-            unlink($fileName);
+            unlink($filePath);
 
             $media = new Media(
                 $user,
