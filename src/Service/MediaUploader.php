@@ -13,6 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Gedmo\Sluggable\Util\Urlizer;
 use Gumlet\ImageResize;
 use League\Flysystem\FilesystemInterface;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -85,7 +86,7 @@ class MediaUploader implements MediaUploaderInterface
             );
             $resizer->freecrop($cropWidth, $cropHeight, $startXCoordinate, $startYCoordinate);
             $resizer->resizeToBestFit(1080,1080);
-            $fileName = sha1(microtime()).'.jpg';
+            $fileName = Uuid::uuid4()->toString().'.jpg';
             $filePath = '/tmp/'.$fileName;
             $resizer->save(
                 $filePath
@@ -102,8 +103,7 @@ class MediaUploader implements MediaUploaderInterface
                 fclose($stream);
             }
 
-            unlink($filePath);
-            unlink($newPhoto->getPathname());
+
 
             $media = new Media(
                 $user,
@@ -113,6 +113,9 @@ class MediaUploader implements MediaUploaderInterface
                 new Width((string) $imageSize[0]),
                 new Height((string) $imageSize[1])
             );
+
+            unlink($filePath);
+            unlink($newPhoto->getPathname());
 
             $mediaCollection[] = $media;
             $this->entityManager->persist($media);
