@@ -60,6 +60,10 @@ class MediaUploader implements MediaUploaderInterface
 
         $mediaCollection = [];
 
+        if ($request->request->has('imageCrop')) {
+            var_dump($request->get('imageCrop'));
+        }
+
         foreach ($newPhotos as $newPhoto) {
             $imageSize = getimagesize($newPhoto->getPathname());
             $startXCoordinate = 0;
@@ -85,7 +89,7 @@ class MediaUploader implements MediaUploaderInterface
                 $resizer = new ImageResize(
                     $newPhoto->getPathname()
                 );
-                $resizer->crop(300, 300);
+                $resizer->freecrop($cropWidth, $cropHeight, $startXCoordinate, $startYCoordinate);
                 $fileName = sha1(microtime()).'.jpg';
                 $resizer->save(
                     $fileName
