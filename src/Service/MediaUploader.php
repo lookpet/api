@@ -73,7 +73,7 @@ class MediaUploader implements MediaUploaderInterface
                 $startXCoordinate = $request->request->get('x');
             }
             $startYCoordinate = 0;
-            if ($request->request->has('x')) {
+            if ($request->request->has('y')) {
                 $startYCoordinate = $request->request->get('y');
             }
             $cropWidth = $imageSize[0];
@@ -109,6 +109,8 @@ class MediaUploader implements MediaUploaderInterface
                     new Height((string) 1080)
                 );
             }
+
+            sleep(5);
 
             //@todo job for cache to s3
 
