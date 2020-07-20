@@ -93,6 +93,9 @@ class MediaUploader implements MediaUploaderInterface
                 ]
             );
             $publicId = $cloudinaryUpload['public_id'];
+            sleep(5);
+
+
 
             if ($request->request->has('width') && $request->request->has('height')) {
                 $cloudinaryTransformUrl = $this->photoTransformer->resizeCrop(
@@ -109,8 +112,6 @@ class MediaUploader implements MediaUploaderInterface
                     new Height((string) 1080)
                 );
             }
-
-            sleep(5);
 
             //@todo job for cache to s3
 
