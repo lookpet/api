@@ -104,7 +104,7 @@ class MediaUploader implements MediaUploaderInterface
 
             $imageSize = getimagesize($filePath);
 
-            $stream = fopen($fileName, 'rb');
+            $stream = fopen($filePath, 'rb');
             $this->filesystem->write(
                 '/pets/uploads/' . $fileName,
                 $stream
