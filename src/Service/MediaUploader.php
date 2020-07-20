@@ -95,13 +95,14 @@ class MediaUploader implements MediaUploaderInterface
                     $newPhoto->getPathname()
                 );
                 $resizer->crop(1080, 1080);
-                $fileName = '/tmp/'.sha1(microtime()).'.jpg';
+                $fileName = sha1(microtime()).'.jpg';
+                $filePath = '/tmp/'.$fileName;
                 $resizer->save(
-                    $fileName
+                    $filePath
                 );
             }
 
-            $imageSize = getimagesize($fileName);
+            $imageSize = getimagesize($filePath);
 
             $stream = fopen($fileName, 'rb');
             $this->filesystem->write(
