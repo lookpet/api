@@ -73,12 +73,15 @@ class MediaUploader implements MediaUploaderInterface
             $cropWidth = $imageSize[0];
             $cropHeight = $imageSize[1];
             if (isset($imageCropParams[$key])) {
-                [
-                    $startXCoordinate,
-                    $startYCoordinate,
-                    $cropWidth,
-                    $cropHeight
-                ] = explode(',', $imageCropParams[$key]);
+                $cropInformation = explode(',', $imageCropParams[$key]);
+                if (count($cropInformation) === 4) {
+                    [
+                        $startXCoordinate,
+                        $startYCoordinate,
+                        $cropWidth,
+                        $cropHeight
+                    ] = $cropInformation;
+                }
             }
 
             $resizer = new ImageResize(
