@@ -47,6 +47,13 @@ class MediaDeleteController extends AbstractController
     public function delete(string $id): JsonResponse
     {
         $media = $this->mediaRepository->find($id);
+
+        if ($media === null) {
+            return new JsonResponse([
+
+            ],Response::HTTP_NOT_FOUND);
+        }
+
         if ($media->getUser()->getId() !== $this->getUser()->getId()) {
             return new JsonResponse([
                 'message' => 'Wrong user',
