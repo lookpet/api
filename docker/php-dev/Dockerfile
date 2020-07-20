@@ -11,6 +11,8 @@ ENV APP_VERSION_NUMBER=${VERSION:-latest}\
     APP_VERSION=${VERSION:-latest}/${GIT_SHA:-latest}/${TIMESTAMP:-latest}\
     COMPOSER_HOME=/var/composer
 
+USER root
+
 # Setup GD extension
 RUN apk add --no-cache \
       freetype \

@@ -5,8 +5,13 @@ namespace App\CloudinaryBridge\Service;
 use App\PetDomain\VO\Height;
 use App\PetDomain\VO\Width;
 
-class PhotoTransformer implements PhotoTransformerInterface
+class CloudinaryPhotoTransformer
 {
+    public function __construct()
+    {
+        Config::load();
+    }
+
     /**
      * {@inheritdoc}
      */

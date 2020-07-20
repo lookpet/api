@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\CloudinaryBridge\Service\CloudinaryClientInterface as CloudinaryClient;
 use App\CloudinaryBridge\Service\PhotoTransformerInterface;
 use App\Entity\Media;
 use App\PetDomain\VO\FilePath;
@@ -11,14 +12,13 @@ use App\PetDomain\VO\Url;
 use App\PetDomain\VO\Width;
 use Doctrine\ORM\EntityManagerInterface;
 use Gedmo\Sluggable\Util\Urlizer;
-use Gumlet\ImageResize;
 use League\Flysystem\FilesystemInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class MediaUploader implements MediaUploaderInterface
+class CloudinaryMediaUploader
 {
     /**
      * @var EntityManagerInterface
@@ -32,15 +32,21 @@ class MediaUploader implements MediaUploaderInterface
      * @var PhotoTransformerInterface
      */
     private PhotoTransformerInterface $photoTransformer;
+    /**
+     * @var CloudinaryClient
+     */
+    private CloudinaryClient $cloudinaryUploader;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         FilesystemInterface $filesystem,
-        PhotoTransformerInterface $photoTransformer
+        PhotoTransformerInterface $photoTransformer,
+        CloudinaryClient $cloudinaryUploader
     ) {
         $this->entityManager = $entityManager;
         $this->filesystem = $filesystem;
         $this->photoTransformer = $photoTransformer;
+        $this->cloudinaryUploader = $cloudinaryUploader;
     }
 
     /**
@@ -79,53 +85,52 @@ class MediaUploader implements MediaUploaderInterface
                 $cropHeight = $request->request->get('height');
             }
 
+            $cloudinaryUpload = $this->cloudinaryUploader->upload(
+                $newPhoto->getPathname(),
+                [
+                    'quality' => 80,
+                    'format' => 'jpg',
+                ]
+            );
+            $publicId = $cloudinaryUpload['public_id'];
+            sleep(5);
+
 
 
             if ($request->request->has('width') && $request->request->has('height')) {
-                $resizer = new ImageResize(
-                    $newPhoto->getPathname()
-                );
-                $resizer->crop(300, 300);
-                $fileName = sha1(microtime()).'.jpg';
-                $resizer->save(
-                    $fileName
+                $cloudinaryTransformUrl = $this->photoTransformer->resizeCrop(
+                    $publicId,
+                    $cropWidth,
+                    $cropHeight,
+                    $startXCoordinate,
+                    $startYCoordinate
                 );
             } else {
-                $resizer = new ImageResize(
-                    $newPhoto->getPathname()
-                );
-                $resizer->crop(1080, 1080);
-                $fileName = '/tmp/'.sha1(microtime()).'.jpg';
-                $resizer->save(
-                    $fileName
+                $cloudinaryTransformUrl =  $this->photoTransformer->crop(
+                    $publicId,
+                    new Width((string) 1080),
+                    new Height((string) 1080)
                 );
             }
 
-            $imageSize = getimagesize($fileName);
-
-            $stream = fopen($fileName, 'rb');
-            $this->filesystem->write(
-                '/pets/uploads/' . $fileName,
-                $stream
-            );
-            if (is_resource($stream)) {
-                fclose($stream);
-            }
-
-            unlink($fileName);
+            $imageSize = getimagesize($cloudinaryTransformUrl);
+//            new Url($_ENV['AWS_S3_PATH'] . '/pets/uploads/' . $cloudinaryUpload['public_id']),
 
             $media = new Media(
                 $user,
-                new FilePath('/pets/uploads/' . $fileName),
-                new Url($_ENV['AWS_S3_PATH'] . '/pets/uploads/' . $fileName),
+                new FilePath('/pets/uploads/' . $cloudinaryUpload['public_id']),
+                new Url($cloudinaryTransformUrl),
                 new Mime($imageSize['mime']),
                 new Width((string) $imageSize[0]),
-                new Height((string) $imageSize[1])
+                new Height((string) $imageSize[1]),
+                $publicId,
+                new Url($cloudinaryTransformUrl)
             );
 
             $mediaCollection[] = $media;
             $this->entityManager->persist($media);
             $this->entityManager->flush();
+            $this->cloudinaryUploader->delete($publicId);
         }
 
         return $mediaCollection;
