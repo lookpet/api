@@ -8,7 +8,6 @@
         "ext-iconv": "*",
         "ext-json": "*",
         "aws/aws-sdk-php": "^3.137",
-        "cloudinary/cloudinary_php": "^1.17",
         "cocur/slugify": "^4.0",
         "doctrine/annotations": "^1.10",
         "gedmo/doctrine-extensions": "^2.4",

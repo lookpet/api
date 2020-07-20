@@ -60,15 +60,20 @@ class MediaUploader implements MediaUploaderInterface
 
         $mediaCollection = [];
 
+        $imageCropParams = [];
         if ($request->request->has('imageCrop')) {
-            var_dump($request->get('imageCrop'));
+           $imageCropParams = $request->get('imageCrop');
         }
 
-        foreach ($newPhotos as $newPhoto) {
+        if ($request->get('debug')) {
+            throw new \Exception(serialize($imageCropParams));
+        }
+
+        foreach ($newPhotos as $key => $newPhoto) {
             $imageSize = getimagesize($newPhoto->getPathname());
             $startXCoordinate = 0;
             if ($request->request->has('x')) {
-                $startXCoordinate = $request->request->get('x');
+                $startXCoordinate = $imageCropParams[$key];
             }
             $startYCoordinate = 0;
             if ($request->request->has('y')) {
