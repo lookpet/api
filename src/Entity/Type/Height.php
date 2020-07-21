@@ -18,7 +18,7 @@ class Height extends Type
 
     public function convertToPHPValue($value, AbstractPlatform $platform): \App\PetDomain\VO\Height
     {
-        return new \App\PetDomain\VO\Height($value);
+        return new \App\PetDomain\VO\Height((string) $value);
     }
 
     public function convertToDatabaseValue($value, AbstractPlatform $platform)

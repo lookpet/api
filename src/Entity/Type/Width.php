@@ -18,7 +18,7 @@ class Width extends Type
 
     public function convertToPHPValue($value, AbstractPlatform $platform): \App\PetDomain\VO\Width
     {
-        return new \App\PetDomain\VO\Width($value);
+        return new \App\PetDomain\VO\Width((string) $value);
     }
 
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
