@@ -12,9 +12,6 @@ class CloudinaryPhotoTransformer
         Config::load();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resizeCrop(string $publicId, int $width, int $height, int $startXCoordinate = 0, int $startYCoordinate = 0): string
     {
         return cloudinary_url($publicId, [

@@ -49,9 +49,6 @@ class CloudinaryMediaUploader
         $this->cloudinaryUploader = $cloudinaryUploader;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function uploadByRequest(UserInterface $user, Request $request): iterable
     {
         if (!$request->files->has('photo')) {
@@ -95,8 +92,6 @@ class CloudinaryMediaUploader
             $publicId = $cloudinaryUpload['public_id'];
             sleep(5);
 
-
-
             if ($request->request->has('width') && $request->request->has('height')) {
                 $cloudinaryTransformUrl = $this->photoTransformer->resizeCrop(
                     $publicId,
@@ -106,7 +101,7 @@ class CloudinaryMediaUploader
                     $startYCoordinate
                 );
             } else {
-                $cloudinaryTransformUrl =  $this->photoTransformer->crop(
+                $cloudinaryTransformUrl = $this->photoTransformer->crop(
                     $publicId,
                     new Width((string) 1080),
                     new Height((string) 1080)

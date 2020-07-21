@@ -77,6 +77,7 @@ class Media implements \JsonSerializable
 
     /**
      * Media constructor.
+     *
      * @param UserInterface $user
      * @param FilePath $filePath
      * @param Url $publicUrl

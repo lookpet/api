@@ -63,7 +63,7 @@ class MediaUploader implements MediaUploaderInterface
 
         $imageCropParams = [];
         if ($request->request->has('imageCrop')) {
-           $imageCropParams = $request->get('imageCrop');
+            $imageCropParams = $request->get('imageCrop');
         }
 
         foreach ($newPhotos as $key => $newPhoto) {
@@ -88,8 +88,8 @@ class MediaUploader implements MediaUploaderInterface
                 $newPhoto->getPathname()
             );
             $resizer->freecrop($cropWidth, $cropHeight, $startXCoordinate, $startYCoordinate);
-            $fileName = Uuid::uuid4()->toString().'.jpg';
-            $filePath = '/tmp/'.$fileName;
+            $fileName = Uuid::uuid4()->toString() . '.jpg';
+            $filePath = '/tmp/' . $fileName;
             $resizer->save(
                 $filePath
             );
@@ -104,8 +104,6 @@ class MediaUploader implements MediaUploaderInterface
             if (is_resource($stream)) {
                 fclose($stream);
             }
-
-
 
             $media = new Media(
                 $user,

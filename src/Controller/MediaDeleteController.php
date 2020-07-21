@@ -50,8 +50,7 @@ class MediaDeleteController extends AbstractController
 
         if ($media === null) {
             return new JsonResponse([
-
-            ],Response::HTTP_NOT_FOUND);
+            ], Response::HTTP_NOT_FOUND);
         }
 
         if ($media->getUser()->getId() !== $this->getUser()->getId()) {
