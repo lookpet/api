@@ -49,7 +49,6 @@ class MediaUploader implements MediaUploaderInterface
      */
     public function uploadByRequest(UserInterface $user, Request $request): iterable
     {
-        header('Access-Control-Allow-Origin: *');
         if (!$request->files->has('photo')) {
             return [];
         }
