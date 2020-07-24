@@ -10,11 +10,9 @@ use App\PetDomain\VO\Mime;
 use App\PetDomain\VO\Url;
 use App\PetDomain\VO\Width;
 use Doctrine\ORM\EntityManagerInterface;
-use Gedmo\Sluggable\Util\Urlizer;
-use Gumlet\ImageResize;
 use League\Flysystem\FilesystemInterface;
 use Ramsey\Uuid\Uuid;
-use Symfony\Component\HttpFoundation\File\File;
+use Intervention\Image\Image;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -30,18 +28,16 @@ class MediaUploader implements MediaUploaderInterface
      */
     private FilesystemInterface $filesystem;
     /**
-     * @var PhotoTransformerInterface
+     * @var Image
      */
-    private PhotoTransformerInterface $photoTransformer;
+    private Image $image;
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        FilesystemInterface $filesystem,
-        PhotoTransformerInterface $photoTransformer
+        FilesystemInterface $filesystem
     ) {
         $this->entityManager = $entityManager;
         $this->filesystem = $filesystem;
-        $this->photoTransformer = $photoTransformer;
     }
 
     /**
@@ -74,6 +70,7 @@ class MediaUploader implements MediaUploaderInterface
          * Fil.
          */
         foreach ($newPhotos as $key => $newPhoto) {
+            $this->correctOrientation($newPhoto);
             $imageSize = getimagesize($newPhoto->getPathname());
             $startXCoordinate = 0;
             $startYCoordinate = 0;
@@ -90,16 +87,14 @@ class MediaUploader implements MediaUploaderInterface
                     ] = $cropInformation;
                 }
             }
-
-            $resizer = new ImageResize(
-                $newPhoto->getPathname()
-            );
-            $resizer->freecrop($cropWidth, $cropHeight, $startXCoordinate, $startYCoordinate);
             $fileName = Uuid::uuid4()->toString() . '.jpg';
             $filePath = '/tmp/' . $fileName;
-            $resizer->save(
-                $filePath
-            );
+
+//            \Intervention\Image\Image::make();
+//            $image = $this->image->make($newPhoto->getPathname());
+//            $image->orientate();
+//            $image->crop($cropWidth, $cropHeight, $startXCoordinate, $startYCoordinate);
+//            $image->save($filePath);
 
             $imageSize = getimagesize($filePath);
 
@@ -132,39 +127,57 @@ class MediaUploader implements MediaUploaderInterface
         return $mediaCollection;
     }
 
-    /**
-     * @param File $file
-     * @param string|null $destination
-     *
-     * @return string
-     * Грузим фото в cloudinary
-     * Забираем кроп-ресайз
-     * Заливаем на s3
-     * Удаляем с cloudinary
-     */
-    private function uploadFilde(File $file, string $destination = null): string
+    function correctImageOrientation($filename) {
+        $exif = \exif_read_data($filename);
+        if (function_exists('exif_read_data')) {
+            $exif = exif_read_data($filename);
+            if($exif && isset($exif['Orientation'])) {
+                $orientation = $exif['Orientation'];
+                if($orientation != 1){
+                    $img = imagecreatefromjpeg($filename);
+                    $deg = 0;
+                    switch ($orientation) {
+                        case 3:
+                            $deg = 180;
+                            break;
+                        case 6:
+                            $deg = 270;
+                            break;
+                        case 8:
+                            $deg = 90;
+                            break;
+                    }
+                    if ($deg) {
+                        $img = imagerotate($img, $deg, 0);
+                    }
+                    // then rewrite the rotated image back to the disk as $filename
+                    imagejpeg($img, $filename, 95);
+                } // if there is some rotation necessary
+            } // if have the exif orientation info
+        } // if function exists
+    }
+
+    private function correctOrientation($filename):void
     {
-        if ($destination === null) {
-            $destination = '/pets/uploads/';
+        $i = get_loaded_extensions();
+        if(extension_loaded("exif")){
+            return;
         }
-
-        if ($file instanceof UploadedFile) {
-            $originalFilename = $file->getClientOriginalName();
-        } else {
-            $originalFilename = $file->getFilename();
+        $image = imagecreatefromjpeg($filename);
+        $exif = exif_read_data($filename);
+        if(!empty($exif['Orientation'])) {
+            switch($exif['Orientation']) {
+                case 8:
+                    $image = imagerotate($image,90,0);
+                    break;
+                case 3:
+                    $image = imagerotate($image,180,0);
+                    break;
+                case 6:
+                    $image = imagerotate($image,-90,0);
+                    break;
+            }
+            imagejpeg($image, $filename, 100);
         }
-
-        $newFilename = Urlizer::urlize(pathinfo($originalFilename, PATHINFO_FILENAME)) . '-' . uniqid('', true) . '.' . $file->guessExtension();
-
-        $stream = fopen($file->getPathname(), 'rb');
-        $this->filesystem->write(
-            $destination . $newFilename,
-            $stream
-        );
-        if (is_resource($stream)) {
-            fclose($stream);
-        }
-
-        return $destination . $newFilename;
     }
 }
