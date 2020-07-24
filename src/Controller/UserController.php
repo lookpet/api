@@ -4,19 +4,14 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\CloudinaryBridge\Service\CloudinaryClient;
 use App\Entity\Breeder;
 use App\Entity\MediaUser;
 use App\Entity\User;
 use App\Repository\PetRepository;
 use App\Repository\UserRepository;
-use App\Service\MediaCloudinaryBuilder;
+use App\Service\MediaUploaderInterface;
 use App\Service\PetResponseBuilderInterface;
-use Gedmo\Sluggable\Util\Urlizer;
-use League\Flysystem\FilesystemInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,16 +19,19 @@ use Symfony\Component\Routing\Annotation\Route;
 
 final class UserController extends AbstractController
 {
-    private FilesystemInterface $filesystem;
     /**
      * @var PetResponseBuilderInterface
      */
     private PetResponseBuilderInterface $petResponseBuilder;
+    /**
+     * @var MediaUploaderInterface
+     */
+    private MediaUploaderInterface $mediaUploader;
 
-    public function __construct(FilesystemInterface $filesystem, PetResponseBuilderInterface $petResponseBuilder)
+    public function __construct(MediaUploaderInterface $mediaUploader, PetResponseBuilderInterface $petResponseBuilder)
     {
-        $this->filesystem = $filesystem;
         $this->petResponseBuilder = $petResponseBuilder;
+        $this->mediaUploader = $mediaUploader;
     }
 
     /**
@@ -83,21 +81,6 @@ final class UserController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse($user->jsonSerialize());
-    }
-
-    /**
-     * @Route("/api/v1/user/photo", methods={"POST"})
-     *
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
-    public function addUserPhoto(Request $request): JsonResponse
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        return $this->setPhotoIfExists($request, $user);
     }
 
     /**
@@ -171,62 +154,26 @@ final class UserController extends AbstractController
         ]);
     }
 
-    private function setPhotoIfExists(Request $request, User $user): JsonResponse
+    private function setPhotoIfExists(Request $request): void
     {
         if (!$request->files->has('photo')) {
-            return new JsonResponse([
-                'message' => 'Empty request',
-            ], Response::HTTP_BAD_REQUEST);
+            return;
         }
 
-        $newPhoto = $request->files->get('photo');
+        $mediaCollection = $this->mediaUploader->uploadByRequest(
+            $this->getUser(),
+            $request
+        );
         $entityManager = $this->getDoctrine()->getManager();
 
-        if ($newPhoto) {
-            $cloudinaryUpload = CloudinaryClient::upload(
-                $newPhoto->getPathname()
-            );
-            $media = MediaCloudinaryBuilder::build(
-                $cloudinaryUpload,
-                $this->getUser()
-            );
-
+        /**
+         * Media $media.
+         */
+        foreach ($mediaCollection as $media) {
             $mediaUser = new MediaUser($media, $this->getUser());
             $entityManager->persist($media);
             $entityManager->persist($mediaUser);
             $entityManager->flush();
-
-            return new JsonResponse($media);
         }
-
-        return new JsonResponse([
-            'message' => 'No file was uploaded',
-        ], Response::HTTP_BAD_REQUEST);
-    }
-
-    private function uploadFile(File $file, string $destination = null): string
-    {
-        if ($destination === null) {
-            $destination = '/pets/uploads/';
-        }
-
-        if ($file instanceof UploadedFile) {
-            $originalFilename = $file->getClientOriginalName();
-        } else {
-            $originalFilename = $file->getFilename();
-        }
-
-        $newFilename = Urlizer::urlize(pathinfo($originalFilename, PATHINFO_FILENAME)) . '-' . uniqid('', true) . '.' . $file->guessExtension();
-
-        $stream = fopen($file->getPathname(), 'rb');
-        $this->filesystem->write(
-                $destination . $newFilename,
-                $stream
-            );
-        if (is_resource($stream)) {
-            fclose($stream);
-        }
-
-        return $destination . $newFilename;
     }
 }

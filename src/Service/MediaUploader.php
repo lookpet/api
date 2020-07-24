@@ -55,6 +55,10 @@ class MediaUploader implements MediaUploaderInterface
 
         $newPhotos = $request->files->get('photo');
 
+        if ($newPhotos instanceof UploadedFile) {
+            $newPhotos = [$newPhotos];
+        }
+
         if (count($newPhotos) === 0) {
             return [];
         }
@@ -66,6 +70,9 @@ class MediaUploader implements MediaUploaderInterface
             $imageCropParams = $request->get('imageCrop');
         }
 
+        /**
+         * Fil.
+         */
         foreach ($newPhotos as $key => $newPhoto) {
             $imageSize = getimagesize($newPhoto->getPathname());
             $startXCoordinate = 0;
