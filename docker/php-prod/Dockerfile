@@ -30,10 +30,9 @@ RUN apk add --no-cache \
       --with-freetype=/usr/include/ \
       # --with-png=/usr/include/ \ # No longer necessary as of 7.4; https://github.com/docker-library/php/pull/910#issuecomment-559383597
       --with-jpeg=/usr/include/ \
-    && docker-php-ext-install -j$(nproc) gd \
+    && docker-php-ext-install -j$(nproc) gd exif \
     && docker-php-ext-enable gd \
     && docker-php-ext-configure exif --enable-exif\
-    && docker-php-ext-install exif \
     && docker-php-ext-enable exif \
     && apk del --no-cache \
       freetype-dev \
