@@ -131,40 +131,4 @@ class MediaUploader implements MediaUploaderInterface
 
         return $mediaCollection;
     }
-
-    /**
-     * @param File $file
-     * @param string|null $destination
-     *
-     * @return string
-     * Грузим фото в cloudinary
-     * Забираем кроп-ресайз
-     * Заливаем на s3
-     * Удаляем с cloudinary
-     */
-    private function uploadFilde(File $file, string $destination = null): string
-    {
-        if ($destination === null) {
-            $destination = '/pets/uploads/';
-        }
-
-        if ($file instanceof UploadedFile) {
-            $originalFilename = $file->getClientOriginalName();
-        } else {
-            $originalFilename = $file->getFilename();
-        }
-
-        $newFilename = Urlizer::urlize(pathinfo($originalFilename, PATHINFO_FILENAME)) . '-' . uniqid('', true) . '.' . $file->guessExtension();
-
-        $stream = fopen($file->getPathname(), 'rb');
-        $this->filesystem->write(
-            $destination . $newFilename,
-            $stream
-        );
-        if (is_resource($stream)) {
-            fclose($stream);
-        }
-
-        return $destination . $newFilename;
-    }
 }

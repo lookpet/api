@@ -4,6 +4,7 @@
     "require": {
         "php": "^7.4",
         "ext-ctype": "*",
+        "ext-exif": "*",
         "ext-gd": "*",
         "ext-iconv": "*",
         "ext-json": "*",
@@ -11,6 +12,7 @@
         "cocur/slugify": "^4.0",
         "doctrine/annotations": "^1.10",
         "gedmo/doctrine-extensions": "^2.4",
+        "gumlet/php-image-resize": "^2.0",
         "league/flysystem-aws-s3-v3": "^1.0",
         "league/flysystem-bundle": "^1.5",
         "liip/test-fixtures-bundle": "^1.9",
@@ -31,8 +33,7 @@
         "symfony/translation": "5.0.*",
         "symfony/twig-bundle": "5.0.*",
         "symfony/validator": "5.0.*",
-        "symfony/yaml": "5.0.*",
-      "ext-exif": "*"
+        "symfony/yaml": "5.0.*"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.3",
