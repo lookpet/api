@@ -31,7 +31,7 @@ build-deploy-production:
 	ssh root@157.230.29.214 "cd /root/api && make git-pull && make run-build && cd /root/deploy-api-production && make pull-deploy-prod"
 
 build-deploy-stage:
-	ssh root@157.230.29.214 "cd /root/api && make git-pull && make run-build && cd /root/deploy-api-stage && make pull-deploy-stage"
+	ssh root@157.230.29.214 "cd /root/develop-api && make git-pull && make run-build && cd /root/deploy-api-stage && make pull-deploy-stage"
 
 run-build: aws-v2-login build-push
 
