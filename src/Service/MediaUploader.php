@@ -71,7 +71,7 @@ class MediaUploader implements MediaUploaderInterface
         }
 
         /**
-         * File
+         * Fil
          */
         foreach ($newPhotos as $key => $newPhoto) {
             $this->correctOrientation($newPhoto);
