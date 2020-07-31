@@ -12,10 +12,8 @@ if ($_SERVER['APP_DEBUG']) {
     Debug::enable();
 }
 
-
 Request::setTrustedProxies(
     ['127.0.0.1', $request->server->get('REMOTE_ADDR')],
-
     Request::HEADER_X_FORWARDED_AWS_ELB
 );
 
