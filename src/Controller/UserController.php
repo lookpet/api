@@ -133,7 +133,7 @@ final class UserController extends AbstractController
             'updatedAt' => 'desc',
         ]);
 
-        return $this->petResponseBuilder->build($user, ...$pets);
+        return $this->petResponseBuilder->build($this->getUser(), ...$pets);
     }
 
     /**
