@@ -591,6 +591,11 @@ class User implements UserInterface, \JsonSerializable
         return $this;
     }
 
+    public function equals(User $user):bool
+    {
+        return $this->getId() === $user->getId();
+    }
+
     private function generateSlug(?string $firstName): void
     {
         $firstName = mb_strtolower($firstName);
