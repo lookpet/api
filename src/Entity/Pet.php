@@ -431,14 +431,15 @@ class Pet implements \JsonSerializable
         return $this;
     }
 
-    public function hasLike(?UserInterface $user): bool
+    public function hasLike(?User $user): bool
     {
         if ($user === null) {
             return false;
         }
 
+        /** @var PetLike $currentLike */
         foreach ($this->likes as $currentLike) {
-            if ($currentLike->getUser() === $user) {
+            if ($currentLike->getUser()->equals($user)) {
                 return true;
             }
         }
