@@ -15,6 +15,7 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 final class ApiTokenAuthenticator extends AbstractGuardAuthenticator
 {
     private const PUBLIC_ROUTES = [
+        'main_page',
         'api_login',
         'api_register',
         'public_pet_slug',
