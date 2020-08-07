@@ -1,4 +1,4 @@
-FROM nginx:1.17.8-alpine
+FROM nginx:1.19.1-alpine
 
 WORKDIR /app/public
 COPY ./public /app/public
