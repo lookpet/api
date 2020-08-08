@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class MediaUploader
+class SimpleMediaUploader implements MediaUploaderInterface
 {
     /**
      * @var EntityManagerInterface
@@ -65,46 +65,9 @@ class MediaUploader
 
         $mediaCollection = [];
 
-        $imageCropParams = [];
-        if ($request->request->has('imageCrop')) {
-            $imageCropParams = $request->get('imageCrop');
-        }
-
-        /**
-         * Fil
-         */
         foreach ($newPhotos as $key => $newPhoto) {
-            $this->correctOrientation($newPhoto);
-            $imageSize = getimagesize($newPhoto->getPathname());
-            $startXCoordinate = 0;
-            $startYCoordinate = 0;
-            $cropWidth = $imageSize[0];
-            $cropHeight = $imageSize[1];
-            if (isset($imageCropParams[$key])) {
-                $cropInformation = explode(',', $imageCropParams[$key]);
-                if (count($cropInformation) === 4) {
-                    [
-                        $startXCoordinate,
-                        $startYCoordinate,
-                        $cropWidth,
-                        $cropHeight
-                    ] = $cropInformation;
-                }
-            }
-
-            $resizer = new ImageResize(
-                $newPhoto->getPathname()
-            );
-            $resizer->freecrop($cropWidth, $cropHeight, $startXCoordinate, $startYCoordinate);
             $fileName = Uuid::uuid4()->toString() . '.jpg';
-            $filePath = '/tmp/' . $fileName;
-            $resizer->save(
-                $filePath
-            );
-
-            $imageSize = getimagesize($filePath);
-
-            $stream = fopen($filePath, 'rb');
+            $stream = fopen($newPhoto->getPathname(), 'rb');
             $this->filesystem->write(
                 '/pets/uploads/' . $fileName,
                 $stream
@@ -117,13 +80,10 @@ class MediaUploader
                 $user,
                 new FilePath('/pets/uploads/' . $fileName),
                 new Url($_ENV['AWS_S3_PATH'] . '/pets/uploads/' . $fileName),
-                new Mime($imageSize['mime']),
-                new Width((string) $imageSize[0]),
-                new Height((string) $imageSize[1])
+                new Mime('image'),
+                new Width((string) 1080),
+                new Height((string) 1080)
             );
-
-            unlink($filePath);
-            unlink($newPhoto->getPathname());
 
             $mediaCollection[] = $media;
             $this->entityManager->persist($media);
@@ -131,25 +91,5 @@ class MediaUploader
         }
 
         return $mediaCollection;
-    }
-
-    private function correctOrientation($filename):void
-    {
-        $image = imagecreatefromjpeg($filename);
-        $exif = exif_read_data($filename);
-        if(!empty($exif['Orientation'])) {
-            switch($exif['Orientation']) {
-                case 8:
-                    $image = imagerotate($image,90,0);
-                    break;
-                case 3:
-                    $image = imagerotate($image,180,0);
-                    break;
-                case 6:
-                    $image = imagerotate($image,-90,0);
-                    break;
-            }
-            imagejpeg($image, $filename, 100);
-        }
     }
 }
