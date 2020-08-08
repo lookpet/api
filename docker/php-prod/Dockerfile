@@ -37,8 +37,6 @@ RUN apk add --no-cache \
       libpng-dev \
     && rm -rf /tmp/*
 
-RUN docker-php-ext-install fileinfo
-
 COPY --chown=root docker/php-prod/conf.d/ $PHP_INI_DIR/conf.d/
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer

@@ -32,8 +32,6 @@ RUN apk add --no-cache \
       libpng-dev \
     && rm -rf /tmp/*
 
-RUN docker-php-ext-install fileinfo
-
 COPY --chown=www-data . /app
 COPY --chown=root docker/php-dev/conf.d/ $PHP_INI_DIR/conf.d/
 
