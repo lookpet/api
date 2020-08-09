@@ -126,11 +126,12 @@ class Media implements \JsonSerializable
         return $this->user;
     }
 
-    public function hasAccess(?User $user = null):bool
+    public function hasAccess(?User $user = null): bool
     {
         if ($this->getUser() === null) {
             return true;
         }
+
         return $this->getUser() === $user;
     }
 

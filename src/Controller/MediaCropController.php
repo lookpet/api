@@ -3,9 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\MediaRepository;
-use App\Service\MediaUploaderInterface;
-use Doctrine\ORM\EntityManagerInterface;
-use League\Flysystem\FilesystemInterface;
+use App\Service\MediaCropperInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,32 +13,18 @@ use Symfony\Component\Routing\Annotation\Route;
 class MediaCropController extends AbstractController
 {
     /**
+     * @var MediaCropperInterface
+     */
+    private MediaCropperInterface $mediaCropper;
+    /**
      * @var MediaRepository
      */
     private MediaRepository $mediaRepository;
-    /**
-     * @var FilesystemInterface
-     */
-    private FilesystemInterface $filesystem;
-    /**
-     * @var EntityManagerInterface
-     */
-    private EntityManagerInterface $entityManager;
-    /**
-     * @var MediaUploaderInterface
-     */
-    private MediaUploaderInterface $mediaUploader;
 
-    public function __construct(
-        MediaUploaderInterface $mediaUploader,
-        MediaRepository $mediaRepository,
-        FilesystemInterface $filesystem,
-        EntityManagerInterface $entityManager
-    ) {
+    public function __construct(MediaCropperInterface $mediaCropper, MediaRepository $mediaRepository)
+    {
+        $this->mediaCropper = $mediaCropper;
         $this->mediaRepository = $mediaRepository;
-        $this->filesystem = $filesystem;
-        $this->entityManager = $entityManager;
-        $this->mediaUploader = $mediaUploader;
     }
 
     /**
@@ -53,11 +37,25 @@ class MediaCropController extends AbstractController
      */
     public function upload(string $id, Request $request): JsonResponse
     {
+        imagecreatetruecolor(100, 100);
         $media = $this->mediaRepository->find($id);
+
+        if (!$media->hasAccess($this->getUser())) {
+            return new JsonResponse(null, Response::HTTP_FORBIDDEN);
+        }
 
         if ($media === null) {
             return new JsonResponse(null, Response::HTTP_NOT_FOUND);
         }
+
+        $imageCropParams = [
+            0, 0, $media->getWidth()->get(), $media->getHeight()->get(),
+        ];
+        if ($request->request->has('imageCrop')) {
+            $imageCropParams = explode(',', $request->get('imageCrop'));
+        }
+
+        $media = $this->mediaCropper->crop($media, $imageCropParams, $this->getUser());
 
         return new JsonResponse($media);
     }

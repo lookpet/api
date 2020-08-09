@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class SimpleMediaUploader implements MediaUploaderInterface
+class S3MediaUploader implements MediaUploaderInterface
 {
     /**
      * @var EntityManagerInterface
