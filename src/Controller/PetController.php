@@ -522,29 +522,9 @@ final class PetController extends AbstractController
 
     private function temp_upload(Request $request, Pet $pet): void
     {
-        $mediaPetCollection = [];
-        $mediaCollection = $this->mediaUploader->uploadByRequest(
+        $mediaPetCollection = $this->mediaUploader->uploadByRequest(
             $request, $this->getUser()
         );
-
-        if ($request->request->has('imageCrop')) {
-            $imageCrop = $request->get('imageCrop');
-            if (is_string($imageCrop)) {
-                $imageCrop = [$imageCrop];
-            }
-        }
-
-        foreach ($mediaCollection as $key => $media) {
-            if (!isset($imageCrop[$key])) {
-                $imageCropParams = [
-                    0, 0, $media->getWidth()->get(), $media->getHeight()->get(),
-                ];
-            } else {
-                $imageCropParams = explode(',', $imageCrop[$key]);
-            }
-
-            $mediaPetCollection[] = $this->mediaCropper->crop($media, $imageCropParams, $this->getUser());
-        }
 
         $pet->addMedia(...$mediaPetCollection);
     }
