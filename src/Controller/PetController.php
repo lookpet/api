@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Dto\PetDto;
 use App\Entity\Pet;
+use App\Repository\MediaRepository;
 use App\Repository\PetRepository;
 use App\Service\MediaUploaderInterface;
 use App\Service\PetResponseBuilderInterface;
@@ -26,13 +27,19 @@ final class PetController extends AbstractController
      * @var MediaUploaderInterface
      */
     private MediaUploaderInterface $mediaUploader;
+    /**
+     * @var MediaRepository
+     */
+    private MediaRepository $mediaRepository;
 
     public function __construct(
         PetResponseBuilderInterface $petResponseBuilder,
-        MediaUploaderInterface $mediaUploader
+        MediaUploaderInterface $mediaUploader,
+        MediaRepository $mediaRepository
     ) {
         $this->petResponseBuilder = $petResponseBuilder;
         $this->mediaUploader = $mediaUploader;
+        $this->mediaRepository = $mediaRepository;
     }
 
     /**
@@ -488,10 +495,20 @@ final class PetController extends AbstractController
 
     private function setPhotoIfExists(Request $request, Pet $pet): void
     {
-        $mediaCollection = $this->mediaUploader->uploadByRequest(
-            $this->getUser(),
-            $request
-        );
-        $pet->addMedia(...$mediaCollection);
+        if ($request->request->has('media')) {
+            $petMedia = [];
+            $mediaCollection = $request->request->get('media');
+            if (is_string($mediaCollection)) {
+                $mediaCollection = [$mediaCollection];
+            }
+            foreach ($mediaCollection as $mediaId) {
+                $media = $this->mediaRepository->find($mediaId);
+                if ($media === null) {
+                    continue;
+                }
+                $petMedia[] = $media;
+            }
+            $pet->addMedia(...$petMedia);
+        }
     }
 }
