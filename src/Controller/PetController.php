@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Dto\PetDto;
 use App\Entity\Pet;
+use App\Repository\MediaRepository;
 use App\Repository\PetRepository;
+use App\Service\MediaCropperInterface;
 use App\Service\MediaUploaderInterface;
 use App\Service\PetResponseBuilderInterface;
 use Cocur\Slugify\Slugify;
@@ -26,13 +28,25 @@ final class PetController extends AbstractController
      * @var MediaUploaderInterface
      */
     private MediaUploaderInterface $mediaUploader;
+    /**
+     * @var MediaRepository
+     */
+    private MediaRepository $mediaRepository;
+    /**
+     * @var MediaCropperInterface
+     */
+    private MediaCropperInterface $mediaCropper;
 
     public function __construct(
         PetResponseBuilderInterface $petResponseBuilder,
-        MediaUploaderInterface $mediaUploader
+        MediaUploaderInterface $mediaUploader,
+        MediaRepository $mediaRepository,
+        MediaCropperInterface $mediaCropper
     ) {
         $this->petResponseBuilder = $petResponseBuilder;
         $this->mediaUploader = $mediaUploader;
+        $this->mediaRepository = $mediaRepository;
+        $this->mediaCropper = $mediaCropper;
     }
 
     /**
@@ -488,10 +502,30 @@ final class PetController extends AbstractController
 
     private function setPhotoIfExists(Request $request, Pet $pet): void
     {
-        $mediaCollection = $this->mediaUploader->uploadByRequest(
-            $this->getUser(),
-            $request
+        if ($request->request->has('media')) {
+            $petMedia = [];
+            $mediaCollection = $request->request->get('media');
+            if (is_string($mediaCollection)) {
+                $mediaCollection = [$mediaCollection];
+            }
+            foreach ($mediaCollection as $mediaId) {
+                $media = $this->mediaRepository->find($mediaId);
+                if ($media === null) {
+                    continue;
+                }
+                $petMedia[] = $media;
+            }
+            $pet->addMedia(...$petMedia);
+        }
+        $this->temp_upload($request, $pet);
+    }
+
+    private function temp_upload(Request $request, Pet $pet): void
+    {
+        $mediaPetCollection = $this->mediaUploader->uploadByRequest(
+            $request, $this->getUser()
         );
-        $pet->addMedia(...$mediaCollection);
+
+        $pet->addMedia(...$mediaPetCollection);
     }
 }

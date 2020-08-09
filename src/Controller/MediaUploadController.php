@@ -3,14 +3,15 @@
 namespace App\Controller;
 
 use App\Repository\MediaRepository;
+use App\Service\MediaUploaderInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use League\Flysystem\FilesystemInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-class MediaDeleteController extends AbstractController
+class MediaUploadController extends AbstractController
 {
     /**
      * @var MediaRepository
@@ -24,8 +25,13 @@ class MediaDeleteController extends AbstractController
      * @var EntityManagerInterface
      */
     private EntityManagerInterface $entityManager;
+    /**
+     * @var MediaUploaderInterface
+     */
+    private MediaUploaderInterface $mediaUploader;
 
     public function __construct(
+        MediaUploaderInterface $mediaUploader,
         MediaRepository $mediaRepository,
         FilesystemInterface $filesystem,
         EntityManagerInterface $entityManager
@@ -33,36 +39,23 @@ class MediaDeleteController extends AbstractController
         $this->mediaRepository = $mediaRepository;
         $this->filesystem = $filesystem;
         $this->entityManager = $entityManager;
+        $this->mediaUploader = $mediaUploader;
     }
 
     /**
-     * @Route("/api/v1/media/{id}", methods={"DELETE"}, name="delete_media")
+     * @Route("/api/v1/media", methods={"POST"}, name="public_post_media")
      *
-     * @param string $id
+     * @param Request $request
      *
      * @return JsonResponse
-     *
-     * @throws \League\Flysystem\FileNotFoundException
      */
-    public function delete(string $id): JsonResponse
+    public function upload(Request $request): JsonResponse
     {
-        $media = $this->mediaRepository->find($id);
+        $mediaCollection = $this->mediaUploader->uploadByRequest(
+            $request,
+            $this->getUser()
+        );
 
-        if ($media === null) {
-            return new JsonResponse([
-            ], Response::HTTP_NOT_FOUND);
-        }
-
-        if (!$media->hasAccess($this->getUser())) {
-            return new JsonResponse([
-                'message' => 'Wrong user',
-            ], Response::HTTP_UNAUTHORIZED);
-        }
-
-        $this->filesystem->delete($media->getPath());
-        $this->entityManager->remove($media);
-        $this->entityManager->flush();
-
-        return new JsonResponse();
+        return new JsonResponse($mediaCollection);
     }
 }

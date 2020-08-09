@@ -7,7 +7,6 @@ use App\Entity\Traits\TimestampTrait;
 use App\Repository\PetLikeRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=PetLikeRepository::class)
