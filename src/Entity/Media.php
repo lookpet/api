@@ -121,9 +121,17 @@ class Media implements \JsonSerializable
         return $this->publicUrl;
     }
 
-    public function getUser(): UserInterface
+    public function getUser(): ?UserInterface
     {
         return $this->user;
+    }
+
+    public function hasAccess(?User $user = null):bool
+    {
+        if ($this->getUser() === null) {
+            return true;
+        }
+        return $this->getUser() === $user;
     }
 
     public function jsonSerialize(): array

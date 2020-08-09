@@ -53,7 +53,7 @@ class MediaDeleteController extends AbstractController
             ], Response::HTTP_NOT_FOUND);
         }
 
-        if ($media->getUser()->getId() !== $this->getUser()->getId()) {
+        if (!$media->hasAccess($this->getUser())) {
             return new JsonResponse([
                 'message' => 'Wrong user',
             ], Response::HTTP_UNAUTHORIZED);
