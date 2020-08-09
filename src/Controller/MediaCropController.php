@@ -48,6 +48,7 @@ class MediaCropController extends AbstractController
      *
      * @param string $id
      * @param Request $request
+     *
      * @return JsonResponse
      */
     public function upload(string $id, Request $request): JsonResponse

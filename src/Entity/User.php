@@ -591,7 +591,7 @@ class User implements UserInterface, \JsonSerializable
         return $this;
     }
 
-    public function equals(User $user):bool
+    public function equals(User $user): bool
     {
         return $this->getId() === $user->getId();
     }

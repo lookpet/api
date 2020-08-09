@@ -9,7 +9,6 @@ use League\Flysystem\FilesystemInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class MediaUploadController extends AbstractController
@@ -47,12 +46,11 @@ class MediaUploadController extends AbstractController
      * @Route("/api/v1/media", methods={"POST"}, name="public_post_media")
      *
      * @param Request $request
-     * @return JsonResponse
      *
+     * @return JsonResponse
      */
     public function upload(Request $request): JsonResponse
     {
-
         $mediaCollection = $this->mediaUploader->uploadByRequest(
             $this->getUser(),
             $request

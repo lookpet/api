@@ -1,9 +1,7 @@
 <?php
 
-
 namespace App\Controller;
 
-use Swagger\Annotations as SWG;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,7 +13,7 @@ class MainPageController extends AbstractController
      *
      * @return JsonResponse
      */
-    public function main():JsonResponse
+    public function main(): JsonResponse
     {
         return new JsonResponse();
     }
