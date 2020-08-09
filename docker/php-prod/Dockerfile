@@ -35,6 +35,9 @@ RUN apk add --no-cache \
       libpng-dev \
     && rm -rf /tmp/*
 
+RUN pecl install redis \
+    && docker-php-ext-enable redis
+
 COPY --chown=root docker/php-prod/conf.d/ $PHP_INI_DIR/conf.d/
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer
