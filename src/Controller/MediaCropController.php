@@ -37,7 +37,6 @@ class MediaCropController extends AbstractController
      */
     public function upload(string $id, Request $request): JsonResponse
     {
-        imagecreatetruecolor(100, 100);
         $media = $this->mediaRepository->find($id);
 
         if (!$media->hasAccess($this->getUser())) {
