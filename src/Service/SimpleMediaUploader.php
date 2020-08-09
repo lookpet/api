@@ -75,14 +75,16 @@ class SimpleMediaUploader implements MediaUploaderInterface
             if (is_resource($stream)) {
                 fclose($stream);
             }
+            $imageUrl = $_ENV['AWS_S3_PATH'] . '/pets/uploads/' . $fileName;
+            $imageInfo = getimagesize($imageUrl);
 
             $media = new Media(
                 $user,
                 new FilePath('/pets/uploads/' . $fileName),
-                new Url($_ENV['AWS_S3_PATH'] . '/pets/uploads/' . $fileName),
-                new Mime('image'),
-                new Width((string) 1080),
-                new Height((string) 1080)
+                new Url($imageUrl),
+                new Mime($imageInfo['mime']),
+                new Width((string) $imageInfo[0]),
+                new Height((string) $imageInfo[1])
             );
 
             $mediaCollection[] = $media;
