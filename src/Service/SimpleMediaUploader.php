@@ -44,7 +44,7 @@ class SimpleMediaUploader implements MediaUploaderInterface
     /**
      * {@inheritdoc}
      */
-    public function uploadByRequest(UserInterface $user, Request $request): iterable
+    public function uploadByRequest(Request $request, ?UserInterface $user = null): iterable
     {
         if (!$request->files->has('photo')) {
             return [];

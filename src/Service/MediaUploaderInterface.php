@@ -14,5 +14,5 @@ interface MediaUploaderInterface
      *
      * @return Media[]
      */
-    public function uploadByRequest(UserInterface $user, Request $request): iterable;
+    public function uploadByRequest(Request $request, ?UserInterface $user = null): iterable;
 }

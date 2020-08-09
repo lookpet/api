@@ -52,8 +52,8 @@ class MediaUploadController extends AbstractController
     public function upload(Request $request): JsonResponse
     {
         $mediaCollection = $this->mediaUploader->uploadByRequest(
-            $this->getUser(),
-            $request
+            $request,
+            null
         );
 
         return new JsonResponse($mediaCollection);

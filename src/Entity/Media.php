@@ -36,7 +36,7 @@ class Media implements \JsonSerializable
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="media")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      */
     private $user;
 
@@ -89,7 +89,7 @@ class Media implements \JsonSerializable
      * @param bool $isS3Saved
      */
     public function __construct(
-        UserInterface $user,
+        ?UserInterface $user,
         FilePath $filePath,
         Url $publicUrl,
         Mime $mime,
