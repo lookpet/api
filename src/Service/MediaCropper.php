@@ -54,19 +54,19 @@ class MediaCropper implements MediaCropperInterface
             ] = $imageCropParams;
         }
 
-        $handle = fopen($media->getPublicUrl(), 'rb');
-        $img = new \Imagick();
-        $img->readImageFile($handle);
-        $img->cropImage(128, 128, 0, 0);
-        $img->writeImage($filePath);
-        $stream = fopen($filePath, 'rb');
-        $this->filesystem->write(
-            '/pets/uploads/' . $fileName,
-            $stream
-        );
-        if (is_resource($stream)) {
-            fclose($stream);
-        }
+//        $handle = fopen($media->getPublicUrl(), 'rb');
+//        $img = new \Imagick();
+//        $img->readImageFile($handle);
+//        $img->cropImage(128, 128, 0, 0);
+//        $img->writeImage($filePath);
+//        $stream = fopen($filePath, 'rb');
+//        $this->filesystem->write(
+//            '/pets/uploads/' . $fileName,
+//            $stream
+//        );
+//        if (is_resource($stream)) {
+//            fclose($stream);
+//        }
 
         $media = new Media(
             $user,
