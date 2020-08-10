@@ -57,19 +57,12 @@ class MediaCropper implements MediaCropperInterface
             $media->getPath()
         );
 
-        $tmpFile = '/tmp/' . Uuid::uuid4()->toString() . '.jpg';
-        file_put_contents($tmpFile, $file);
-
-        $resizer = new ImageResize(
-            $tmpFile
-        );
+        $resizer = ImageResize::createFromString($file);
         $resizer->freecrop($cropWidth, $cropHeight, $startXCoordinate, $startYCoordinate);
 
         $resizer->save(
             $filePath, 2
         );
-
-        sleep(5);
 
         $stream = fopen($filePath, 'rb');
         $this->filesystem->write(
