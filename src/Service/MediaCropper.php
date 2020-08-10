@@ -61,7 +61,7 @@ class MediaCropper implements MediaCropperInterface
         }
 
         $this->logger->debug($media->getPublicUrl());
-        $imageToCrop = imagecreatefromstring(
+        $imageToCrop = @imagecreatefromstring(
             $this->filesystem->read($media->getPath())
         );
         if ($imageToCrop === false) {
