@@ -60,14 +60,14 @@ class MediaCropper implements MediaCropperInterface
         $tmpFile = '/tmp/' . Uuid::uuid4()->toString() . '.jpg';
         file_put_contents($tmpFile, $file);
 
-        $resizer = new ImageResize(
-            $tmpFile
-        );
-        $resizer->freecrop($cropWidth, $cropHeight, $startXCoordinate, $startYCoordinate);
+//        $resizer = new ImageResize(
+//            $tmpFile
+//        );
+//        $resizer->freecrop($cropWidth, $cropHeight, $startXCoordinate, $startYCoordinate);
 
-        $resizer->save(
-            $filePath
-        );
+//        $resizer->save(
+//            $filePath
+//        );
 
         $imageSize = getimagesize($filePath);
 
