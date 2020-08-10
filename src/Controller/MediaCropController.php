@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Repository\MediaRepository;
 use App\Service\MediaCropperInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,11 +21,22 @@ class MediaCropController extends AbstractController
      * @var MediaRepository
      */
     private MediaRepository $mediaRepository;
+    /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
 
-    public function __construct(MediaCropperInterface $mediaCropper, MediaRepository $mediaRepository)
+    /**
+     * MediaCropController constructor.
+     * @param MediaCropperInterface $mediaCropper
+     * @param MediaRepository $mediaRepository
+     * @param LoggerInterface $logger
+     */
+    public function __construct(MediaCropperInterface $mediaCropper, MediaRepository $mediaRepository, LoggerInterface $logger)
     {
         $this->mediaCropper = $mediaCropper;
         $this->mediaRepository = $mediaRepository;
+        $this->logger = $logger;
     }
 
     /**
@@ -54,8 +66,13 @@ class MediaCropController extends AbstractController
             $imageCropParams = explode(',', $request->get('imageCrop'));
         }
 
-        $media = $this->mediaCropper->crop($media, $imageCropParams, $this->getUser());
+        try {
+            $media = $this->mediaCropper->crop($media, $imageCropParams, $this->getUser());
 
-        return new JsonResponse($media);
+            return new JsonResponse($media);
+        } catch (\Exception $exception) {
+            $this->logger->error($exception->getMessage());
+        }
+
     }
 }
