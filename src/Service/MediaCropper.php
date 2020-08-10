@@ -69,9 +69,8 @@ class MediaCropper implements MediaCropperInterface
             $filePath
         );
 
-        $imageSize = getimagesize($filePath);
 
-        $stream = fopen($tmpFile, 'rb');
+        $stream = fopen($filePath, 'rb');
         $this->filesystem->write(
             '/pets/uploads/' . $fileName,
             $stream
@@ -84,9 +83,9 @@ class MediaCropper implements MediaCropperInterface
             $user,
             new FilePath('/pets/uploads/' . $fileName),
             new Url($_ENV['AWS_S3_PATH'] . '/pets/uploads/' . $fileName),
-            new Mime($imageSize['mime']),
-            new Width((string) $imageSize[0]),
-            new Height((string) $imageSize[1])
+            new Mime($media->getMime()),
+            new Width((string) $media->getWidth()),
+            new Height((string) $media->getHeight())
         );
 
         $this->entityManager->persist($media);
