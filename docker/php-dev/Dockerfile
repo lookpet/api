@@ -24,6 +24,9 @@ RUN apk add --no-cache \
     && docker-php-ext-install -j$(nproc) exif \
     && docker-php-ext-configure exif --enable-exif \
     && docker-php-ext-enable exif \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd exif \
+    && docker-php-ext-enable gd \
     && apk del --no-cache \
       freetype-dev \
       libjpeg-turbo-dev \
