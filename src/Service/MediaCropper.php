@@ -69,6 +69,7 @@ class MediaCropper implements MediaCropperInterface
             $filePath
         );
 
+        sleep(1);
 
         $stream = fopen($filePath, 'rb');
         $this->filesystem->write(
