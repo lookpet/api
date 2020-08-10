@@ -54,7 +54,33 @@ class MediaCropper implements MediaCropperInterface
             ] = $imageCropParams;
         }
 
-        $imageToCrop = @imagecreatefromstring(
+        $handle = fopen($media->getPublicUrl(), 'rb');
+        $img = new \Imagick();
+        $img->readImageFile($handle);
+        $img->cropImage(128, 128, 0, 0);
+        $img->writeImage($filePath);
+        $stream = fopen($filePath, 'rb');
+        $this->filesystem->write(
+            '/pets/uploads/' . $fileName,
+            $stream
+        );
+        if (is_resource($stream)) {
+            fclose($stream);
+        }
+
+        $media = new Media(
+            $user,
+            new FilePath('/pets/uploads/' . $fileName),
+            new Url($_ENV['AWS_S3_PATH'] . '/pets/uploads/' . $fileName),
+            new Mime($media->getMime()),
+            new Width((string) $media->getWidth()),
+            new Height((string) $media->getHeight())
+        );
+
+        $this->entityManager->persist($media);
+        $this->entityManager->flush();
+
+        /*$imageToCrop = @imagecreatefromstring(
             $this->filesystem->read($media->getPath())
         );
         if ($imageToCrop !== false) {
@@ -64,28 +90,9 @@ class MediaCropper implements MediaCropperInterface
                 imagedestroy($coppedImage);
                 imagedestroy($imageToCrop);
 
-                $stream = fopen($filePath, 'rb');
-                $this->filesystem->write(
-                    '/pets/uploads/' . $fileName,
-                    $stream
-                );
-                if (is_resource($stream)) {
-                    fclose($stream);
-                }
 
-                $media = new Media(
-                    $user,
-                    new FilePath('/pets/uploads/' . $fileName),
-                    new Url($_ENV['AWS_S3_PATH'] . '/pets/uploads/' . $fileName),
-                    new Mime($media->getMime()),
-                    new Width((string) $media->getWidth()),
-                    new Height((string) $media->getHeight())
-                );
-
-                $this->entityManager->persist($media);
-                $this->entityManager->flush();
             }
-        }
+        }*/
 
         return $media;
     }
