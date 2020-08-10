@@ -29,21 +29,15 @@ class MediaCropper implements MediaCropperInterface
      * @var PhotoTransformerInterface
      */
     private PhotoTransformerInterface $photoTransformer;
-    /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $logger;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         FilesystemInterface $filesystem,
-        PhotoTransformerInterface $photoTransformer,
-        LoggerInterface $logger
+        PhotoTransformerInterface $photoTransformer
     ) {
         $this->entityManager = $entityManager;
         $this->filesystem = $filesystem;
         $this->photoTransformer = $photoTransformer;
-        $this->logger = $logger;
     }
 
     public function crop(Media $media, array $imageCropParams = [], ?UserInterface $user = null): Media
@@ -60,42 +54,37 @@ class MediaCropper implements MediaCropperInterface
             ] = $imageCropParams;
         }
 
-        $this->logger->debug($media->getPublicUrl());
         $imageToCrop = @imagecreatefromstring(
             $this->filesystem->read($media->getPath())
         );
-        if ($imageToCrop === false) {
-            throw new \Exception($media->getPublicUrl(). ' failed to imagecreatefromjpeg');
+        imagejpeg($imageToCrop, $filePath);
+        $coppedImage = imagecrop($imageToCrop, ['x' => $startXCoordinate, 'y' => $startYCoordinate, 'width' => $cropWidth, 'height' => $cropHeight]);
+        if ($coppedImage !== false) {
+            imagejpeg($coppedImage, $filePath);
+            imagedestroy($coppedImage);
+            imagedestroy($imageToCrop);
+
+            $stream = fopen($filePath, 'rb');
+            $this->filesystem->write(
+                '/pets/uploads/' . $fileName,
+                $stream
+            );
+            if (is_resource($stream)) {
+                fclose($stream);
+            }
+
+            $media = new Media(
+                $user,
+                new FilePath('/pets/uploads/' . $fileName),
+                new Url($_ENV['AWS_S3_PATH'] . '/pets/uploads/' . $fileName),
+                new Mime($media->getMime()),
+                new Width((string) $media->getWidth()),
+                new Height((string) $media->getHeight())
+            );
+
+            $this->entityManager->persist($media);
+            $this->entityManager->flush();
         }
-//        imagejpeg($imageToCrop, $filePath);
-//        $coppedImage = imagecrop($imageToCrop, ['x' => $startXCoordinate, 'y' => $startYCoordinate, 'width' => $cropWidth, 'height' => $cropHeight]);
-//        if ($coppedImage !== false) {
-//            imagejpeg($coppedImage, $filePath);
-//            imagedestroy($coppedImage);
-//        }
-//        imagedestroy($imageToCrop);
-
-//        $stream = fopen($filePath, 'rb');
-//        $this->filesystem->write(
-//            '/pets/uploads/' . $fileName,
-//            $stream
-//        );
-//        if (is_resource($stream)) {
-//            fclose($stream);
-//        }
-
-//        $media = new Media(
-//            $user,
-//            new FilePath('/pets/uploads/' . $fileName),
-//            new Url($_ENV['AWS_S3_PATH'] . '/pets/uploads/' . $fileName),
-//            new Mime($media->getMime()),
-//            new Width((string) $media->getWidth()),
-//            new Height((string) $media->getHeight())
-//        );
-//
-//        $this->entityManager->persist($media);
-//        $this->entityManager->flush();
-
         return $media;
     }
 }
