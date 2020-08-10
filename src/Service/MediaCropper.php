@@ -11,6 +11,7 @@ use App\PetDomain\VO\Url;
 use App\PetDomain\VO\Width;
 use Doctrine\ORM\EntityManagerInterface;
 use League\Flysystem\FilesystemInterface;
+use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -28,15 +29,21 @@ class MediaCropper implements MediaCropperInterface
      * @var PhotoTransformerInterface
      */
     private PhotoTransformerInterface $photoTransformer;
+    /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         FilesystemInterface $filesystem,
-        PhotoTransformerInterface $photoTransformer
+        PhotoTransformerInterface $photoTransformer,
+        LoggerInterface $logger
     ) {
         $this->entityManager = $entityManager;
         $this->filesystem = $filesystem;
         $this->photoTransformer = $photoTransformer;
+        $this->logger = $logger;
     }
 
     public function crop(Media $media, array $imageCropParams = [], ?UserInterface $user = null): Media
@@ -53,7 +60,11 @@ class MediaCropper implements MediaCropperInterface
             ] = $imageCropParams;
         }
 
+        $this->logger->debug($media->getPublicUrl());
         $imageToCrop = imagecreatefromjpeg($media->getPublicUrl());
+        if ($imageToCrop === false) {
+            throw new \Exception($media->getPublicUrl(). ' failed to imagecreatefromjpeg');
+        }
 //        imagejpeg($imageToCrop, $filePath);
 //        $coppedImage = imagecrop($imageToCrop, ['x' => $startXCoordinate, 'y' => $startYCoordinate, 'width' => $cropWidth, 'height' => $cropHeight]);
 //        if ($coppedImage !== false) {
