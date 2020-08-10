@@ -68,17 +68,17 @@ class MediaCropper implements MediaCropperInterface
 //            fclose($stream);
 //        }
 
-        $media = new Media(
-            $user,
-            new FilePath('/pets/uploads/' . $fileName),
-            new Url($_ENV['AWS_S3_PATH'] . '/pets/uploads/' . $fileName),
-            new Mime($media->getMime()),
-            new Width((string) $media->getWidth()),
-            new Height((string) $media->getHeight())
-        );
-
-        $this->entityManager->persist($media);
-        $this->entityManager->flush();
+//        $media = new Media(
+//            $user,
+//            new FilePath('/pets/uploads/' . $fileName),
+//            new Url($_ENV['AWS_S3_PATH'] . '/pets/uploads/' . $fileName),
+//            new Mime($media->getMime()),
+//            new Width((string) $media->getWidth()),
+//            new Height((string) $media->getHeight())
+//        );
+//
+//        $this->entityManager->persist($media);
+//        $this->entityManager->flush();
 
         /*$imageToCrop = @imagecreatefromstring(
             $this->filesystem->read($media->getPath())
