@@ -30,6 +30,11 @@ RUN apk add --no-cache \
       libpng-dev \
     && rm -rf /tmp/*
 
+RUN apk add --update --no-cache autoconf g++ imagemagick imagemagick-dev libtool make pcre-dev \
+    && pecl install imagick \
+    && docker-php-ext-enable imagick \
+    && apk del autoconf g++ libtool make pcre-dev
+
 RUN pecl install redis \
     && docker-php-ext-enable redis
 
