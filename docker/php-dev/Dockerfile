@@ -9,19 +9,29 @@ ENV APP_VERSION_NUMBER=${VERSION:-latest}\
     APP_VERSION_HASH=${GIT_SHA:-latest}\
     APP_VERSION_TIMESTAMP=${TIMESTAMP:-latest}\
     APP_VERSION=${VERSION:-latest}/${GIT_SHA:-latest}/${TIMESTAMP:-latest}\
-    COMPOSER_HOME=/var/composer \
-    MAGICK_HOME=/usr
+    COMPOSER_HOME=/var/composer
 
 USER root
 
-RUN docker-php-ext-install -j$(nproc) exif \
+# Setup GD extension
+RUN apk add --no-cache \
+      freetype \
+      libjpeg-turbo \
+      libpng \
+      freetype-dev \
+      libjpeg-turbo-dev \
+      libpng-dev \
+    && docker-php-ext-install -j$(nproc) exif \
     && docker-php-ext-configure exif --enable-exif \
-    && docker-php-ext-enable exif
+    && docker-php-ext-enable exif \
+    && apk del --no-cache \
+      freetype-dev \
+      libjpeg-turbo-dev \
+      libpng-dev \
+    && rm -rf /tmp/*
 
-RUN apt-get update && apt-get install -y \
-    libmagickwand-dev --no-install-recommends \
-    && pecl install imagick \
-    && docker-php-ext-enable imagick
+RUN pecl install redis \
+    && docker-php-ext-enable redis
 
 COPY --chown=www-data . /app
 COPY --chown=root docker/php-dev/conf.d/ $PHP_INI_DIR/conf.d/
