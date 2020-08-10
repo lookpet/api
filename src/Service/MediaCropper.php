@@ -66,7 +66,7 @@ class MediaCropper implements MediaCropperInterface
         $resizer->freecrop($cropWidth, $cropHeight, $startXCoordinate, $startYCoordinate);
 
         $resizer->save(
-            $filePath
+            $filePath, 2
         );
 
         sleep(5);
