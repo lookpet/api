@@ -69,9 +69,9 @@ class MediaCropper implements MediaCropperInterface
 //            $filePath
 //        );
 
-        $imageSize = getimagesize($filePath);
+        $imageSize = getimagesize($tmpFile);
 
-        $stream = fopen($filePath, 'rb');
+        $stream = fopen($tmpFile, 'rb');
         $this->filesystem->write(
             '/pets/uploads/' . $fileName,
             $stream
