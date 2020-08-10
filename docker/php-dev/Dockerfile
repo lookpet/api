@@ -18,13 +18,12 @@ RUN docker-php-ext-install -j$(nproc) exif \
     && docker-php-ext-configure exif --enable-exif \
     && docker-php-ext-enable exif
 
-#Install imagemagick:
-RUN apk --no-cache update \
-    && apk --no-cache upgrade \
-  && apk add --update freetype-dev libpng-dev libjpeg-turbo-dev libxml2-dev autoconf g++ imagemagick-dev imagemagick libtool make \
-    && pecl install imagick \
-    && docker-php-ext-enable imagick \
-    && apk del autoconf g++ libtool make
+RUN set -ex \
+&& apk add --no-cache --virtual .phpize-deps $PHPIZE_DEPS imagemagick-dev libtool \
+&& export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" \
+&& pecl install imagick \
+&& docker-php-ext-enable imagick \ && apk add --no-cache --virtual .imagick-runtime-deps imagemagick \
+&& apk del .phpize-deps
 
 COPY --chown=www-data . /app
 COPY --chown=root docker/php-dev/conf.d/ $PHP_INI_DIR/conf.d/
