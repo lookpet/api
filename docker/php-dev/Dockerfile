@@ -23,9 +23,6 @@ RUN apk --no-cache update \
     && docker-php-ext-enable imagick \
     && apk del autoconf g++ libtool make
 
-RUN pecl install redis \
-    && docker-php-ext-enable redis
-
 COPY --chown=www-data . /app
 COPY --chown=root docker/php-dev/conf.d/ $PHP_INI_DIR/conf.d/
 
