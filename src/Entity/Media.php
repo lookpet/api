@@ -137,7 +137,6 @@ class Media implements \JsonSerializable
         }
 
         return false;
-
     }
 
     public function jsonSerialize(): array

@@ -10,7 +10,6 @@ use App\PetDomain\VO\Mime;
 use App\PetDomain\VO\Url;
 use App\PetDomain\VO\Width;
 use Doctrine\ORM\EntityManagerInterface;
-use Gumlet\ImageResize;
 use League\Flysystem\FilesystemInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -53,16 +52,14 @@ class MediaCropper implements MediaCropperInterface
                 $cropHeight
             ] = $imageCropParams;
         }
-        $file = $this->filesystem->read(
-            $media->getPath()
-        );
 
-        $resizer = ImageResize::createFromString($file);
-        $resizer->freecrop($cropWidth, $cropHeight, $startXCoordinate, $startYCoordinate);
-
-        $resizer->save(
-            $filePath, 2
-        );
+        $imageToCrop = imagecreatefromjpeg($media->getPublicUrl());
+        $coppedImage = imagecrop($imageToCrop, ['x' => $startXCoordinate, 'y' => $startYCoordinate, 'width' => $cropWidth, 'height' => $cropHeight]);
+        if ($coppedImage !== false) {
+            imagejpeg($coppedImage, $filePath);
+            imagedestroy($coppedImage);
+        }
+        imagedestroy($imageToCrop);
 
         $stream = fopen($filePath, 'rb');
         $this->filesystem->write(
