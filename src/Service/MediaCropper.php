@@ -63,7 +63,7 @@ class MediaCropper implements MediaCropperInterface
         $resizer = new ImageResize(
             $tmpFile
         );
-//        $resizer->freecrop($cropWidth, $cropHeight, $startXCoordinate, $startYCoordinate);
+        $resizer->freecrop($cropWidth, $cropHeight, $startXCoordinate, $startYCoordinate);
 
         $resizer->save(
             $filePath
