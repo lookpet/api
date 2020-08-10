@@ -72,6 +72,7 @@ class MediaCropController extends AbstractController
             return new JsonResponse($media);
         } catch (\Exception $exception) {
             $this->logger->error($exception->getMessage());
+            return new JsonResponse($exception->getMessage());
         }
 
     }
