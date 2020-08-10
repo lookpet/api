@@ -14,6 +14,9 @@ ENV APP_VERSION_NUMBER=${VERSION:-latest}\
 
 USER root
 
+RUN docker-php-ext-install -j$(nproc) exif \
+    && docker-php-ext-configure exif --enable-exif \
+    && docker-php-ext-enable exif
 
 #Install imagemagick:
 RUN apk --no-cache update \
