@@ -59,7 +59,6 @@ class MediaCropper implements MediaCropperInterface
 
         $tmpFile = '/tmp/' . Uuid::uuid4()->toString() . '.jpg';
         file_put_contents($tmpFile, $file);
-        sleep(2);
 
         $resizer = new ImageResize(
             $tmpFile
@@ -69,6 +68,8 @@ class MediaCropper implements MediaCropperInterface
         $resizer->save(
             $filePath
         );
+
+        sleep(5);
 
         $stream = fopen($filePath, 'rb');
         $this->filesystem->write(
