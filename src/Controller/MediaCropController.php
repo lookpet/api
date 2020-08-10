@@ -43,9 +43,9 @@ class MediaCropController extends AbstractController
             return new JsonResponse(null, Response::HTTP_NOT_FOUND);
         }
 
-        if (!$media->hasAccess($this->getUser())) {
-            return new JsonResponse(null, Response::HTTP_FORBIDDEN);
-        }
+//        if (!$media->hasAccess($this->getUser())) {
+//            return new JsonResponse(null, Response::HTTP_FORBIDDEN);
+//        }
 
         $imageCropParams = [
             0, 0, $media->getWidth()->get(), $media->getHeight()->get(),

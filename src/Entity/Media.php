@@ -132,7 +132,12 @@ class Media implements \JsonSerializable
             return true;
         }
 
-        return $this->getUser() === $user;
+        if ($this->getUser() !== null && $user !== null) {
+            return $this->getUser()->getId() === $user->getId();
+        }
+
+        return false;
+
     }
 
     public function jsonSerialize(): array
