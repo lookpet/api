@@ -24,14 +24,14 @@ RUN apk add --no-cache \
     && docker-php-ext-install -j$(nproc) exif \
     && docker-php-ext-configure exif --enable-exif \
     && docker-php-ext-enable exif \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) gd exif \
-    && docker-php-ext-enable gd \
     && apk del --no-cache \
       freetype-dev \
       libjpeg-turbo-dev \
       libpng-dev \
     && rm -rf /tmp/*
+
+RUN pecl install redis \
+    && docker-php-ext-enable redis
 
 COPY --chown=www-data . /app
 COPY --chown=root docker/php-dev/conf.d/ $PHP_INI_DIR/conf.d/
