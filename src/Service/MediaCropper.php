@@ -54,12 +54,13 @@ class MediaCropper implements MediaCropperInterface
         }
 
         $imageToCrop = imagecreatefromjpeg($media->getPublicUrl());
-        $coppedImage = imagecrop($imageToCrop, ['x' => $startXCoordinate, 'y' => $startYCoordinate, 'width' => $cropWidth, 'height' => $cropHeight]);
-        if ($coppedImage !== false) {
-            imagejpeg($coppedImage, $filePath);
-            imagedestroy($coppedImage);
-        }
-        imagedestroy($imageToCrop);
+        imagejpeg($imageToCrop, $filePath);
+//        $coppedImage = imagecrop($imageToCrop, ['x' => $startXCoordinate, 'y' => $startYCoordinate, 'width' => $cropWidth, 'height' => $cropHeight]);
+//        if ($coppedImage !== false) {
+//            imagejpeg($coppedImage, $filePath);
+//            imagedestroy($coppedImage);
+//        }
+//        imagedestroy($imageToCrop);
 
         $stream = fopen($filePath, 'rb');
         $this->filesystem->write(
