@@ -61,7 +61,9 @@ class MediaCropper implements MediaCropperInterface
         }
 
         $this->logger->debug($media->getPublicUrl());
-        $imageToCrop = imagecreatefromjpeg($media->getPublicUrl());
+        $imageToCrop = imagecreatefromstring(
+            $this->filesystem->read($media->getPath())
+        );
         if ($imageToCrop === false) {
             throw new \Exception($media->getPublicUrl(). ' failed to imagecreatefromjpeg');
         }
