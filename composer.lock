@@ -10655,7 +10655,6 @@
     "platform": {
         "php": "^7.4",
         "ext-ctype": "*",
-        "ext-exif": "*",
         "ext-gd": "*",
         "ext-iconv": "*",
         "ext-json": "*"
