@@ -13,9 +13,6 @@ ENV APP_VERSION_NUMBER=${VERSION:-latest}\
 
 USER root
 
-RUN pecl install redis \
-    && docker-php-ext-enable redis
-
 COPY --chown=www-data . /app
 COPY --chown=root docker/php-dev/conf.d/ $PHP_INI_DIR/conf.d/
 
