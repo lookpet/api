@@ -16,7 +16,7 @@ class NotificationController extends AbstractController
     public function getNotifications(): JsonResponse
     {
         return new JsonResponse([
-            'hello',
+            'hello world',
         ]);
     }
 }
