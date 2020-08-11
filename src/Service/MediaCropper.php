@@ -10,7 +10,6 @@ use App\PetDomain\VO\Mime;
 use App\PetDomain\VO\Url;
 use App\PetDomain\VO\Width;
 use Doctrine\ORM\EntityManagerInterface;
-use Gumlet\ImageResize;
 use League\Flysystem\FilesystemInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -42,8 +41,8 @@ class MediaCropper implements MediaCropperInterface
 
     public function crop(Media $media, array $imageCropParams = [], ?UserInterface $user = null): Media
     {
-        $fileName = Uuid::uuid4()->toString() . '.jpg';
-        $filePath = '/tmp/' . $fileName;
+        $mediaId = Uuid::uuid4()->toString();
+        $fileName = $mediaId . '.jpg';
 
         if (count($imageCropParams) === 4) {
             [
@@ -53,23 +52,15 @@ class MediaCropper implements MediaCropperInterface
                 $cropHeight
             ] = $imageCropParams;
         }
-        $file = $this->filesystem->read(
-            $media->getPath()
+
+        $filePath = sprintf(
+            'http://photo-proxy-production.eu-central-1.elasticbeanstalk.com/cx%d,cy%d,cw%d,ch%d/%s',
+            $startXCoordinate,
+            $startYCoordinate,
+            $cropWidth,
+            $cropHeight,
+            $media->getPublicUrl()
         );
-
-        $tmpFile = '/tmp/' . Uuid::uuid4()->toString() . '.jpg';
-        file_put_contents($tmpFile, $file);
-
-        $resizer = new ImageResize(
-            $tmpFile
-        );
-        $resizer->freecrop($cropWidth, $cropHeight, $startXCoordinate, $startYCoordinate);
-
-        $resizer->save(
-            $filePath
-        );
-
-        $imageSize = getimagesize($filePath);
 
         $stream = fopen($filePath, 'rb');
         $this->filesystem->write(
@@ -80,13 +71,18 @@ class MediaCropper implements MediaCropperInterface
             fclose($stream);
         }
 
+        $relativeFilePath = '/pets/uploads/' . $fileName;
+        $imageUrl = $_ENV['AWS_S3_PATH'] . $relativeFilePath;
+        $imageInfo = getimagesize($imageUrl);
+
         $media = new Media(
             $user,
-            new FilePath('/pets/uploads/' . $fileName),
-            new Url($_ENV['AWS_S3_PATH'] . '/pets/uploads/' . $fileName),
-            new Mime($imageSize['mime']),
-            new Width((string) $imageSize[0]),
-            new Height((string) $imageSize[1])
+            new FilePath($relativeFilePath),
+            new Url($imageUrl),
+            new Mime($imageInfo['mime']),
+            new Width((string) $imageInfo[0]),
+            new Height((string) $imageInfo[1]),
+            $mediaId
         );
 
         $this->entityManager->persist($media);

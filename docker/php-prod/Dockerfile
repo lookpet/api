@@ -18,25 +18,6 @@ ENV APP_DEBUG=1 \
 
 USER root
 
-# Setup GD extension
-RUN apk add --no-cache \
-      freetype \
-      libjpeg-turbo \
-      libpng \
-      freetype-dev \
-      libjpeg-turbo-dev \
-      libpng-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) gd exif \
-    && docker-php-ext-enable gd \
-    && docker-php-ext-configure exif --enable-exif\
-    && docker-php-ext-enable exif \
-    && apk del --no-cache \
-      freetype-dev \
-      libjpeg-turbo-dev \
-      libpng-dev \
-    && rm -rf /tmp/*
-
 COPY --chown=root docker/php-prod/conf.d/ $PHP_INI_DIR/conf.d/
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer
