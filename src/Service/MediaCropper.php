@@ -11,7 +11,6 @@ use App\PetDomain\VO\Url;
 use App\PetDomain\VO\Width;
 use Doctrine\ORM\EntityManagerInterface;
 use League\Flysystem\FilesystemInterface;
-use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -42,8 +41,8 @@ class MediaCropper implements MediaCropperInterface
 
     public function crop(Media $media, array $imageCropParams = [], ?UserInterface $user = null): Media
     {
-        $fileName = Uuid::uuid4()->toString() . '.jpg';
-        $filePath = '/tmp/' . $fileName;
+        $mediaId = Uuid::uuid4()->toString();
+        $fileName = $mediaId . '.jpg';
 
         if (count($imageCropParams) === 4) {
             [
@@ -54,45 +53,40 @@ class MediaCropper implements MediaCropperInterface
             ] = $imageCropParams;
         }
 
-//        $handle = fopen($media->getPublicUrl(), 'rb');
-//        $img = new \Imagick();
-//        $img->readImageFile($handle);
-//        $img->cropImage(128, 128, 0, 0);
-//        $img->writeImage($filePath);
-//        $stream = fopen($filePath, 'rb');
-//        $this->filesystem->write(
-//            '/pets/uploads/' . $fileName,
-//            $stream
-//        );
-//        if (is_resource($stream)) {
-//            fclose($stream);
-//        }
-
-//        $media = new Media(
-//            $user,
-//            new FilePath('/pets/uploads/' . $fileName),
-//            new Url($_ENV['AWS_S3_PATH'] . '/pets/uploads/' . $fileName),
-//            new Mime($media->getMime()),
-//            new Width((string) $media->getWidth()),
-//            new Height((string) $media->getHeight())
-//        );
-//
-//        $this->entityManager->persist($media);
-//        $this->entityManager->flush();
-
-        /*$imageToCrop = @imagecreatefromstring(
-            $this->filesystem->read($media->getPath())
+        $filePath = sprintf(
+            'http://photo-proxy-production.eu-central-1.elasticbeanstalk.com/cx%d,cy%d,cw%d,ch%d/%s',
+            $startXCoordinate,
+            $startYCoordinate,
+            $cropWidth,
+            $cropHeight,
+            $media->getPublicUrl()
         );
-        if ($imageToCrop !== false) {
-            $coppedImage = imagecrop($imageToCrop, ['x' => $startXCoordinate, 'y' => $startYCoordinate, 'width' => $cropWidth, 'height' => $cropHeight]);
-            if ($coppedImage !== false) {
-                imagejpeg($coppedImage, $filePath);
-                imagedestroy($coppedImage);
-                imagedestroy($imageToCrop);
 
+        $stream = fopen($filePath, 'rb');
+        $this->filesystem->write(
+            '/pets/uploads/' . $fileName,
+            $stream
+        );
+        if (is_resource($stream)) {
+            fclose($stream);
+        }
 
-            }
-        }*/
+        $relativeFilePath = '/pets/uploads/' . $fileName;
+        $imageUrl = $_ENV['AWS_S3_PATH'] . $relativeFilePath;
+        $imageInfo = getimagesize($imageUrl);
+
+        $media = new Media(
+            $user,
+            new FilePath($relativeFilePath),
+            new Url($imageUrl),
+            new Mime($imageInfo['mime']),
+            new Width((string) $imageInfo[0]),
+            new Height((string) $imageInfo[1]),
+            $mediaId
+        );
+
+        $this->entityManager->persist($media);
+        $this->entityManager->flush();
 
         return $media;
     }

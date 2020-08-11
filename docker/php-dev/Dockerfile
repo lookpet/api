@@ -13,28 +13,6 @@ ENV APP_VERSION_NUMBER=${VERSION:-latest}\
 
 USER root
 
-# Setup GD extension
-RUN apk add --no-cache \
-      freetype \
-      libjpeg-turbo \
-      libpng \
-      freetype-dev \
-      libjpeg-turbo-dev \
-      libpng-dev \
-    && docker-php-ext-install -j$(nproc) exif \
-    && docker-php-ext-configure exif --enable-exif \
-    && docker-php-ext-enable exif \
-    && apk del --no-cache \
-      freetype-dev \
-      libjpeg-turbo-dev \
-      libpng-dev \
-    && rm -rf /tmp/*
-
-RUN apk add --update --no-cache autoconf g++ imagemagick imagemagick-dev libtool make pcre-dev \
-    && pecl install imagick \
-    && docker-php-ext-enable imagick \
-    && apk del autoconf g++ libtool make pcre-dev
-
 RUN pecl install redis \
     && docker-php-ext-enable redis
 
