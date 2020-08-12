@@ -19,6 +19,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 final class UserController extends AbstractController
 {
+
     /**
      * @var PetResponseBuilderInterface
      */
