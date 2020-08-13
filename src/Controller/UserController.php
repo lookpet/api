@@ -19,7 +19,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 final class UserController extends AbstractController
 {
-
     /**
      * @var PetResponseBuilderInterface
      */
@@ -162,8 +161,8 @@ final class UserController extends AbstractController
         }
 
         $mediaCollection = $this->mediaUploader->uploadByRequest(
-            $this->getUser(),
-            $request
+            $request,
+            $this->getUser()
         );
         $entityManager = $this->getDoctrine()->getManager();
 
