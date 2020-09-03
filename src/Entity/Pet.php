@@ -148,6 +148,11 @@ class Pet implements \JsonSerializable
      */
     private $isSold;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isDeleted=false;
+
     public function __construct(string $type, ?string $slug, ?string $name = null, ?string $id = null, ?UserInterface $user = null)
     {
         $this->user = $user;
@@ -559,5 +564,15 @@ class Pet implements \JsonSerializable
         $slugify = new Slugify();
         $slugEntropy = random_int(10, 100000);
         $this->slug = $slugify->slugify(implode('-', [$this->name, $slugEntropy]));
+    }
+
+    public function getIsDeleted(): bool
+    {
+        return $this->isDeleted;
+    }
+
+    public function delete(): void
+    {
+        $this->isDeleted = true;
     }
 }

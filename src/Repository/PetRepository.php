@@ -24,6 +24,7 @@ final class PetRepository extends ServiceEntityRepository implements PetReposito
     public function findBySearch(?string $breed, ?string $type, ?string $city, ?bool $isLookingForNewOwner = null, ?Gender $gender = null, ?Offset $offset = null): iterable
     {
         $queryBuilder = $this->createQueryBuilder('p');
+        $queryBuilder->andWhere($queryBuilder->expr()->eq('p.isDeleted', 'false'));
 
         if ($gender !== null) {
             $queryBuilder->andWhere($queryBuilder->expr()->eq('p.gender', ':gender'));

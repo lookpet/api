@@ -291,6 +291,7 @@ final class PetController extends AbstractController
         try {
             $pet = $petRepository->findOneBy([
                 'slug' => $slug,
+                'isDeleted' => false,
             ]);
 
             if ($pet === null) {
@@ -409,6 +410,7 @@ final class PetController extends AbstractController
     {
         $pet = $petRepository->findOneBy([
             'slug' => $slug,
+            'isDeleted' => false,
         ], [
             'createdAt' => 'desc',
         ]);
@@ -443,6 +445,7 @@ final class PetController extends AbstractController
 
         $pet = $petRepository->findOneBy([
             'slug' => $slug,
+            'isDeleted' => false,
         ], [
             'createdAt' => 'desc',
         ]);
