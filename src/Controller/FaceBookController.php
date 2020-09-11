@@ -36,31 +36,31 @@ class FaceBookController extends AbstractController
      */
     public function facebook(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
-        if ($request->request->has('userID')) {
+        if ($request->request->has('profile')) {
+            $profile = $request->request->get('profile');
             $user = null;
 
-            if ($request->request->has('email')) {
+            if (!empty($profile['email'])) {
                 $user = $this->userRepository->findOneBy([
-                    'email' => $request->request->get('email'),
+                    'email' => $profile['email'],
                 ]);
             }
 
             if ($user === null) {
                 $user = $this->userRepository->findOneBy([
                     'provider' => 'facebook',
-                    'providerId' => $request->request->get('userID'),
+                    'providerId' => $profile['id'],
                 ]);
             }
 
             if ($user === null) {
                 $user = new User();
-                $user->setEmail($request->request->get('email'));
-                $user->setName($request->request->get('name'));
-                $name = explode(' ', $request->request->get('name'));
-                $user->setFirstName(isset($name[0]) ? $name[0] : null);
-                $user->setLastName(isset($name[1]) ? $name[1] : null);
+                $user->setEmail($profile['email'] ?? null);
+                $user->setName($profile['name']);
+                $user->setFirstName($profile['first_name']);
+                $user->setLastName($profile['last_name']);
                 $user->setProvider('facebook');
-                $user->setProviderId($request->request->get('userID'));
+                $user->setProviderId($profile['id']);
             }
 
             $user->setProviderLastResponse($request->getContent());
@@ -82,6 +82,6 @@ class FaceBookController extends AbstractController
             ]);
         }
 
-        return new JsonResponse([], Response::HTTP_NOT_FOUND);
+        return new JsonResponse([], Response::HTTP_FORBIDDEN);
     }
 }

@@ -4,7 +4,7 @@ services:
     autowire: true
     public: false
 
-  tests\DataFixtures\ORM\:
+  Tests\DataFixtures\ORM\:
     resource: '%kernel.project_dir%/tests/DataFixtures/ORM/'
     tags:
       - { name: doctrine.fixture.orm }

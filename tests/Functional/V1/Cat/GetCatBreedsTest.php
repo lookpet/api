@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Functional\V1\Cat;
+namespace Tests\Functional\V1\Cat;
 
 use App\PetDomain\Cat\CatBreedList;
 use Liip\FunctionalTestBundle\Test\WebTestCase;

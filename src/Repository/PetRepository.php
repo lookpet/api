@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Pet;
+use App\PetDomain\VO\Gender;
+use App\PetDomain\VO\Offset;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -19,9 +21,20 @@ final class PetRepository extends ServiceEntityRepository implements PetReposito
         parent::__construct($registry, Pet::class);
     }
 
-    public function findBySearch(?string $breed, ?string $type, ?string $city): iterable
+    public function findBySearch(?string $breed, ?string $type, ?string $city, ?bool $isLookingForNewOwner = null, ?Gender $gender = null, ?Offset $offset = null): iterable
     {
         $queryBuilder = $this->createQueryBuilder('p');
+        $queryBuilder->andWhere($queryBuilder->expr()->eq('p.isDeleted', 'false'));
+
+        if ($gender !== null) {
+            $queryBuilder->andWhere($queryBuilder->expr()->eq('p.gender', ':gender'));
+            $queryBuilder->setParameter('gender', $gender);
+        }
+
+        if ($isLookingForNewOwner !== null) {
+            $queryBuilder->andWhere($queryBuilder->expr()->eq('p.isLookingForOwner', ':isLookingForOwner'));
+            $queryBuilder->setParameter('isLookingForOwner', $isLookingForNewOwner);
+        }
 
         if (!empty($breed)) {
             $queryBuilder->andWhere($queryBuilder->expr()->eq('p.breed', $queryBuilder->expr()->literal($breed)));
@@ -36,6 +49,7 @@ final class PetRepository extends ServiceEntityRepository implements PetReposito
         }
 
         return $queryBuilder->orderBy('p.updatedAt', 'DESC')
+            ->setFirstResult($offset->get())
             ->setMaxResults(10)
             ->getQuery()
             ->getResult();
@@ -63,6 +77,7 @@ final class PetRepository extends ServiceEntityRepository implements PetReposito
             ->where($queryBuilder->expr()->eq('pet.type', $queryBuilder->expr()->literal($petType)))
             ->andWhere($queryBuilder->expr()->isNotNull('pet.city'))
             ->andWhere($queryBuilder->expr()->neq('pet.city', "''"))
+            ->andWhere($queryBuilder->expr()->neq('pet.city', "'undefined'"))
             ->getQuery()
             ->getResult();
     }

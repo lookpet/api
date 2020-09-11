@@ -3,17 +3,16 @@
 namespace App\Controller;
 
 use App\Dto\PetDto;
-use App\Entity\Media;
 use App\Entity\Pet;
+use App\Repository\MediaRepository;
 use App\Repository\PetRepository;
-use App\Service\PetResponseBuilder;
-use Gedmo\Sluggable\Util\Urlizer;
-use League\Flysystem\FilesystemInterface;
+use App\Service\MediaCropperInterface;
+use App\Service\MediaUploaderInterface;
+use App\Service\PetResponseBuilderInterface;
+use Cocur\Slugify\Slugify;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,11 +20,33 @@ use Symfony\Component\Routing\Annotation\Route;
 
 final class PetController extends AbstractController
 {
-    private FilesystemInterface $filesystem;
+    /**
+     * @var PetResponseBuilderInterface
+     */
+    private PetResponseBuilderInterface $petResponseBuilder;
+    /**
+     * @var MediaUploaderInterface
+     */
+    private MediaUploaderInterface $mediaUploader;
+    /**
+     * @var MediaRepository
+     */
+    private MediaRepository $mediaRepository;
+    /**
+     * @var MediaCropperInterface
+     */
+    private MediaCropperInterface $mediaCropper;
 
-    public function __construct(FilesystemInterface $filesystem)
-    {
-        $this->filesystem = $filesystem;
+    public function __construct(
+        PetResponseBuilderInterface $petResponseBuilder,
+        MediaUploaderInterface $mediaUploader,
+        MediaRepository $mediaRepository,
+        MediaCropperInterface $mediaCropper
+    ) {
+        $this->petResponseBuilder = $petResponseBuilder;
+        $this->mediaUploader = $mediaUploader;
+        $this->mediaRepository = $mediaRepository;
+        $this->mediaCropper = $mediaCropper;
     }
 
     /**
@@ -105,6 +126,16 @@ final class PetController extends AbstractController
             }
 
             $slug = $request->request->get('slug');
+            if (!$request->request->has('slug')) {
+                $slugify = new Slugify();
+                $slug = $slugify->slugify(
+                    implode('-', [
+                        $request->request->get('name'),
+                        random_int(1000, 1000000),
+                    ])
+                );
+            }
+
             $type = $request->request->get('type');
             $name = $request->request->get('name');
 
@@ -112,10 +143,18 @@ final class PetController extends AbstractController
 
             if ($request->request->has('city')) {
                 $pet->setCity($request->request->get('city'));
+
+                if ($request->request->has('placeId')) {
+                    $pet->setPlaceId($request->request->get('placeId'));
+                }
             }
 
             if ($request->request->has('breed')) {
                 $pet->setBreed($request->request->get('breed'));
+            }
+
+            if ($request->request->has('price')) {
+                $pet->setPrice($request->request->get('price'));
             }
 
             if ($request->request->has('fatherName')) {
@@ -155,11 +194,20 @@ final class PetController extends AbstractController
                 $pet->setIsLookingForOwner($isLookingForNewOwner);
             }
 
+            if ($request->request->has('isFree')) {
+                $isFree = $request->request->get('isFree') === 'true';
+                $pet->setIsFree($isFree);
+            }
+
+            if ($request->request->has('isSold')) {
+                $isSold = $request->request->get('isSold') === 'true';
+                $pet->setIsSold($isSold);
+            }
+
+            $this->setPhotoIfExists($request, $pet);
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($pet);
             $entityManager->flush();
-
-            $this->setPhotoIfExists($request, $pet);
 
             return new JsonResponse(
                 $pet
@@ -176,6 +224,7 @@ final class PetController extends AbstractController
      *
      * @param string $slug
      * @param Request $request
+     * @param PetRepository $petRepository
      *
      * @return JsonResponse
      *
@@ -242,12 +291,19 @@ final class PetController extends AbstractController
         try {
             $pet = $petRepository->findOneBy([
                 'slug' => $slug,
+                'isDeleted' => false,
             ]);
 
             if ($pet === null) {
                 return new JsonResponse([
                     'message' => 'Pet not exist',
                 ], Response::HTTP_BAD_REQUEST);
+            }
+
+            if ($pet->getUser()->getId() !== $this->getUser()->getId()) {
+                return new JsonResponse([
+                    'message' => 'Wrong user',
+                ], Response::HTTP_UNAUTHORIZED);
             }
 
             if ($request->request->has('type') && empty($request->request->get('type'))) {
@@ -265,12 +321,20 @@ final class PetController extends AbstractController
 
             if ($request->request->has('city')) {
                 $pet->setCity($request->request->get('city'));
+
+                if ($request->request->has('placeId')) {
+                    $pet->setPlaceId($request->request->get('placeId'));
+                }
             }
 
             $this->setPhotoIfExists($request, $pet);
 
             if ($request->request->has('breed')) {
                 $pet->setBreed($request->request->get('breed'));
+            }
+
+            if ($request->request->has('price')) {
+                $pet->setPrice($request->request->get('price'));
             }
 
             if ($request->request->has('fatherName')) {
@@ -310,6 +374,16 @@ final class PetController extends AbstractController
                 $pet->setIsLookingForOwner($isLookingForNewOwner);
             }
 
+            if ($request->request->has('isFree')) {
+                $isFree = $request->request->get('isFree') === 'true';
+                $pet->setIsFree($isFree);
+            }
+
+            if ($request->request->has('isSold')) {
+                $isSold = $request->request->get('isSold') === 'true';
+                $pet->setIsSold($isSold);
+            }
+
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($pet);
             $entityManager->flush();
@@ -336,6 +410,7 @@ final class PetController extends AbstractController
     {
         $pet = $petRepository->findOneBy([
             'slug' => $slug,
+            'isDeleted' => false,
         ], [
             'createdAt' => 'desc',
         ]);
@@ -370,6 +445,7 @@ final class PetController extends AbstractController
 
         $pet = $petRepository->findOneBy([
             'slug' => $slug,
+            'isDeleted' => false,
         ], [
             'createdAt' => 'desc',
         ]);
@@ -380,7 +456,7 @@ final class PetController extends AbstractController
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        return PetResponseBuilder::buildSingle($pet, $this->getUser());
+        return $this->petResponseBuilder->buildForOnePet($pet, $this->getUser());
     }
 
     /**
@@ -424,57 +500,35 @@ final class PetController extends AbstractController
             'updatedAt' => 'desc',
         ], $limit, $offset);
 
-        return PetResponseBuilder::buildResponse($pets, $this->getUser());
+        return $this->petResponseBuilder->build($this->getUser(), ...$pets);
     }
 
     private function setPhotoIfExists(Request $request, Pet $pet): void
     {
-        if (!$request->files->has('photo')) {
-            return;
+        if ($request->request->has('media')) {
+            $petMedia = [];
+            $mediaCollection = $request->request->get('media');
+            if (is_string($mediaCollection)) {
+                $mediaCollection = [$mediaCollection];
+            }
+            foreach ($mediaCollection as $mediaId) {
+                $media = $this->mediaRepository->find($mediaId);
+                if ($media === null) {
+                    continue;
+                }
+                $petMedia[] = $media;
+            }
+            $pet->addMedia(...$petMedia);
         }
-
-        $newPhotos = $request->files->get('photo');
-
-        if (count($newPhotos) === 0) {
-            return;
-        }
-        $entityManager = $this->getDoctrine()->getManager();
-        foreach ($newPhotos as $newPhoto) {
-            $newFile = $this->uploadFile($newPhoto);
-            $media = new Media();
-            $media->setPublicUrl($newFile);
-            $media->setUser($this->getUser());
-            $media->setSize('original');
-            $pet->addMedia($media);
-            $entityManager->persist($media);
-            $entityManager->persist($pet);
-            $entityManager->flush();
-        }
+        $this->temp_upload($request, $pet);
     }
 
-    private function uploadFile(File $file, string $destination = null): string
+    private function temp_upload(Request $request, Pet $pet): void
     {
-        if ($destination === null) {
-            $destination = '/pets/uploads/';
-        }
-
-        if ($file instanceof UploadedFile) {
-            $originalFilename = $file->getClientOriginalName();
-        } else {
-            $originalFilename = $file->getFilename();
-        }
-
-        $newFilename = Urlizer::urlize(pathinfo($originalFilename, PATHINFO_FILENAME)) . '-' . uniqid('', true) . '.' . $file->guessExtension();
-
-        $stream = fopen($file->getPathname(), 'rb');
-        $this->filesystem->write(
-            $destination . $newFilename,
-            $stream
+        $mediaPetCollection = $this->mediaUploader->uploadByRequest(
+            $request, $this->getUser()
         );
-        if (is_resource($stream)) {
-            fclose($stream);
-        }
 
-        return $destination . $newFilename;
+        $pet->addMedia(...$mediaPetCollection);
     }
 }

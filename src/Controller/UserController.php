@@ -5,16 +5,13 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Breeder;
-use App\Entity\Media;
+use App\Entity\MediaUser;
 use App\Entity\User;
 use App\Repository\PetRepository;
 use App\Repository\UserRepository;
-use App\Service\PetResponseBuilder;
-use Gedmo\Sluggable\Util\Urlizer;
-use League\Flysystem\FilesystemInterface;
+use App\Service\MediaUploaderInterface;
+use App\Service\PetResponseBuilderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,11 +19,19 @@ use Symfony\Component\Routing\Annotation\Route;
 
 final class UserController extends AbstractController
 {
-    private FilesystemInterface $filesystem;
+    /**
+     * @var PetResponseBuilderInterface
+     */
+    private PetResponseBuilderInterface $petResponseBuilder;
+    /**
+     * @var MediaUploaderInterface
+     */
+    private MediaUploaderInterface $mediaUploader;
 
-    public function __construct(FilesystemInterface $filesystem)
+    public function __construct(MediaUploaderInterface $mediaUploader, PetResponseBuilderInterface $petResponseBuilder)
     {
-        $this->filesystem = $filesystem;
+        $this->petResponseBuilder = $petResponseBuilder;
+        $this->mediaUploader = $mediaUploader;
     }
 
     /**
@@ -79,21 +84,6 @@ final class UserController extends AbstractController
     }
 
     /**
-     * @Route("/api/v1/user/photo", methods={"POST"})
-     *
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
-    public function addUserPhoto(Request $request): JsonResponse
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        return $this->setPhotoIfExists($request, $user);
-    }
-
-    /**
      * @Route("/api/v1/user/{slug}", methods={"GET"}, name="public_get_user")
      *
      * @param string $slug
@@ -125,6 +115,10 @@ final class UserController extends AbstractController
     /**
      * @Route("/api/v1/user/{slug}/pets", methods={"GET"}, name="user_pets")
      *
+     * @param string $slug
+     * @param PetRepository $petRepository
+     * @param UserRepository $userRepository
+     *
      * @return JsonResponse
      */
     public function getPets(string $slug, PetRepository $petRepository, UserRepository $userRepository): JsonResponse
@@ -135,9 +129,11 @@ final class UserController extends AbstractController
 
         $pets = $petRepository->findBy([
             'user' => $user,
+        ], [
+            'updatedAt' => 'desc',
         ]);
 
-        return PetResponseBuilder::buildResponse($pets, $user);
+        return $this->petResponseBuilder->build($this->getUser(), ...$pets);
     }
 
     /**
@@ -150,7 +146,7 @@ final class UserController extends AbstractController
     public function search(UserRepository $userRepository): JsonResponse
     {
         $users = $userRepository->findBy([], [
-            'createdAt' => 'desc',
+            'updatedAt' => 'desc',
         ]);
 
         return new JsonResponse([
@@ -158,56 +154,26 @@ final class UserController extends AbstractController
         ]);
     }
 
-    private function setPhotoIfExists(Request $request, User $user): JsonResponse
+    private function setPhotoIfExists(Request $request): void
     {
         if (!$request->files->has('photo')) {
-            return new JsonResponse([
-                'message' => 'Empty request',
-            ], Response::HTTP_BAD_REQUEST);
+            return;
         }
 
-        $newPhoto = $request->files->get('photo');
+        $mediaCollection = $this->mediaUploader->uploadByRequest(
+            $request,
+            $this->getUser()
+        );
         $entityManager = $this->getDoctrine()->getManager();
-        if ($newPhoto) {
-            $newFile = $this->uploadFile($newPhoto);
-            $media = new Media();
-            $media->setPublicUrl($newFile);
-            $media->setUser($user);
-            $media->setSize('original');
+
+        /**
+         * Media $media.
+         */
+        foreach ($mediaCollection as $media) {
+            $mediaUser = new MediaUser($media, $this->getUser());
             $entityManager->persist($media);
+            $entityManager->persist($mediaUser);
             $entityManager->flush();
-
-            return new JsonResponse($media);
         }
-
-        return new JsonResponse([
-            'message' => 'No file was uploaded',
-        ], Response::HTTP_BAD_REQUEST);
-    }
-
-    private function uploadFile(File $file, string $destination = null): string
-    {
-        if ($destination === null) {
-            $destination = '/pets/uploads/';
-        }
-
-        if ($file instanceof UploadedFile) {
-            $originalFilename = $file->getClientOriginalName();
-        } else {
-            $originalFilename = $file->getFilename();
-        }
-
-        $newFilename = Urlizer::urlize(pathinfo($originalFilename, PATHINFO_FILENAME)) . '-' . uniqid('', true) . '.' . $file->guessExtension();
-
-        $stream = fopen($file->getPathname(), 'rb');
-        $this->filesystem->write(
-                $destination . $newFilename,
-                $stream
-            );
-        if (is_resource($stream)) {
-            fclose($stream);
-        }
-
-        return $destination . $newFilename;
     }
 }

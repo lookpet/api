@@ -29,7 +29,7 @@ class User implements UserInterface, \JsonSerializable
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=180, unique=true)
+     * @ORM\Column(type="string", length=180, unique=true, nullable=true)
      * @Groups("main")
      */
     private $email;
@@ -71,12 +71,8 @@ class User implements UserInterface, \JsonSerializable
     private $description;
 
     /**
-     * @ORM\OneToMany(targetEntity=Media::class, mappedBy="user")
-     */
-    private $media;
-
-    /**
      * @ORM\OneToMany(targetEntity=Pet::class, mappedBy="user")
+     * @ORM\OrderBy({"updatedAt" = "DESC"})
      */
     private $pets;
 
@@ -125,6 +121,17 @@ class User implements UserInterface, \JsonSerializable
      */
     private $providerLastResponse;
 
+    /**
+     * @ORM\OneToMany(targetEntity=MediaUser::class, mappedBy="user")
+     * @ORM\OrderBy({"createdAt" = "DESC"})
+     */
+    private $media;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $placeId;
+
     public function __construct(?string $slug = null, ?string $firstName = null, ?string $id = null)
     {
         if ($slug === null) {
@@ -145,9 +152,10 @@ class User implements UserInterface, \JsonSerializable
         $this->pets = new ArrayCollection();
         $this->petComments = new ArrayCollection();
         $this->petLikes = new ArrayCollection();
+        $this->media = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -157,7 +165,7 @@ class User implements UserInterface, \JsonSerializable
         return $this->email;
     }
 
-    public function setEmail(string $email): self
+    public function setEmail(?string $email): self
     {
         $this->email = $email;
 
@@ -315,45 +323,14 @@ class User implements UserInterface, \JsonSerializable
         return $this;
     }
 
-    /**
-     * @return Collection|Media[]
-     */
-    public function getMedia(): Collection
-    {
-        return $this->media;
-    }
-
-    public function addMedia(Media $media): self
-    {
-        if (!$this->media->contains($media)) {
-            $this->media[] = $media;
-            $media->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removemedia(Media $media): self
-    {
-        if ($this->media->contains($media)) {
-            $this->media->removeElement($media);
-            // set the owning side to null (unless already changed)
-            if ($media->getUser() === $this) {
-                $media->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getAvatarUrl(): ?string
     {
         if ($this->media->count() !== 0) {
-            return $this->media->first()->getPublicUrl();
+            return $this->media->first()->getMedia()->getPublicUrl();
         } elseif ($this->isFaceBook()) {
             $lastResponse = $this->getProviderLastResponse();
-            if (isset($lastResponse['picture']['data']['url'])) {
-                return $lastResponse['picture']['data']['url'];
+            if (isset($lastResponse['profile']['picture']['data']['url'])) {
+                return $lastResponse['profile']['picture']['data']['url'];
             }
         }
 
@@ -381,6 +358,7 @@ class User implements UserInterface, \JsonSerializable
             'media' => $this->getMedia()->getValues(),
             'breeder' => $this->getBreeder(),
             'hasPets' => count($this->getPets()) === 0 ? false : true,
+            'email' => $this->getEmail(),
         ];
     }
 
@@ -520,7 +498,7 @@ class User implements UserInterface, \JsonSerializable
 
     public function getName(): ?string
     {
-        return $this->name;
+        return $this->name ?? $this->firstName;
     }
 
     public function setName(?string $name): self
@@ -568,6 +546,54 @@ class User implements UserInterface, \JsonSerializable
         $this->providerLastResponse = $providerLastResponse;
 
         return $this;
+    }
+
+    /**
+     * @return Collection|MediaUser[]
+     */
+    public function getMedia(): Collection
+    {
+        return $this->media;
+    }
+
+    public function addMedia(MediaUser $mediaUser): self
+    {
+        if (!$this->media->contains($mediaUser)) {
+            $this->media[] = $mediaUser;
+            $mediaUser->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMedia(MediaUser $mediaUser): self
+    {
+        if ($this->media->contains($mediaUser)) {
+            $this->media->removeElement($mediaUser);
+            // set the owning side to null (unless already changed)
+            if ($mediaUser->getUser() === $this) {
+                $mediaUser->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getPlaceId(): ?string
+    {
+        return $this->placeId;
+    }
+
+    public function setPlaceId(?string $placeId): self
+    {
+        $this->placeId = $placeId;
+
+        return $this;
+    }
+
+    public function equals(User $user): bool
+    {
+        return $this->getId() === $user->getId();
     }
 
     private function generateSlug(?string $firstName): void

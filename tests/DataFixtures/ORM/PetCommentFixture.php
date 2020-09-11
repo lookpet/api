@@ -1,6 +1,6 @@
 <?php
 
-namespace tests\DataFixtures\ORM;
+namespace Tests\DataFixtures\ORM;
 
 use App\Entity\Pet;
 use Doctrine\Bundle\FixturesBundle\Fixture;

@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Functional\V1\Pets\Comments;
+namespace Tests\Functional\V1\Pets\Comments;
 
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Liip\TestFixturesBundle\Test\FixturesTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use tests\DataFixtures\ORM\PetFixture;
-use tests\DataFixtures\ORM\UserFixture;
+use Tests\DataFixtures\ORM\PetFixture;
+use Tests\DataFixtures\ORM\UserFixture;
 use tests\Helpers\AuthenticationHelper;
 
 /**

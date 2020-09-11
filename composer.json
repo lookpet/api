@@ -5,6 +5,7 @@
         "php": "^7.4",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "ext-json": "*",
         "aws/aws-sdk-php": "^3.137",
         "cocur/slugify": "^4.0",
         "doctrine/annotations": "^1.10",
@@ -55,7 +56,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "tests\\": "tests/"
+            "Tests\\": "tests/"
         }
     },
     "replace": {

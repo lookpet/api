@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Traits\LifecycleCallbackTrait;
 use App\Entity\Traits\TimestampTrait;
+use App\PetDomain\VO\Age;
 use App\Repository\PetRepository;
 use Cocur\Slugify\Slugify;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -92,6 +93,7 @@ class Pet implements \JsonSerializable
      * @ORM\JoinTable(name="pet_media",
      *      joinColumns={@ORM\JoinColumn(name="pet_id", referencedColumnName="id")},
      * )
+     * @ORM\OrderBy({"createdAt" = "DESC"})
      */
     private $media;
 
@@ -125,6 +127,31 @@ class Pet implements \JsonSerializable
      * @ORM\ManyToOne(targetEntity=Breeder::class, inversedBy="pets")
      */
     private $breeder;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $placeId;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $price;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $isFree;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $isSold;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isDeleted=false;
 
     public function __construct(string $type, ?string $slug, ?string $name = null, ?string $id = null, ?UserInterface $user = null)
     {
@@ -304,6 +331,7 @@ class Pet implements \JsonSerializable
             'slug' => $this->getSlug(),
             'name' => $this->getName(),
             'city' => $this->getCity(),
+            'placeId' => $this->getPlaceId(),
             'breed' => $this->getBreed(),
             'fatherName' => $this->getFatherName(),
             'motherName' => $this->getMotherName(),
@@ -316,10 +344,14 @@ class Pet implements \JsonSerializable
             'comments' => $this->getComments()->toArray(),
             'createdAt' => $this->getCreatedAt(),
             'isLookingForNewOwner' => $this->getIsLookingForOwner(),
+            'price' => $this->getPrice(),
+            'isFree' => $this->isFree(),
+            'isSold' => $this->isSold(),
             'media' => $this->getMedia()->getValues(),
             'user' => $this->getUser(),
             'breeder' => $this->getBreeder(),
             'isAlive' => true,
+//            'description' => $this->des
         ];
     }
 
@@ -331,10 +363,12 @@ class Pet implements \JsonSerializable
         return $this->media;
     }
 
-    public function addMedia(Media $medium): self
+    public function addMedia(Media ...$mediaCollection): self
     {
-        if (!$this->media->contains($medium)) {
-            $this->media[] = $medium;
+        foreach ($mediaCollection as $media) {
+            if (!$this->media->contains($media)) {
+                $this->media[] = $media;
+            }
         }
 
         return $this;
@@ -402,14 +436,15 @@ class Pet implements \JsonSerializable
         return $this;
     }
 
-    public function hasLike(?UserInterface $user): bool
+    public function hasLike(?User $user): bool
     {
         if ($user === null) {
             return false;
         }
 
+        /** @var PetLike $currentLike */
         foreach ($this->likes as $currentLike) {
-            if ($currentLike->getUser() === $user) {
+            if ($currentLike->getUser()->equals($user)) {
                 return true;
             }
         }
@@ -462,10 +497,82 @@ class Pet implements \JsonSerializable
         return $this;
     }
 
+    public function getAge(): ?Age
+    {
+        if ($this->dateOfBirth === null) {
+            return null;
+        }
+
+        return new Age($this->dateOfBirth);
+    }
+
+    public function getPlaceId(): ?string
+    {
+        return $this->placeId;
+    }
+
+    public function setPlaceId(?string $placeId): self
+    {
+        $this->placeId = $placeId;
+
+        return $this;
+    }
+
+    public function getPrice(): ?string
+    {
+        return $this->price;
+    }
+
+    public function setPrice(?string $price): self
+    {
+        $this->price = $price;
+
+        return $this;
+    }
+
+    public function isFree(): ?bool
+    {
+        return $this->isFree;
+    }
+
+    public function setIsFree(?bool $isFree): self
+    {
+        $this->isFree = $isFree;
+
+        return $this;
+    }
+
+    public function isSold(): ?bool
+    {
+        return $this->isSold;
+    }
+
+    public function setIsSold(?bool $isSold): self
+    {
+        $this->isSold = $isSold;
+
+        if ($this->isSold === true) {
+            $this->isLookingForOwner = false;
+            $this->isFree = false;
+        }
+
+        return $this;
+    }
+
     private function generateSlug(): void
     {
         $slugify = new Slugify();
-        $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
-        $this->slug = $slugify->slugify(implode('-', [$slugEntropy]));
+        $slugEntropy = random_int(10, 100000);
+        $this->slug = $slugify->slugify(implode('-', [$this->name, $slugEntropy]));
+    }
+
+    public function getIsDeleted(): bool
+    {
+        return $this->isDeleted;
+    }
+
+    public function delete(): void
+    {
+        $this->isDeleted = true;
     }
 }

@@ -22,6 +22,7 @@ JUNIT_FILE_PATH                 = $(JUNIT_LOCATION_PATH)/$(JUNIT_FILE)
 SSH_KEY_FILE   ?= $(HOME)/.ssh/id_rsa
 export DOCKER_BUILDKIT := 1
 
+
 export VERSION := $(shell git describe --all --dirty --always | sed -E 's/[a-z]+\///;s/\//-/')
 export GIT_SHA := $(shell git rev-parse HEAD)
 export TIMESTAMP := $(shell date +"%Y%m%d%H%M%S")

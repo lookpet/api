@@ -7,7 +7,6 @@ use App\Entity\Traits\TimestampTrait;
 use App\Repository\PetLikeRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=PetLikeRepository::class)
@@ -35,7 +34,7 @@ class PetLike implements \JsonSerializable
      */
     private $user;
 
-    public function __construct(Pet $pet, UserInterface $user)
+    public function __construct(Pet $pet, User $user)
     {
         $this->id = Uuid::uuid4()->toString();
         $this->pet = $pet;
@@ -52,7 +51,7 @@ class PetLike implements \JsonSerializable
         return $this->pet;
     }
 
-    public function getUser(): UserInterface
+    public function getUser(): User
     {
         return $this->user;
     }

@@ -10,4 +10,4 @@ COPY ./docker/nginx/conf.d/ /etc/nginx/conf.d
 
 CMD ["nginx"]
 
-EXPOSE 80 8080 443
+EXPOSE 80 443

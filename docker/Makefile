@@ -1,4 +1,5 @@
-build-push: build-prod-all push-prod-all build-dev-all push-dev-all
+build-push-develop: build-dev-all push-dev-all
+build-push-production: build-prod-all push-prod-all
 build-dev-all: build-nginx build-dev-php
 build-prod-all: build-nginx build-prod-php
 

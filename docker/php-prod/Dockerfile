@@ -16,10 +16,13 @@ ENV APP_DEBUG=1 \
     APP_VERSION=${VERSION:-latest}/${GIT_SHA:-latest}/${TIMESTAMP:-latest}\
     COMPOSER_HOME=/var/composer
 
+USER root
+
 COPY --chown=root docker/php-prod/conf.d/ $PHP_INI_DIR/conf.d/
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 RUN composer install --prefer-dist --no-scripts
+RUN php bin/console assets:install
 #db in CI required
 #RUN php bin/console cache:warmup -e prod
 #RUN php bin/console lint:yaml $(find config src -type f \( -iname \*.yaml -o -iname \*.yml \)) --parse-tags -e prod

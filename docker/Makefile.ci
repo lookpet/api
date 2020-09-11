@@ -27,10 +27,17 @@ build-prod-php:
 	docker tag $(NAMESPACE)/api-php:$(GIT_SHA) $(NAMESPACE)/api-php:$(VERSION)
 	docker tag $(NAMESPACE)/api-php:$(GIT_SHA) $(NAMESPACE)/api-php:latest
 
-deploy-digital:
-	ssh root@157.230.29.214 "cd /root/api-deploy && make deploy"
+build-deploy-production:
+	ssh root@157.230.29.214 "cd /root/api && make git-pull && make run-build-push-production && cd /root/deploy-api-production && make pull-deploy-prod"
 
-deploy-prod:
-	eb deploy
+build-deploy-stage:
+	ssh root@157.230.29.214 "cd /root/develop-api && make git-pull && make run-build-push-develop && cd /root/deploy-api-stage && make pull-deploy-stage"
 
-run-deploy: aws-v2-login build-push deploy-prod
+run-build-push-develop: aws-v2-login build-push-develop
+run-build-push-production: aws-v2-login build-push-production
+
+git-pull:
+	git pull
+
+clear-space:
+	docker system prune -af

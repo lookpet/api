@@ -1,0 +1,20 @@
+num_of_years: >-
+    {years, plural,
+        one   {# year}
+        many   {# years}
+        other {# years}
+    }
+
+num_of_months: >-
+    {months, plural,
+        one   {# months}
+        many   {# months}
+        other {# months}
+    }
+
+num_of_days: >-
+    {days, plural,
+        one   {# day}
+        many   {# days}
+        other {# days}
+    }

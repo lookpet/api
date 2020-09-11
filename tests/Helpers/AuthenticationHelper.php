@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace tests\Helpers;
 
 use Symfony\Component\HttpFoundation\Request;
-use tests\DataFixtures\ORM\UserFixture;
+use Tests\DataFixtures\ORM\UserFixture;
 
 final class AuthenticationHelper
 {
@@ -21,7 +21,7 @@ final class AuthenticationHelper
             ['CONTENT_TYPE' => 'application/json'],
             (string) json_encode([
                 'email' => UserFixture::TEST_USER_EMAIL,
-                'password' => UserFixture::DEFAULT_PASSWORD,
+                'password' => UserFixture::PASSWORD_GOOD,
             ])
         );
         $response = $client->getResponse();

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Functional\V1\Authentication;
+namespace Tests\Functional\V1\Authentication;
 
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Liip\TestFixturesBundle\Test\FixturesTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use tests\DataFixtures\ORM\UserFixture;
+use Tests\DataFixtures\ORM\UserFixture;
 
 /**
  * @group functional
@@ -105,7 +105,7 @@ final class RegistrationTest extends WebTestCase
         return [
             [
                 [
-                    'password' => UserFixture::DEFAULT_PASSWORD,
+                    'password' => UserFixture::PASSWORD_GOOD,
                 ],
                 'Empty email',
             ],
@@ -114,6 +114,20 @@ final class RegistrationTest extends WebTestCase
                     'email' => UserFixture::TEST_USER_EMAIL,
                 ],
                 'Empty password',
+            ],
+            [
+                [
+                    'email' => UserFixture::TEST_USER_BAD_EMAIL,
+                    'password' => UserFixture::PASSWORD_GOOD,
+                ],
+                'Invalid email address',
+            ],
+            [
+                [
+                    'email' => UserFixture::TEST_USER_EMAIL,
+                    'password' => UserFixture::PASSWORD_BAD,
+                ],
+                'Password too short min length is 6',
             ],
         ];
     }

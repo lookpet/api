@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\PetDomain\VO\Gender;
+use App\PetDomain\VO\Limit;
+use App\PetDomain\VO\Offset;
+use App\PetDomain\VO\PageNumber;
 use App\Repository\PetRepository;
-use App\Service\PetResponseBuilder;
+use App\Service\PetResponseBuilderInterface;
 use Swagger\Annotations as SWG;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,6 +19,16 @@ use Symfony\Component\Routing\Annotation\Route;
 
 final class SearchController extends AbstractController
 {
+    /**
+     * @var PetResponseBuilderInterface
+     */
+    private PetResponseBuilderInterface $petResponseBuilder;
+
+    public function __construct(PetResponseBuilderInterface $petResponseBuilder)
+    {
+        $this->petResponseBuilder = $petResponseBuilder;
+    }
+
     /**
      * @Route("/api/v1/search/pet", methods={"GET"}, name="search_pet")
      *
@@ -42,6 +56,11 @@ final class SearchController extends AbstractController
      *     in="query",
      *     type="string",
      *   ),
+     *   @SWG\Parameter(
+     *     name="isLookingForOwner",
+     *     in="query",
+     *     type="boolean",
+     *   ),
      *
      *   @SWG\Response(
      *     response=200,
@@ -57,12 +76,36 @@ final class SearchController extends AbstractController
      */
     public function search(Request $request, PetRepository $petRepository): JsonResponse
     {
+        $gender = null;
+
+        if ($request->query->has('gender') && in_array(
+            $request->query->get('gender'), Gender::ALL
+            )) {
+            $gender = new Gender($request->query->get('gender'));
+        }
+
+        $isLookingForNewOwner = null;
+        if ($request->query->has('isLookingForNewOwner') && in_array(
+                $request->query->get('isLookingForNewOwner'),
+                ['true', 'false']
+            )) {
+            $isLookingForNewOwner = $request->query->get('isLookingForNewOwner') === 'true';
+        }
+
         $pets = $petRepository->findBySearch(
             $request->query->get('breed'),
             $request->query->get('type'),
             $request->query->get('city'),
+            $isLookingForNewOwner,
+            $gender,
+            new Offset(
+                new PageNumber(
+                    (int) $request->get('page')
+                ),
+                new Limit()
+            )
         );
 
-        return PetResponseBuilder::buildResponse($pets, $this->getUser());
+        return $this->petResponseBuilder->build($this->getUser(), ...$pets);
     }
 }
