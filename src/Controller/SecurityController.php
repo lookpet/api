@@ -4,9 +4,12 @@ namespace App\Controller;
 
 use App\Dto\AuthenticationUserLoginDto;
 use App\Dto\AuthenticationUserRegistrationDto;
+use App\EmailTemplates\EmailTemplateDto;
 use App\Entity\ApiToken;
 use App\Entity\User;
+use App\PetDomain\VO\EmailRecipient;
 use App\Repository\UserRepository;
+use App\Service\EmailTemplateSenderInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
@@ -201,8 +204,9 @@ final class SecurityController extends AbstractController
     public function register(
         Request $request,
         UserPasswordEncoderInterface $passwordEncoder,
-        EntityManagerInterface $entityManager): JsonResponse
-    {
+        EntityManagerInterface $entityManager,
+        EmailTemplateSenderInterface $emailTemplateSender
+    ): JsonResponse {
         try {
             if (!$request->request->has('email')) {
                 return new JsonResponse([
@@ -256,6 +260,21 @@ final class SecurityController extends AbstractController
 
             $entityManager->persist($user);
             $entityManager->flush();
+
+            if (!$user->isLookPetUser()) {
+                $emailTemplateSender->send(new EmailTemplateDto(
+                    EmailRecipient::create(
+                        $_ENV['MJ_FROM_EMAIL'],
+                        $_ENV['MJ_FROM_NAME']
+                    ),
+                    EmailRecipient::create(
+                        $user->getEmail(),
+                        $user->getName()
+                    ),
+                    'Добро пожаловать на look.pet',
+                    $_ENV['MJ_TEMPLATE_WELCOME']
+                ));
+            }
         } catch (\Exception $exception) {
             return new JsonResponse([
                 'message' => $exception->getMessage(),
