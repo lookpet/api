@@ -40,6 +40,6 @@ services:
             - true
             - { version: 'v3.1' }
 
-    App\Service\EmailTemplateSenderInterface: App\Service\EmailTemplateTemplateSender
-
+    App\Service\EmailTemplateSenderInterface: '@App\Service\EmailTemplateTemplateSender'
+    App\Service\EmailTemplateTemplateSender: '@Mailjet\Client'
 
