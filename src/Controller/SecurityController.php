@@ -158,6 +158,7 @@ final class SecurityController extends AbstractController
      * @param Request $request
      * @param UserPasswordEncoderInterface $passwordEncoder
      * @param EntityManagerInterface $entityManager
+     * @param EmailTemplateSenderInterface $emailTemplateSender
      *
      * @return JsonResponse
      *

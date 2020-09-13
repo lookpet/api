@@ -41,5 +41,7 @@ services:
             - { version: 'v3.1' }
 
     App\Service\EmailTemplateSenderInterface: '@App\Service\EmailTemplateTemplateSender'
-    App\Service\EmailTemplateTemplateSender: '@Mailjet\Client'
+    App\Service\EmailTemplateTemplateSender:
+        arguments:
+            - '@Mailjet\Client'
 
