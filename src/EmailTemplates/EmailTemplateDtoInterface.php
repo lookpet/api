@@ -11,9 +11,9 @@ interface EmailTemplateDtoInterface
      */
     public function isTemplateLanguage(): bool;
 
-    public function setFrom(?EmailRecipient $from): void;
+    public function setFrom(?EmailRecipient $from): self;
 
-    public function setVariables(array $variables): void;
+    public function setVariables(array $variables): self;
 
     public function getVariables(): array;
 

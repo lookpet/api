@@ -28,9 +28,11 @@ class EmailTemplateDto implements EmailTemplateDtoInterface
         $this->from = null;
     }
 
-    public function setFrom(?EmailRecipient $from): void
+    public function setFrom(?EmailRecipient $from): self
     {
         $this->from = $from;
+
+        return $this;
     }
 
     public function getVariables(): array
@@ -38,9 +40,11 @@ class EmailTemplateDto implements EmailTemplateDtoInterface
         return $this->variables;
     }
 
-    public function setVariables(array $variables): void
+    public function setVariables(array $variables): self
     {
         $this->variables = $variables;
+
+        return $this;
     }
 
     public function hasVariables(): bool

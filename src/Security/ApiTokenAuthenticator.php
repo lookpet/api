@@ -18,6 +18,7 @@ final class ApiTokenAuthenticator extends AbstractGuardAuthenticator
         'public_post_media_crop',
         'public_post_media',
         'main_page',
+        'api_password_reset',
         'api_login',
         'api_register',
         'public_pet_slug',
