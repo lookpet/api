@@ -9,7 +9,7 @@ class EmailTemplateDto implements EmailTemplateDtoInterface
     /**
      * @var EmailRecipient
      */
-    private EmailRecipient $from;
+    private ?EmailRecipient $from;
     /**
      * @var EmailRecipient
      */
@@ -17,14 +17,35 @@ class EmailTemplateDto implements EmailTemplateDtoInterface
     private string $subject;
     private int $templateId;
     private bool $isTemplateLanguage;
+    private array $variables = [];
 
-    public function __construct(EmailRecipient $from, EmailRecipient $to, string $subject, int $templateId, bool $isTemplateLanguage = true)
+    public function __construct(EmailRecipient $to, string $subject, int $templateId, bool $isTemplateLanguage = true)
     {
-        $this->from = $from;
         $this->to = $to;
         $this->subject = $subject;
         $this->templateId = $templateId;
         $this->isTemplateLanguage = $isTemplateLanguage;
+        $this->from = null;
+    }
+
+    public function setFrom(?EmailRecipient $from): void
+    {
+        $this->from = $from;
+    }
+
+    public function getVariables(): array
+    {
+        return $this->variables;
+    }
+
+    public function setVariables(array $variables): void
+    {
+        $this->variables = $variables;
+    }
+
+    public function hasVariables(): bool
+    {
+        return count($this->variables) > 0;
     }
 
     /**
@@ -62,8 +83,13 @@ class EmailTemplateDto implements EmailTemplateDtoInterface
     /**
      * @return EmailRecipient
      */
-    public function getFrom(): EmailRecipient
+    public function getFrom(): ?EmailRecipient
     {
         return $this->from;
+    }
+
+    public function hasFrom(): bool
+    {
+        return $this->getFrom() !== null;
     }
 }

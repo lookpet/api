@@ -265,10 +265,6 @@ final class SecurityController extends AbstractController
             if (!$user->isLookPetUser()) {
                 $emailTemplateSender->send(new EmailTemplateDto(
                     EmailRecipient::create(
-                        $_ENV['MJ_FROM_EMAIL'],
-                        $_ENV['MJ_FROM_NAME']
-                    ),
-                    EmailRecipient::create(
                         $user->getEmail(),
                         $user->getName()
                     ),

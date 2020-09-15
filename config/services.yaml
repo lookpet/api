@@ -40,8 +40,14 @@ services:
             - true
             - { version: 'v3.1' }
 
+    App\PetDomain\VO\EmailRecipient:
+        arguments:
+            - '%env(MJ_FROM_EMAIL)%'
+            - '%env(MJ_FROM_NAME)%'
+
     App\Service\EmailTemplateSenderInterface: '@App\Service\EmailTemplateTemplateSender'
     App\Service\EmailTemplateTemplateSender:
         arguments:
             - '@Mailjet\Client'
+            - '@App\PetDomain\VO\EmailRecipient'
 
