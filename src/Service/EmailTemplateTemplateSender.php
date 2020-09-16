@@ -44,7 +44,7 @@ class EmailTemplateTemplateSender implements EmailTemplateSenderInterface
         ];
 
         if ($templateDto->hasVariables()) {
-            array_merge(
+            $body = array_merge(
                 $body['Messages'][0],
                 [
                     'Variables' => $templateDto->getVariables(),
