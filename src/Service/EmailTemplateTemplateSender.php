@@ -46,7 +46,6 @@ class EmailTemplateTemplateSender implements EmailTemplateSenderInterface
         if ($templateDto->hasVariables()) {
             $body['Messages'][0]['Variables'] = $templateDto->getVariables();
         }
-        $this->emailSenderClient->setConnectionTimeout(5);
 
         $this->emailSenderClient->post(
           Resources::$Email,
