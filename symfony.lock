@@ -169,6 +169,9 @@
     "liip/test-fixtures-bundle": {
         "version": "1.9.1"
     },
+    "mailjet/mailjet-apiv3-php": {
+        "version": "v1.4.1"
+    },
     "mtdowling/jmespath.php": {
         "version": "2.5.0"
     },

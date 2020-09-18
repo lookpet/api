@@ -520,11 +520,6 @@ final class PetController extends AbstractController
             }
             $pet->addMedia(...$petMedia);
         }
-        $this->temp_upload($request, $pet);
-    }
-
-    private function temp_upload(Request $request, Pet $pet): void
-    {
         $mediaPetCollection = $this->mediaUploader->uploadByRequest(
             $request, $this->getUser()
         );

@@ -342,6 +342,13 @@ class User implements UserInterface, \JsonSerializable
         return $this->provider === 'facebook';
     }
 
+    public function isLookPetUser(): bool
+    {
+        $domain = mb_substr($this->getEmail(), mb_strpos($this->getEmail(), '@') + 1);
+
+        return $domain === 'look.pet';
+    }
+
     public function jsonSerialize(): array
     {
         return [
