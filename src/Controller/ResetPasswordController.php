@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class ResetPasswordController extends AbstractController
 {
@@ -22,11 +23,19 @@ class ResetPasswordController extends AbstractController
      * @var UserRepositoryInterface
      */
     private UserRepositoryInterface $userRepository;
+    /**
+     * @var UserPasswordEncoderInterface
+     */
+    private UserPasswordEncoderInterface $passwordEncoder;
 
-    public function __construct(EmailTemplateSenderInterface $emailTemplateSender, UserRepositoryInterface $userRepository)
+    public function __construct(
+        UserPasswordEncoderInterface $passwordEncoder,
+        EmailTemplateSenderInterface $emailTemplateSender,
+        UserRepositoryInterface $userRepository)
     {
         $this->emailTemplateSender = $emailTemplateSender;
         $this->userRepository = $userRepository;
+        $this->passwordEncoder = $passwordEncoder;
     }
 
     /**
@@ -52,6 +61,9 @@ class ResetPasswordController extends AbstractController
             return new JsonResponse([], Response::HTTP_OK);
         }
 
+        $password = $this->randomPassword();
+        $user->setPassword($this->passwordEncoder->encodePassword($user, $password));
+
         $this->emailTemplateSender->send(
             (new EmailTemplateDto(
                 EmailRecipient::create(
@@ -61,9 +73,14 @@ class ResetPasswordController extends AbstractController
                 'Восстановить доступ к look.pet',
                 $_ENV['MJ_TEMPLATE_RESET_PASSWORD']
             ))->setVariables([
-                'password_reset_link' => 'https://look.pet',
+                'new_password' => $password,
             ]));
 
         return new JsonResponse([], Response::HTTP_OK);
+    }
+
+    private function randomPassword($length = 8) {
+        $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?";
+        return substr( str_shuffle( $chars ), 0, $length );
     }
 }
