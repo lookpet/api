@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\DataFixtures\ORM\PetFixture;
 use Tests\DataFixtures\ORM\UserFixture;
-use tests\Helpers\AuthenticationHelper;
+use Tests\Helpers\AuthenticationHelper;
 
 /**
  * @group functional

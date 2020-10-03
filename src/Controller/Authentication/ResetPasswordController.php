@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Controller;
+declare(strict_types=1);
+
+namespace App\Controller\Authentication;
 
 use App\EmailTemplates\EmailTemplateDto;
 use App\PetDomain\VO\EmailRecipient;
@@ -15,17 +17,8 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class ResetPasswordController extends AbstractController
 {
-    /**
-     * @var EmailTemplateSenderInterface
-     */
     private EmailTemplateSenderInterface $emailTemplateSender;
-    /**
-     * @var UserRepositoryInterface
-     */
     private UserRepositoryInterface $userRepository;
-    /**
-     * @var UserPasswordEncoderInterface
-     */
     private UserPasswordEncoderInterface $passwordEncoder;
 
     public function __construct(
@@ -79,8 +72,10 @@ class ResetPasswordController extends AbstractController
         return new JsonResponse([], Response::HTTP_OK);
     }
 
-    private function randomPassword($length = 8) {
-        $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?";
-        return substr( str_shuffle( $chars ), 0, $length );
+    private function randomPassword($length = 8)
+    {
+        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?';
+
+        return mb_substr(str_shuffle($chars), 0, $length);
     }
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\Pet;
 
 use App\Entity\PetComment;
 use App\Repository\PetCommentRepository;
@@ -16,13 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 final class PetCommentController extends AbstractController
 {
-    /**
-     * @var PetRepository
-     */
     private PetRepository $petRepository;
-    /**
-     * @var PetCommentRepository
-     */
     private PetCommentRepository $petCommentRepository;
 
     public function __construct(PetRepository $petRepository, PetCommentRepository $petCommentRepository)

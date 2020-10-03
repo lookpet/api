@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Controller;
+declare(strict_types=1);
+
+namespace App\Controller\Media;
 
 use App\Repository\MediaRepository;
 use App\Service\MediaCropperInterface;
@@ -13,17 +15,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class MediaCropController extends AbstractController
 {
-    /**
-     * @var MediaCropperInterface
-     */
     private MediaCropperInterface $mediaCropper;
-    /**
-     * @var MediaRepository
-     */
     private MediaRepository $mediaRepository;
-    /**
-     * @var LoggerInterface
-     */
     private LoggerInterface $logger;
 
     /**
@@ -55,10 +48,6 @@ class MediaCropController extends AbstractController
         if ($media === null) {
             return new JsonResponse(null, Response::HTTP_NOT_FOUND);
         }
-
-//        if (!$media->hasAccess($this->getUser())) {
-//            return new JsonResponse(null, Response::HTTP_FORBIDDEN);
-//        }
 
         $imageCropParams = [
             0, 0, $media->getWidth()->get(), $media->getHeight()->get(),

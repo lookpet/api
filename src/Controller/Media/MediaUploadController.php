@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Controller;
+declare(strict_types=1);
+
+namespace App\Controller\Media;
 
 use App\Repository\MediaRepository;
 use App\Service\MediaUploaderInterface;
@@ -13,21 +15,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class MediaUploadController extends AbstractController
 {
-    /**
-     * @var MediaRepository
-     */
     private MediaRepository $mediaRepository;
-    /**
-     * @var FilesystemInterface
-     */
     private FilesystemInterface $filesystem;
-    /**
-     * @var EntityManagerInterface
-     */
     private EntityManagerInterface $entityManager;
-    /**
-     * @var MediaUploaderInterface
-     */
     private MediaUploaderInterface $mediaUploader;
 
     public function __construct(

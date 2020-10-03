@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace tests\Helpers;
+namespace Tests\Helpers;
 
 use Symfony\Component\HttpFoundation\Request;
 use Tests\DataFixtures\ORM\UserFixture;

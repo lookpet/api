@@ -34,7 +34,7 @@ final class RegistrationTest extends WebTestCase
             (string) json_encode([
                 'firstName' => UserFixture::TEST_USER_FIRST_NAME,
                 'email' => UserFixture::TEST_USER_EMAIL,
-                'password' => '1234',
+                'password' => '123456',
             ])
         );
         $response = $client->getResponse();
@@ -71,7 +71,7 @@ final class RegistrationTest extends WebTestCase
         $content = json_decode($response->getContent(), true);
 
         self::assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        self::assertEquals('User already exist', $content['message']);
+        self::assertEquals('Password too short min length is 6', $content['message']);
     }
 
     /**

@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Controller;
+declare(strict_types=1);
+
+namespace App\Controller\Authentication;
 
 use App\Dto\AuthenticationUserLoginDto;
 use App\Dto\AuthenticationUserRegistrationDto;
@@ -8,7 +10,7 @@ use App\EmailTemplates\EmailTemplateDto;
 use App\Entity\ApiToken;
 use App\Entity\User;
 use App\PetDomain\VO\EmailRecipient;
-use App\Repository\UserRepository;
+use App\Repository\UserRepositoryInterface;
 use App\Service\EmailTemplateSenderInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -22,18 +24,12 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-final class SecurityController extends AbstractController
+final class AuthenticationController extends AbstractController
 {
-    /**
-     * @var UserRepository
-     */
-    private UserRepository $userRepository;
-    /**
-     * @var ValidatorInterface
-     */
+    private UserRepositoryInterface $userRepository;
     private ValidatorInterface $validator;
 
-    public function __construct(UserRepository $userRepository, ValidatorInterface $validator)
+    public function __construct(UserRepositoryInterface $userRepository, ValidatorInterface $validator)
     {
         $this->userRepository = $userRepository;
         $this->validator = $validator;
@@ -45,7 +41,6 @@ final class SecurityController extends AbstractController
      * @param Request $request
      * @param UserPasswordEncoderInterface $passwordEncoder
      * @param EntityManagerInterface $entityManager
-     * @param ValidatorInterface $validator
      *
      * @return JsonResponse
      *

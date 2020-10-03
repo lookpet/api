@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Controller;
+declare(strict_types=1);
+
+namespace App\Controller\Media;
 
 use App\Repository\MediaRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,17 +14,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class MediaDeleteController extends AbstractController
 {
-    /**
-     * @var MediaRepository
-     */
     private MediaRepository $mediaRepository;
-    /**
-     * @var FilesystemInterface
-     */
     private FilesystemInterface $filesystem;
-    /**
-     * @var EntityManagerInterface
-     */
     private EntityManagerInterface $entityManager;
 
     public function __construct(

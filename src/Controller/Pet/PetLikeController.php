@@ -2,30 +2,23 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\Pet;
 
 use App\Entity\PetLike;
-use App\Repository\PetLikeRepository;
-use App\Repository\PetRepository;
+use App\Repository\PetLikeRepositoryInterface;
+use App\Repository\PetRepositoryInterface;
 use Swagger\Annotations as SWG;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 final class PetLikeController extends AbstractController
 {
-    /**
-     * @var PetRepository
-     */
-    private PetRepository $petRepository;
-    /**
-     * @var PetLikeRepository
-     */
-    private PetLikeRepository $petLikeRepository;
+    private PetRepositoryInterface $petRepository;
+    private PetLikeRepositoryInterface $petLikeRepository;
 
-    public function __construct(PetRepository $petRepository, PetLikeRepository $petLikeRepository)
+    public function __construct(PetRepositoryInterface $petRepository, PetLikeRepositoryInterface $petLikeRepository)
     {
         $this->petRepository = $petRepository;
         $this->petLikeRepository = $petLikeRepository;
@@ -34,7 +27,7 @@ final class PetLikeController extends AbstractController
     /**
      * @Route("/api/v1/pet/{slug}/like", methods={"POST"}, name="pet_like")
      *
-     * @param Request $request
+     * @param string $slug
      *
      * @return JsonResponse
      *
@@ -69,10 +62,7 @@ final class PetLikeController extends AbstractController
         }
         $pet = array_pop($pets);
 
-        $petLikes = $this->petLikeRepository->findBy([
-            'pet' => $pet,
-            'user' => $this->getUser(),
-        ]);
+        $petLikes = $this->petLikeRepository->getPetLikes($this->getUser(), $pet);
 
         if (count($petLikes) === 0) {
             $petLike = new PetLike($pet, $this->getUser());

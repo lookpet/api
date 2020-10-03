@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\Dog;
 
 use App\PetDomain\PetTypes;
 use App\Repository\PetRepositoryInterface;
