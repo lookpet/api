@@ -2,25 +2,25 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\Pet;
 
-use App\PetDomain\Cat\CatBreedList;
+use App\PetDomain\PetTypes;
 use Swagger\Annotations as SWG;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-final class CatBreedController extends AbstractController
+final class PetTypeController extends AbstractController
 {
     /**
-     * @Route("/api/v1/cat/breeds", methods={"GET"}, name="public_cat_breeds")
+     * @Route("/api/v1/types", methods={"GET"}, name="public_pet_types")
      *
      * @return JsonResponse
      *
-     * @SWG\Get(path="/api/v1/cat/breeds",
-     *   tags={"Cat"},
-     *   summary="cat breed list",
+     *  @SWG\Get(path="/api/v1/types",
+     *   tags={"Pet"},
+     *   summary="Pet types list",
      *   description="",
      *   produces={"application/json"},
      *
@@ -29,15 +29,18 @@ final class CatBreedController extends AbstractController
      *     description="OK",
      *     examples={
      *     "application/json": {
-     *           "maine-coon": "мейн-кун",
-     *           "scottish-fold": "шотландская вислоухая кошка"
+     *           "dog": "собака",
+     *           "cat": "кот/кошка"
      *          }
      *       }
      *    )
      * )
      */
-    public function getBreedList(): JsonResponse
+    public function getTypes(): JsonResponse
     {
-        return new JsonResponse(CatBreedList::getAll(), Response::HTTP_OK);
+        return new JsonResponse(
+            PetTypes::getList(),
+            Response::HTTP_OK
+        );
     }
 }

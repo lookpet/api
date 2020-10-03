@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\Cat;
 
 use App\PetDomain\PetTypes;
 use App\Repository\PetRepositoryInterface;
@@ -12,18 +12,18 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-final class DogBreedExistController extends AbstractController
+final class CatCityExistController extends AbstractController
 {
     /**
-     * @Route("/api/v1/dog/breed/exist", methods={"GET"}, name="public_dog_breeds_exist")
+     * @Route("/api/v1/cat/city/exist", methods={"GET"}, name="public_cat_city_exist")
      *
      * @param PetRepositoryInterface $petRepository
      *
      * @return JsonResponse
      *
-     * @SWG\Get(path="/api/v1/dog/breed/exist",
-     *   tags={"Dog"},
-     *   summary="Dog breed list that have profiles",
+     * @SWG\Get(path="/api/v1/cat/city/exist",
+     *   tags={"Cat"},
+     *   summary="cat cities list of pet profiles",
      *   description="",
      *   produces={"application/json"},
      *
@@ -32,14 +32,14 @@ final class DogBreedExistController extends AbstractController
      *     description="OK",
      *     examples={
      *     "application/json": {
-     *           {"breed":"Siberian Husky"}
+     *           {"city":"Moscow"}
      *     }
      *       }
      *    )
      * )
      */
-    public function getBreedList(PetRepositoryInterface $petRepository): JsonResponse
+    public function getCitiesList(PetRepositoryInterface $petRepository): JsonResponse
     {
-        return new JsonResponse($petRepository->getExistBreeds(PetTypes::DOG), Response::HTTP_OK);
+        return new JsonResponse($petRepository->getExistCities(PetTypes::CAT), Response::HTTP_OK);
     }
 }

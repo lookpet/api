@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Controller;
+declare(strict_types=1);
+
+namespace App\Controller\Pet;
 
 use App\Dto\PetDto;
 use App\Entity\Pet;
@@ -20,21 +22,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 final class PetController extends AbstractController
 {
-    /**
-     * @var PetResponseBuilderInterface
-     */
     private PetResponseBuilderInterface $petResponseBuilder;
-    /**
-     * @var MediaUploaderInterface
-     */
     private MediaUploaderInterface $mediaUploader;
-    /**
-     * @var MediaRepository
-     */
     private MediaRepository $mediaRepository;
-    /**
-     * @var MediaCropperInterface
-     */
     private MediaCropperInterface $mediaCropper;
 
     public function __construct(

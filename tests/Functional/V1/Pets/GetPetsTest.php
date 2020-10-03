@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Functional\V1\Pets;
+namespace Tests\Functional\V1\Pets;
 
-use Helpers\AuthenticationHelper;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Liip\TestFixturesBundle\Test\FixturesTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\DataFixtures\ORM\PetFixture;
+use Tests\Helpers\AuthenticationHelper;
 
 /**
  * @group functional
@@ -23,7 +23,7 @@ final class GetPetsTest extends WebTestCase
     public function testGetPets(): void
     {
         $client = static::createClient();
-        $token = AuthenticationHelper::login();
+//        $token = AuthenticationHelper::login($client);
 
         $this->loadFixtures([PetFixture::class]);
 

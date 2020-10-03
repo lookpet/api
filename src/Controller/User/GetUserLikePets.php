@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Controller;
+declare(strict_types=1);
+
+namespace App\Controller\User;
 
 use App\Repository\UserRepositoryInterface;
 use Swagger\Annotations as SWG;
@@ -10,9 +12,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class GetUserLikePets extends AbstractController
 {
-    /**
-     * @var UserRepositoryInterface
-     */
     private UserRepositoryInterface $userRepository;
 
     public function __construct(UserRepositoryInterface $userRepository)

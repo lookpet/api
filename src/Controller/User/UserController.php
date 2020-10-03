@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\User;
 
 use App\Entity\Breeder;
 use App\Entity\MediaUser;
@@ -19,13 +19,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 final class UserController extends AbstractController
 {
-    /**
-     * @var PetResponseBuilderInterface
-     */
     private PetResponseBuilderInterface $petResponseBuilder;
-    /**
-     * @var MediaUploaderInterface
-     */
     private MediaUploaderInterface $mediaUploader;
 
     public function __construct(MediaUploaderInterface $mediaUploader, PetResponseBuilderInterface $petResponseBuilder)

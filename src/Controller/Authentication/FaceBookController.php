@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\Authentication;
 
 use App\Entity\ApiToken;
 use App\Entity\User;
@@ -16,9 +16,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class FaceBookController extends AbstractController
 {
-    /**
-     * @var UserRepository
-     */
     private UserRepository $userRepository;
 
     public function __construct(UserRepository $userRepository)

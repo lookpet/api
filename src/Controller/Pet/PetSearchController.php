@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\Pet;
 
 use App\PetDomain\VO\Gender;
 use App\PetDomain\VO\Limit;
@@ -17,11 +17,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-final class SearchController extends AbstractController
+final class PetSearchController extends AbstractController
 {
-    /**
-     * @var PetResponseBuilderInterface
-     */
     private PetResponseBuilderInterface $petResponseBuilder;
 
     public function __construct(PetResponseBuilderInterface $petResponseBuilder)

@@ -54,8 +54,9 @@ final class LoginTest extends WebTestCase
      *
      * @param array $requestData
      * @param string $responseMessage
+     * @param int $responseCode
      */
-    public function testLoginFailsBecauseInputDataIsNotSet(array $requestData, string $responseMessage): void
+    public function testLoginFailsBecauseInputDataIsNotSet(array $requestData, string $responseMessage, int $responseCode): void
     {
         $client = static::createClient();
         $this->loadFixtures();
@@ -71,7 +72,7 @@ final class LoginTest extends WebTestCase
         $response = $client->getResponse();
         $content = json_decode($response->getContent(), true);
 
-        self::assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        self::assertEquals($responseCode, $response->getStatusCode());
         self::assertEquals($responseMessage, $content['message']);
     }
 
@@ -83,19 +84,22 @@ final class LoginTest extends WebTestCase
                     'password' => UserFixture::PASSWORD_GOOD,
                 ],
                 'Empty email',
+                Response::HTTP_FORBIDDEN,
             ],
             [
                 [
                     'email' => UserFixture::TEST_USER_EMAIL,
                 ],
                 'Empty password',
+                Response::HTTP_BAD_REQUEST,
             ],
             [
                 [
                     'email' => UserFixture::TEST_USER_BAD_EMAIL,
                     'password' => UserFixture::PASSWORD_GOOD,
                 ],
-                'Invalid email address',
+                'Invalid email or password',
+                Response::HTTP_BAD_REQUEST,
             ],
         ];
     }

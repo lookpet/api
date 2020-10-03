@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Controller;
+declare(strict_types=1);
+
+namespace App\Controller\Authentication;
 
 use App\Dto\AuthenticationUserLoginDto;
 use App\Dto\AuthenticationUserRegistrationDto;
@@ -22,15 +24,9 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-final class SecurityController extends AbstractController
+final class AuthenticationController extends AbstractController
 {
-    /**
-     * @var UserRepository
-     */
     private UserRepository $userRepository;
-    /**
-     * @var ValidatorInterface
-     */
     private ValidatorInterface $validator;
 
     public function __construct(UserRepository $userRepository, ValidatorInterface $validator)
@@ -45,7 +41,6 @@ final class SecurityController extends AbstractController
      * @param Request $request
      * @param UserPasswordEncoderInterface $passwordEncoder
      * @param EntityManagerInterface $entityManager
-     * @param ValidatorInterface $validator
      *
      * @return JsonResponse
      *
