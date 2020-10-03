@@ -10,7 +10,7 @@ use App\EmailTemplates\EmailTemplateDto;
 use App\Entity\ApiToken;
 use App\Entity\User;
 use App\PetDomain\VO\EmailRecipient;
-use App\Repository\UserRepository;
+use App\Repository\UserRepositoryInterface;
 use App\Service\EmailTemplateSenderInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -26,10 +26,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class AuthenticationController extends AbstractController
 {
-    private UserRepository $userRepository;
+    private UserRepositoryInterface $userRepository;
     private ValidatorInterface $validator;
 
-    public function __construct(UserRepository $userRepository, ValidatorInterface $validator)
+    public function __construct(UserRepositoryInterface $userRepository, ValidatorInterface $validator)
     {
         $this->userRepository = $userRepository;
         $this->validator = $validator;

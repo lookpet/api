@@ -6,7 +6,7 @@ namespace App\Controller\Authentication;
 
 use App\Entity\ApiToken;
 use App\Entity\User;
-use App\Repository\UserRepository;
+use App\Repository\UserRepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,9 +16,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class FaceBookController extends AbstractController
 {
-    private UserRepository $userRepository;
+    private UserRepositoryInterface $userRepository;
 
-    public function __construct(UserRepository $userRepository)
+    public function __construct(UserRepositoryInterface $userRepository)
     {
         $this->userRepository = $userRepository;
     }
