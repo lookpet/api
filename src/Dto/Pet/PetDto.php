@@ -2,12 +2,22 @@
 
 declare(strict_types=1);
 
-namespace App\Dto;
+namespace App\Dto\Pet;
 
+use App\Entity\Media;
 use Swagger\Annotations as SWG;
 
 final class PetDto
 {
+    /**
+     * @SWG\Property(
+     *     type="string",
+     *     description="pet id",
+     *     example="dog",
+     * )
+     */
+    private string $id;
+
     /**
      * @SWG\Property(
      *     type="string",
@@ -69,7 +79,7 @@ final class PetDto
      *     example="2020-01-01",
      * )
      */
-    private ?string $dateOfBirth;
+    private ?\DateTimeInterface $dateOfBirth;
 
     /**
      * @SWG\Property(
@@ -115,6 +125,66 @@ final class PetDto
      * )
      */
     private string $motherName;
+
+    /**
+     * @SWG\Property(
+     *     type="string",
+     *     description="city",
+     *     example="Moscow",
+     * )
+     */
+    private string $city;
+
+    /**
+     * @SWG\Property(
+     *     type="string",
+     *     description="place_id",
+     *     example="",
+     * )
+     */
+    private string $placeId;
+
+    /**
+     * @SWG\Property(
+     *     type="string",
+     *     description="place_id",
+     *     example="10000$",
+     * )
+     */
+    private string $price;
+
+    /**
+     * @SWG\Property(
+     *     type="bool",
+     *     description="whether the pet is free",
+     *     example="true",
+     * )
+     */
+    private bool $isFree = false;
+
+    /**
+     * @SWG\Property(
+     *     type="bool",
+     *     description="whether the pet is sold",
+     *     example="true",
+     * )
+     */
+    private bool $isSold = false;
+
+    /**
+     * @var Media[]
+     */
+    private array $media = [];
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function setId(string $id): void
+    {
+        $this->id = $id;
+    }
 
     public function getType(): string
     {
@@ -176,12 +246,12 @@ final class PetDto
         $this->eyeColor = $eyeColor;
     }
 
-    public function getDateOfBirth(): ?string
+    public function getDateOfBirth(): ?\DateTimeInterface
     {
         return $this->dateOfBirth;
     }
 
-    public function setDateOfBirth(?string $dateOfBirth): void
+    public function setDateOfBirth(?\DateTimeInterface $dateOfBirth): void
     {
         $this->dateOfBirth = $dateOfBirth;
     }
@@ -211,7 +281,7 @@ final class PetDto
         return $this->isLookingForNewOwner;
     }
 
-    public function setIsLookingForNewOwner(bool $isLookingForNewOwner): void
+    public function setIsLookingForOwner(bool $isLookingForNewOwner): void
     {
         $this->isLookingForNewOwner = $isLookingForNewOwner;
     }
@@ -234,5 +304,71 @@ final class PetDto
     public function setMotherName(string $motherName): void
     {
         $this->motherName = $motherName;
+    }
+
+    public function getCity(): string
+    {
+        return $this->city;
+    }
+
+    public function setCity(string $city): void
+    {
+        $this->city = $city;
+    }
+
+    public function getPlaceId(): string
+    {
+        return $this->placeId;
+    }
+
+    public function setPlaceId(string $placeId): void
+    {
+        $this->placeId = $placeId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrice(): string
+    {
+        return $this->price;
+    }
+
+    /**
+     * @param string $price
+     */
+    public function setPrice(string $price): void
+    {
+        $this->price = $price;
+    }
+
+    public function isSold(): bool
+    {
+        return $this->isSold;
+    }
+
+    public function setIsSold(bool $isSold): void
+    {
+        $this->isSold = $isSold;
+    }
+
+    public function isFree(): bool
+    {
+        return $this->isFree;
+    }
+
+    public function setIsFree(bool $isFree): void
+    {
+        $this->isFree = $isFree;
+    }
+
+    public function getMedia(): array
+    {
+        return $this->media;
+    }
+
+    public function setMedia(Media ...$media): void
+    {
+        $this->media = $media;
     }
 }

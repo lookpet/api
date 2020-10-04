@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace App\Controller\Pet;
 
-use App\Dto\PetDto;
+use App\Dto\Pet\PetDto;
+use App\Dto\Pet\PetDtoBuilder;
 use App\Entity\Pet;
 use App\Repository\MediaRepository;
 use App\Repository\PetRepository;
 use App\Service\MediaCropperInterface;
 use App\Service\MediaUploaderInterface;
 use App\Service\PetResponseBuilderInterface;
-use Cocur\Slugify\Slugify;
+use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,17 +27,23 @@ final class PetController extends AbstractController
     private MediaUploaderInterface $mediaUploader;
     private MediaRepository $mediaRepository;
     private MediaCropperInterface $mediaCropper;
+    private PetDtoBuilder $petDtoBuilder;
+    private EntityManagerInterface $entityManager;
 
     public function __construct(
         PetResponseBuilderInterface $petResponseBuilder,
         MediaUploaderInterface $mediaUploader,
         MediaRepository $mediaRepository,
-        MediaCropperInterface $mediaCropper
+        MediaCropperInterface $mediaCropper,
+        PetDtoBuilder $petDtoBuilder,
+        EntityManagerInterface $entityManager
     ) {
         $this->petResponseBuilder = $petResponseBuilder;
         $this->mediaUploader = $mediaUploader;
         $this->mediaRepository = $mediaRepository;
         $this->mediaCropper = $mediaCropper;
+        $this->petDtoBuilder = $petDtoBuilder;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -109,103 +116,17 @@ final class PetController extends AbstractController
     public function create(Request $request): JsonResponse
     {
         try {
-            if (!$request->request->has('type')) {
-                return new JsonResponse([
-                    'message' => 'Empty type',
-                ], Response::HTTP_BAD_REQUEST);
-            }
+            $petDto = $this->petDtoBuilder->build($request);
+            $pet = Pet::createFromDto($petDto, $this->getUser());
 
-            $slug = $request->request->get('slug');
-            if (!$request->request->has('slug')) {
-                $slugify = new Slugify();
-                $slug = $slugify->slugify(
-                    implode('-', [
-                        $request->request->get('name'),
-                        random_int(1000, 1000000),
-                    ])
-                );
-            }
+            $this->entityManager->persist($pet);
+            $this->entityManager->flush();
 
-            $type = $request->request->get('type');
-            $name = $request->request->get('name');
-
-            $pet = new Pet($type, $slug, $name, null, $this->getUser());
-
-            if ($request->request->has('city')) {
-                $pet->setCity($request->request->get('city'));
-
-                if ($request->request->has('placeId')) {
-                    $pet->setPlaceId($request->request->get('placeId'));
-                }
-            }
-
-            if ($request->request->has('breed')) {
-                $pet->setBreed($request->request->get('breed'));
-            }
-
-            if ($request->request->has('price')) {
-                $pet->setPrice($request->request->get('price'));
-            }
-
-            if ($request->request->has('fatherName')) {
-                $pet->setFatherName($request->request->get('fatherName'));
-            }
-            if ($request->request->has('motherName')) {
-                $pet->setMotherName($request->request->get('motherName'));
-            }
-
-            if ($request->request->has('color')) {
-                $pet->setColor($request->request->get('color'));
-            }
-
-            if ($request->request->has('about')) {
-                $pet->setAbout($request->request->get('about'));
-            }
-
-            if ($request->request->has('eyeColor')) {
-                $pet->setEyeColor($request->request->get('eyeColor'));
-            }
-
-            if ($request->request->has('dateOfBirth')) {
-                try {
-                    $dateOfBirth = new \DateTime($request->request->get('dateOfBirth'));
-                } catch (\Exception $exception) {
-                    $dateOfBirth = null;
-                }
-                $pet->setDateOfBirth($dateOfBirth);
-            }
-
-            if ($request->request->has('gender')) {
-                $pet->setGender($request->request->get('gender'));
-            }
-
-            if ($request->request->has('isLookingForNewOwner')) {
-                $isLookingForNewOwner = $request->request->get('isLookingForNewOwner') === 'true';
-                $pet->setIsLookingForOwner($isLookingForNewOwner);
-            }
-
-            if ($request->request->has('isFree')) {
-                $isFree = $request->request->get('isFree') === 'true';
-                $pet->setIsFree($isFree);
-            }
-
-            if ($request->request->has('isSold')) {
-                $isSold = $request->request->get('isSold') === 'true';
-                $pet->setIsSold($isSold);
-            }
-
-            $this->setPhotoIfExists($request, $pet);
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($pet);
-            $entityManager->flush();
-
-            return new JsonResponse(
-                $pet
-            );
+            return new JsonResponse($pet);
         } catch (\Exception $exception) {
             return new JsonResponse([
                 'message' => $exception->getMessage(),
-            ], Response::HTTP_BAD_REQUEST);
+            ], $exception->getCode());
         }
     }
 
@@ -481,7 +402,7 @@ final class PetController extends AbstractController
      *
      * @return JsonResponse
      */
-    public function search(PetRepository $petRepository, Request $request): JsonResponse
+    public function list(PetRepository $petRepository, Request $request): JsonResponse
     {
         $page = $request->get('p', 1);
         $limit = 10;
@@ -510,10 +431,5 @@ final class PetController extends AbstractController
             }
             $pet->addMedia(...$petMedia);
         }
-        $mediaPetCollection = $this->mediaUploader->uploadByRequest(
-            $request, $this->getUser()
-        );
-
-        $pet->addMedia(...$mediaPetCollection);
     }
 }

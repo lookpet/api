@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
+use App\Dto\Pet\PetDto;
 use App\Entity\Traits\LifecycleCallbackTrait;
 use App\Entity\Traits\TimestampTrait;
 use App\PetDomain\VO\Age;
 use App\Repository\PetRepository;
-use Cocur\Slugify\Slugify;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -160,19 +160,83 @@ class Pet implements \JsonSerializable
         $this->name = $name;
 
         if ($slug === null) {
-            $this->generateSlug();
-        } else {
-            $this->slug = $slug;
+            throw new \LogicException('Slug cannot be empty');
         }
+
+        $this->slug = $slug;
 
         if ($id === null) {
             $this->id = Uuid::uuid4()->toString();
         } else {
             $this->id = $id;
         }
+
         $this->media = new ArrayCollection();
         $this->likes = new ArrayCollection();
         $this->comments = new ArrayCollection();
+    }
+
+    public static function createFromDto(PetDto $petDto, ?User $user = null): self
+    {
+        $pet = new static(
+            $petDto->getType(),
+            $petDto->getSlug(),
+            $petDto->getName(),
+            $petDto->getId(),
+            $user
+        );
+        $pet->setCity($petDto->getCity())
+            ->setPlaceId($petDto->getPlaceId())
+            ->setBreed($petDto->getBreed())
+            ->setPrice($petDto->getPrice())
+            ->setMotherName($petDto->getMotherName())
+            ->setFatherName($petDto->getFatherName())
+            ->setColor($petDto->getColor())
+            ->setAbout($petDto->getAbout())
+            ->setEyeColor($petDto->getEyeColor())
+            ->setDateOfBirth($petDto->getDateOfBirth())
+            ->setIsLookingForOwner($petDto->isLookingForNewOwner())
+            ->setIsFree($petDto->isFree())
+            ->setIsSold($petDto->isSold())
+            ->addMedia(...$petDto->getMedia());
+
+        return $pet;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'type' => $this->getType(),
+            'slug' => $this->getSlug(),
+            'name' => $this->getName(),
+            'city' => $this->getCity(),
+            'placeId' => $this->getPlaceId(),
+            'breed' => $this->getBreed(),
+            'fatherName' => $this->getFatherName(),
+            'motherName' => $this->getMotherName(),
+            'color' => $this->getColor(),
+            'eyeColor' => $this->getEyeColor(),
+            'dateOfBirth' => $this->getDateOfBirth(),
+            'about' => $this->getAbout(),
+            'gender' => $this->getGender(),
+            'likes' => count($this->getLikes()),
+            'comments' => $this->getComments()->toArray(),
+            'createdAt' => $this->getCreatedAt(),
+            'updatedAt' => $this->getUpdatedAt(),
+            'isLookingForNewOwner' => $this->isLookingForOwner(),
+            'price' => $this->getPrice(),
+            'isFree' => $this->isFree(),
+            'isSold' => $this->isSold(),
+            'media' => $this->getMedia()->getValues(),
+            'user' => $this->getUser(),
+            'breeder' => $this->getBreeder(),
+            'isAlive' => true,
+        ];
+    }
+
+    public function equals(self $pet): bool
+    {
+        return $pet->getId() === $this->getId();
     }
 
     public function getId(): ?string
@@ -192,7 +256,7 @@ class Pet implements \JsonSerializable
         return $this;
     }
 
-    public function getIsAlive(): ?bool
+    public function isAlive(): ?bool
     {
         return $this->isAlive;
     }
@@ -264,7 +328,7 @@ class Pet implements \JsonSerializable
         return $this;
     }
 
-    public function getIsLookingForOwner(): ?bool
+    public function isLookingForOwner(): bool
     {
         return $this->isLookingForOwner;
     }
@@ -324,66 +388,6 @@ class Pet implements \JsonSerializable
         return $this;
     }
 
-    public function jsonSerialize(): array
-    {
-        return [
-            'type' => $this->getType(),
-            'slug' => $this->getSlug(),
-            'name' => $this->getName(),
-            'city' => $this->getCity(),
-            'placeId' => $this->getPlaceId(),
-            'breed' => $this->getBreed(),
-            'fatherName' => $this->getFatherName(),
-            'motherName' => $this->getMotherName(),
-            'color' => $this->getColor(),
-            'eyeColor' => $this->getEyeColor(),
-            'dateOfBirth' => $this->getDateOfBirth(),
-            'about' => $this->getAbout(),
-            'gender' => $this->getGender(),
-            'likes' => count($this->getLikes()),
-            'comments' => $this->getComments()->toArray(),
-            'createdAt' => $this->getCreatedAt(),
-            'updatedAt' => $this->getUpdatedAt(),
-            'isLookingForNewOwner' => $this->getIsLookingForOwner(),
-            'price' => $this->getPrice(),
-            'isFree' => $this->isFree(),
-            'isSold' => $this->isSold(),
-            'media' => $this->getMedia()->getValues(),
-            'user' => $this->getUser(),
-            'breeder' => $this->getBreeder(),
-            'isAlive' => true,
-//            'description' => $this->des
-        ];
-    }
-
-    /**
-     * @return Collection|Media[]
-     */
-    public function getMedia(): Collection
-    {
-        return $this->media;
-    }
-
-    public function addMedia(Media ...$mediaCollection): self
-    {
-        foreach ($mediaCollection as $media) {
-            if (!$this->media->contains($media)) {
-                $this->media[] = $media;
-            }
-        }
-
-        return $this;
-    }
-
-    public function removeMedia(Media $medium): self
-    {
-        if ($this->media->contains($medium)) {
-            $this->media->removeElement($medium);
-        }
-
-        return $this;
-    }
-
     public function getCity(): ?string
     {
         return $this->city;
@@ -416,72 +420,6 @@ class Pet implements \JsonSerializable
     public function setMotherName(?string $motherName): self
     {
         $this->motherName = $motherName;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|PetLike[]
-     */
-    public function getLikes(): Collection
-    {
-        return $this->likes;
-    }
-
-    public function addLike(PetLike $like): self
-    {
-        if (!$this->likes->contains($like)) {
-            $this->likes[] = $like;
-        }
-
-        return $this;
-    }
-
-    public function hasLike(?User $user): bool
-    {
-        if ($user === null) {
-            return false;
-        }
-
-        /** @var PetLike $currentLike */
-        foreach ($this->likes as $currentLike) {
-            if ($currentLike->getUser()->equals($user)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public function removeLike(PetLike ...$like): self
-    {
-        if ($this->likes->contains($like)) {
-            $this->likes->removeElement($like);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|PetComment[]
-     */
-    public function getComments(): Collection
-    {
-        return $this->comments;
-    }
-
-    public function addComment(PetComment $comment): self
-    {
-        $this->comments[] = $comment;
-
-        return $this;
-    }
-
-    public function removeComment(PetComment $comment): self
-    {
-        if ($this->comments->contains($comment)) {
-            $this->comments->removeElement($comment);
-        }
 
         return $this;
     }
@@ -560,7 +498,7 @@ class Pet implements \JsonSerializable
         return $this;
     }
 
-    public function getIsDeleted(): bool
+    public function isDeleted(): bool
     {
         return $this->isDeleted;
     }
@@ -570,10 +508,100 @@ class Pet implements \JsonSerializable
         $this->isDeleted = true;
     }
 
-    private function generateSlug(): void
+    /**
+     * @return Collection|Media[]
+     */
+    public function getMedia(): Collection
     {
-        $slugify = new Slugify();
-        $slugEntropy = random_int(10, 100000);
-        $this->slug = $slugify->slugify(implode('-', [$this->name, $slugEntropy]));
+        return $this->media;
+    }
+
+    public function addMedia(Media ...$mediaCollection): self
+    {
+        foreach ($mediaCollection as $media) {
+            if (!$this->media->contains($media)) {
+                $this->media[] = $media;
+            }
+        }
+
+        return $this;
+    }
+
+    public function removeMedia(Media $medium): self
+    {
+        if ($this->media->contains($medium)) {
+            $this->media->removeElement($medium);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|PetComment[]
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(PetComment $comment): self
+    {
+        $this->comments[] = $comment;
+
+        return $this;
+    }
+
+    public function removeComment(PetComment $comment): self
+    {
+        if ($this->comments->contains($comment)) {
+            $this->comments->removeElement($comment);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|PetLike[]
+     */
+    public function getLikes(): Collection
+    {
+        return $this->likes;
+    }
+
+    public function addLike(PetLike $like): self
+    {
+        if (!$this->likes->contains($like)) {
+            $this->likes[] = $like;
+        }
+
+        return $this;
+    }
+
+    public function hasLike(?User $user): bool
+    {
+        if ($user === null) {
+            return false;
+        }
+
+        /** @var PetLike $currentLike */
+        foreach ($this->likes as $currentLike) {
+            if ($currentLike->getUser()->equals($user)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function removeLike(PetLike ...$like): self
+    {
+        /** @var PetLike $like */
+        foreach ($this->likes as $like) {
+            if ($like->equals($like)) {
+                $this->likes->removeElement($like);
+            }
+        }
+
+        return $this;
     }
 }

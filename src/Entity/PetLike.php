@@ -56,6 +56,12 @@ class PetLike implements \JsonSerializable
         return $this->user;
     }
 
+    public function equals(self $petLike): bool
+    {
+        return $this->getPet()->equals($petLike->getPet())
+            && $this->getUser()->equals($petLike->getUser());
+    }
+
     public function jsonSerialize(): array
     {
         return array_merge(
