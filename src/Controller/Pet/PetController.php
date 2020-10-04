@@ -7,10 +7,7 @@ namespace App\Controller\Pet;
 use App\Dto\Pet\PetDto;
 use App\Dto\Pet\PetDtoBuilder;
 use App\Entity\Pet;
-use App\Repository\MediaRepository;
 use App\Repository\PetRepository;
-use App\Service\MediaCropperInterface;
-use App\Service\MediaUploaderInterface;
 use App\Service\PetResponseBuilderInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -24,24 +21,15 @@ use Symfony\Component\Routing\Annotation\Route;
 final class PetController extends AbstractController
 {
     private PetResponseBuilderInterface $petResponseBuilder;
-    private MediaUploaderInterface $mediaUploader;
-    private MediaRepository $mediaRepository;
-    private MediaCropperInterface $mediaCropper;
     private PetDtoBuilder $petDtoBuilder;
     private EntityManagerInterface $entityManager;
 
     public function __construct(
         PetResponseBuilderInterface $petResponseBuilder,
-        MediaUploaderInterface $mediaUploader,
-        MediaRepository $mediaRepository,
-        MediaCropperInterface $mediaCropper,
         PetDtoBuilder $petDtoBuilder,
         EntityManagerInterface $entityManager
     ) {
         $this->petResponseBuilder = $petResponseBuilder;
-        $this->mediaUploader = $mediaUploader;
-        $this->mediaRepository = $mediaRepository;
-        $this->mediaCropper = $mediaCropper;
         $this->petDtoBuilder = $petDtoBuilder;
         $this->entityManager = $entityManager;
     }
@@ -217,83 +205,8 @@ final class PetController extends AbstractController
                 ], Response::HTTP_UNAUTHORIZED);
             }
 
-            if ($request->request->has('type') && empty($request->request->get('type'))) {
-                return new JsonResponse([
-                    'message' => 'Empty type',
-                ], Response::HTTP_BAD_REQUEST);
-            }
-
-            if ($request->request->has('type')) {
-                $pet->setType($request->request->get('type'));
-            }
-            if ($request->request->has('name')) {
-                $pet->setName($request->request->get('name'));
-            }
-
-            if ($request->request->has('city')) {
-                $pet->setCity($request->request->get('city'));
-
-                if ($request->request->has('placeId')) {
-                    $pet->setPlaceId($request->request->get('placeId'));
-                }
-            }
-
-            $this->setPhotoIfExists($request, $pet);
-
-            if ($request->request->has('breed')) {
-                $pet->setBreed($request->request->get('breed'));
-            }
-
-            if ($request->request->has('price')) {
-                $pet->setPrice($request->request->get('price'));
-            }
-
-            if ($request->request->has('fatherName')) {
-                $pet->setFatherName($request->request->get('fatherName'));
-            }
-            if ($request->request->has('motherName')) {
-                $pet->setMotherName($request->request->get('motherName'));
-            }
-
-            if ($request->request->has('color')) {
-                $pet->setColor($request->request->get('color'));
-            }
-
-            if ($request->request->has('eyeColor')) {
-                $pet->setEyeColor($request->request->get('eyeColor'));
-            }
-
-            if ($request->request->has('dateOfBirth')) {
-                try {
-                    $dateOfBirth = new \DateTime($request->request->get('dateOfBirth'));
-                } catch (\Exception $exception) {
-                    $dateOfBirth = null;
-                }
-                $pet->setDateOfBirth($dateOfBirth);
-            }
-
-            if ($request->request->has('gender')) {
-                $pet->setGender($request->request->get('gender'));
-            }
-
-            if ($request->request->has('about')) {
-                $pet->setAbout($request->request->get('about'));
-            }
-
-            if ($request->request->has('isLookingForNewOwner')) {
-                $isLookingForNewOwner = $request->request->get('isLookingForNewOwner') === 'true';
-                $pet->setIsLookingForOwner($isLookingForNewOwner);
-            }
-
-            if ($request->request->has('isFree')) {
-                $isFree = $request->request->get('isFree') === 'true';
-                $pet->setIsFree($isFree);
-            }
-
-            if ($request->request->has('isSold')) {
-                $isSold = $request->request->get('isSold') === 'true';
-                $pet->setIsSold($isSold);
-            }
+            $petDto = $this->petDtoBuilder->build($request, $pet->getId());
+            $pet = Pet::createFromDto($petDto, $this->getUser());
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($pet);
@@ -412,24 +325,5 @@ final class PetController extends AbstractController
         ], $limit, $offset);
 
         return $this->petResponseBuilder->build($this->getUser(), ...$pets);
-    }
-
-    private function setPhotoIfExists(Request $request, Pet $pet): void
-    {
-        if ($request->request->has('media')) {
-            $petMedia = [];
-            $mediaCollection = $request->request->get('media');
-            if (is_string($mediaCollection)) {
-                $mediaCollection = [$mediaCollection];
-            }
-            foreach ($mediaCollection as $mediaId) {
-                $media = $this->mediaRepository->find($mediaId);
-                if ($media === null) {
-                    continue;
-                }
-                $petMedia[] = $media;
-            }
-            $pet->addMedia(...$petMedia);
-        }
     }
 }
