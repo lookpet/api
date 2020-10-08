@@ -114,6 +114,7 @@ class CreatePetTest extends WebTestCase
         self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
         self::assertSame(self::NAME, $content['name']);
         self::assertSame(self::TYPE, $content['type']);
+        self::assertSame(self::SLUG, $content['slug']);
         self::assertSame(self::CITY, $content['city']);
         self::assertSame(self::PLACE_ID, $content['placeId']);
         self::assertSame(self::BREED, $content['breed']);

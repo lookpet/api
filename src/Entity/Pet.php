@@ -166,88 +166,107 @@ class Pet implements \JsonSerializable
         $this->slug = $slug;
 
         if ($id === null) {
-            $this->id = Uuid::uuid4()->toString();
-        } else {
-            $this->id = $id;
+            $id = Uuid::uuid4()->toString();
         }
 
+        $this->id = $id;
         $this->media = new ArrayCollection();
         $this->likes = new ArrayCollection();
         $this->comments = new ArrayCollection();
     }
 
-    public static function createFromDto(PetDto $petDto, ?User $user = null): self
+    public function updateFromDto(PetDto $petDto, ?User $user = null): self
     {
-        $pet = new static(
-            $petDto->getType(),
-            $petDto->getSlug(),
-            $petDto->getId()
-        );
+        $this->setUser($user);
 
-        $pet->setUser($user);
+        if ($petDto->getType() !== null) {
+            $this->type = $petDto->getType();
+        }
 
-        $pet->setName($petDto->getName());
+        if ($petDto->getName() !== null) {
+            $this->name = $petDto->getName();
+        }
+
+        if ($petDto->getSlug() !== null) {
+            $this->slug = $petDto->getSlug();
+        }
 
         if ($petDto->getCity() !== null) {
-            $pet->setCity($petDto->getCity());
+            $this->city = $petDto->getCity();
             if ($petDto->getPlaceId() !== null) {
-                $pet->setPlaceId($petDto->getPlaceId());
+                $this->placeId = $petDto->getPlaceId();
             }
         }
 
         if ($petDto->getBreed() !== null) {
-            $pet->setBreed($petDto->getBreed());
+            $this->breed = $petDto->getBreed();
         }
 
         if ($petDto->getGender() !== null) {
-            $pet->setGender($petDto->getGender());
+            $this->gender = $petDto->getGender();
         }
 
         if ($petDto->getPrice() !== null) {
-            $pet->setPrice($petDto->getPrice());
+            $this->price = $petDto->getPrice();
         }
 
         if ($petDto->getFatherName() !== null) {
-            $pet->setFatherName($petDto->getFatherName());
+            $this->fatherName = $petDto->getFatherName();
         }
 
         if ($petDto->getMotherName() !== null) {
-            $pet->setMotherName($petDto->getMotherName());
+            $this->motherName = $petDto->getMotherName();
         }
 
         if ($petDto->getColor() !== null) {
-            $pet->setColor($petDto->getColor());
+            $this->color = $petDto->getColor();
         }
 
         if ($petDto->getEyeColor() !== null) {
-            $pet->setEyeColor($petDto->getEyeColor());
+            $this->eyeColor = $petDto->getEyeColor();
         }
 
         if ($petDto->getAbout() !== null) {
-            $pet->setAbout($petDto->getAbout());
+            $this->about = $petDto->getAbout();
         }
 
         if ($petDto->getDateOfBirth() !== null) {
-            $pet->setDateOfBirth($petDto->getDateOfBirth());
+            $this->dateOfBirth = $petDto->getDateOfBirth();
         }
 
         if (count($petDto->getMedia()) > 0) {
-            $pet->addMedia(...$petDto->getMedia());
+            $this->addMedia(...$petDto->getMedia());
         }
 
         if (count($petDto->getComments()) > 0) {
-            $pet->addComments(...$petDto->getComments());
+            $this->addComments(...$petDto->getComments());
         }
 
         if (count($petDto->getPetLikes()) > 0) {
-            $pet->addLikes(...$petDto->getPetLikes());
+            $this->addLikes(...$petDto->getPetLikes());
         }
 
-        $pet->setIsLookingForOwner($petDto->isLookingForNewOwner())
-            ->setIsFree($petDto->isFree())
-            ->setIsSold($petDto->isSold());
+        if ($petDto->isAlive() !== null) {
+            $this->isAlive = $petDto->isAlive();
+        }
 
-        return $pet;
+        if ($petDto->isFree() !== null) {
+            $this->isFree = $petDto->isFree();
+        }
+
+        if ($petDto->isLookingForNewOwner() !== null) {
+            $this->isLookingForOwner = $petDto->isLookingForNewOwner();
+        }
+
+        if ($petDto->isSold() !== null) {
+            $this->isSold = $petDto->isSold();
+            if ($this->isSold === true) {
+                $this->isLookingForOwner = false;
+                $this->isFree = false;
+            }
+        }
+
+        return $this;
     }
 
     public function jsonSerialize(): array
@@ -296,23 +315,9 @@ class Pet implements \JsonSerializable
         return $this->slug;
     }
 
-    public function setSlug(string $slug): self
-    {
-        $this->slug = $slug;
-
-        return $this;
-    }
-
     public function isAlive(): ?bool
     {
         return $this->isAlive;
-    }
-
-    public function setIsAlive(bool $isAlive): self
-    {
-        $this->isAlive = $isAlive;
-
-        return $this;
     }
 
     public function getName(): ?string
@@ -320,23 +325,9 @@ class Pet implements \JsonSerializable
         return $this->name;
     }
 
-    public function setName(?string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
     public function getType(): ?string
     {
         return $this->type;
-    }
-
-    public function setType(string $type): self
-    {
-        $this->type = $type;
-
-        return $this;
     }
 
     public function getGender(): ?string
@@ -344,23 +335,9 @@ class Pet implements \JsonSerializable
         return $this->gender;
     }
 
-    public function setGender(?string $gender): self
-    {
-        $this->gender = $gender;
-
-        return $this;
-    }
-
     public function getBreed(): ?string
     {
         return $this->breed;
-    }
-
-    public function setBreed(?string $breed): self
-    {
-        $this->breed = $breed;
-
-        return $this;
     }
 
     public function getAbout(): ?string
@@ -368,23 +345,9 @@ class Pet implements \JsonSerializable
         return $this->about;
     }
 
-    public function setAbout(?string $about): self
-    {
-        $this->about = $about;
-
-        return $this;
-    }
-
     public function isLookingForOwner(): bool
     {
         return $this->isLookingForOwner;
-    }
-
-    public function setIsLookingForOwner(bool $isLookingForOwner): self
-    {
-        $this->isLookingForOwner = $isLookingForOwner;
-
-        return $this;
     }
 
     public function getDateOfBirth(): ?\DateTimeInterface
@@ -392,35 +355,14 @@ class Pet implements \JsonSerializable
         return $this->dateOfBirth;
     }
 
-    public function setDateOfBirth(?\DateTimeInterface $dateOfBirth): self
-    {
-        $this->dateOfBirth = $dateOfBirth;
-
-        return $this;
-    }
-
     public function getColor(): ?string
     {
         return $this->color;
     }
 
-    public function setColor(?string $color): self
-    {
-        $this->color = $color;
-
-        return $this;
-    }
-
     public function getEyeColor(): ?string
     {
         return $this->eyeColor;
-    }
-
-    public function setEyeColor(?string $eyeColor): self
-    {
-        $this->eyeColor = $eyeColor;
-
-        return $this;
     }
 
     public function getUser(): ?User
@@ -440,23 +382,9 @@ class Pet implements \JsonSerializable
         return $this->city;
     }
 
-    public function setCity(?string $city): self
-    {
-        $this->city = $city;
-
-        return $this;
-    }
-
     public function getFatherName(): ?string
     {
         return $this->fatherName;
-    }
-
-    public function setFatherName(?string $fatherName): self
-    {
-        $this->fatherName = $fatherName;
-
-        return $this;
     }
 
     public function getMotherName(): ?string
@@ -464,23 +392,9 @@ class Pet implements \JsonSerializable
         return $this->motherName;
     }
 
-    public function setMotherName(?string $motherName): self
-    {
-        $this->motherName = $motherName;
-
-        return $this;
-    }
-
     public function getBreeder(): ?Breeder
     {
         return $this->breeder;
-    }
-
-    public function setBreeder(?Breeder $breeder): self
-    {
-        $this->breeder = $breeder;
-
-        return $this;
     }
 
     public function getAge(): ?Age
@@ -497,23 +411,9 @@ class Pet implements \JsonSerializable
         return $this->placeId;
     }
 
-    public function setPlaceId(?string $placeId): self
-    {
-        $this->placeId = $placeId;
-
-        return $this;
-    }
-
     public function getPrice(): ?string
     {
         return $this->price;
-    }
-
-    public function setPrice(?string $price): self
-    {
-        $this->price = $price;
-
-        return $this;
     }
 
     public function isFree(): ?bool
@@ -521,28 +421,9 @@ class Pet implements \JsonSerializable
         return $this->isFree;
     }
 
-    public function setIsFree(?bool $isFree): self
-    {
-        $this->isFree = $isFree;
-
-        return $this;
-    }
-
     public function isSold(): ?bool
     {
         return $this->isSold;
-    }
-
-    public function setIsSold(?bool $isSold): self
-    {
-        $this->isSold = $isSold;
-
-        if ($this->isSold === true) {
-            $this->isLookingForOwner = false;
-            $this->isFree = false;
-        }
-
-        return $this;
     }
 
     public function isDeleted(): bool

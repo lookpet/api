@@ -27,67 +27,13 @@ final class PetTest extends TestCase
 
     public function testGettersSetters(): void
     {
-        $dateOfBirth = new \DateTimeImmutable('-1 day');
-        $age = new Age($dateOfBirth);
         $user = new User(null, null, self::USER_ID);
         $pet = new Pet(PetFixture::TYPE, PetFixture::SLUG, PetFixture::ID, PetFixture::NAME, $user);
-
         self::assertSame(PetFixture::TYPE, $pet->getType());
         self::assertSame(PetFixture::SLUG, $pet->getSlug());
         self::assertSame(PetFixture::NAME, $pet->getName());
         self::assertSame(PetFixture::ID, $pet->getId());
         self::assertSame($user, $pet->getUser());
-
-        $pet->setSlug(self::SLUG);
-        self::assertSame(self::SLUG, $pet->getSlug());
-
-        $pet->setIsAlive(true);
-        self::assertTrue($pet->isAlive());
-
-        $pet->setName(self::NAME);
-        self::assertSame(self::NAME, $pet->getName());
-
-        $pet->setType(self::TYPE);
-        self::assertSame(self::TYPE, $pet->getType());
-
-        $pet->setGender(PetFixture::GENDER);
-        self::assertSame(PetFixture::GENDER, $pet->getGender());
-
-        $pet->setBreed(PetFixture::BREED);
-        self::assertSame(PetFixture::BREED, $pet->getBreed());
-
-        $pet->setAbout(PetFixture::ABOUT);
-        self::assertSame(PetFixture::ABOUT, $pet->getAbout());
-
-        $pet->setIsLookingForOwner(true);
-        self::assertTrue($pet->isLookingForOwner());
-
-        $pet->setDateOfBirth($dateOfBirth);
-        self::assertSame($dateOfBirth, $pet->getDateOfBirth());
-
-        $pet->setColor(PetFixture::COLOR);
-        self::assertSame(PetFixture::COLOR, $pet->getColor());
-
-        $pet->setEyeColor(PetFixture::EYE_COLOR);
-        self::assertSame(PetFixture::EYE_COLOR, $pet->getEyeColor());
-
-        $pet->setCity(PetFixture::CITY);
-        self::assertSame(PetFixture::CITY, $pet->getCity());
-
-        $pet->setFatherName(PetFixture::FATHER_NAME);
-        self::assertSame(PetFixture::FATHER_NAME, $pet->getFatherName());
-
-        $pet->setMotherName(PetFixture::MOTHER_NAME);
-        self::assertSame(PetFixture::MOTHER_NAME, $pet->getMotherName());
-
-        $pet->setIsAlive(true);
-        self::assertTrue($pet->isAlive());
-
-        $pet->setIsSold(true);
-        self::assertTrue($pet->isSold());
-
-        $pet->setIsFree(true);
-        self::assertTrue($pet->isFree());
 
         self::assertFalse($pet->isDeleted());
         $pet->delete();
@@ -95,14 +41,6 @@ final class PetTest extends TestCase
 
         $pet->setUser(null);
         self::assertNull($pet->getUser());
-
-        $pet->setPrice(PetFixture::PRICE);
-        self::assertSame(PetFixture::PRICE, $pet->getPrice());
-
-        $pet->setPlaceId(PetFixture::PLACE_ID);
-        self::assertSame(PetFixture::PLACE_ID, $pet->getPlaceId());
-
-        self::assertTrue($age->equals($pet->getAge()));
 
         self::assertEmpty($pet->getMedia());
         $media = $this->createMock(Media::class);
@@ -130,7 +68,8 @@ final class PetTest extends TestCase
     public function testItCreatesPetFromDto(): void
     {
         $user = $this->createMock(User::class);
-        $dateOfBirth = new \DateTimeImmutable();
+        $dateOfBirth = new \DateTimeImmutable('-1 day');
+        $age = new Age($dateOfBirth);
 
         $petDto = new PetDto();
         $petDto->setType(PetFixture::TYPE);
@@ -147,11 +86,14 @@ final class PetTest extends TestCase
         $petDto->setAbout(PetFixture::ABOUT);
         $petDto->setEyeColor(PetFixture::EYE_COLOR);
         $petDto->setDateOfBirth($dateOfBirth);
+        $petDto->setIsAlive(false);
         $petDto->setIsLookingForOwner(true);
         $petDto->setIsFree(true);
         $petDto->setIsSold(false);
 
-        $pet = Pet::createFromDto($petDto, $user);
+        $pet = new Pet(PetFixture::TYPE, PetFixture::SLUG, PetFixture::ID, PetFixture::NAME, $user);
+
+        $pet->updateFromDto($petDto, $user);
 
         self::assertSame($user, $pet->getUser());
         self::assertSame(PetFixture::TYPE, $pet->getType());
@@ -169,8 +111,10 @@ final class PetTest extends TestCase
         self::assertSame(PetFixture::ABOUT, $pet->getAbout());
         self::assertSame($dateOfBirth, $pet->getDateOfBirth());
         self::assertTrue($pet->isLookingForOwner());
+        self::assertFalse($pet->isAlive());
         self::assertFalse($pet->isSold());
         self::assertTrue($pet->isFree());
+        self::assertTrue($age->equals($pet->getAge()));
     }
 
     public function testItThrowsExceptionWhenSlugIsNotSet(): void

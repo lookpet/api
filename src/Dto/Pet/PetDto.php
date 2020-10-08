@@ -28,7 +28,7 @@ final class PetDto
      *     example="dog",
      * )
      */
-    private string $type;
+    private ?string $type = null;
 
     /**
      * @SWG\Property(
@@ -109,7 +109,7 @@ final class PetDto
      *     example="true",
      * )
      */
-    private bool $isLookingForNewOwner = false;
+    private ?bool $isLookingForNewOwner = null;
 
     /**
      * @SWG\Property(
@@ -163,7 +163,7 @@ final class PetDto
      *     example="true",
      * )
      */
-    private bool $isFree = false;
+    private ?bool $isFree = null;
 
     /**
      * @SWG\Property(
@@ -172,7 +172,16 @@ final class PetDto
      *     example="true",
      * )
      */
-    private bool $isSold = false;
+    private ?bool $isSold = null;
+
+    /**
+     * @SWG\Property(
+     *     type="bool",
+     *     description="whether the pet is alive",
+     *     example="true",
+     * )
+     */
+    private ?bool $isAlive = null;
 
     /**
      * @var Media[]
@@ -201,12 +210,12 @@ final class PetDto
         $this->id = $id;
     }
 
-    public function getType(): string
+    public function getType(): ?string
     {
         return $this->type;
     }
 
-    public function setType(string $type): void
+    public function setType(?string $type): void
     {
         $this->type = $type;
     }
@@ -291,7 +300,7 @@ final class PetDto
         $this->about = $about;
     }
 
-    public function isLookingForNewOwner(): bool
+    public function isLookingForNewOwner(): ?bool
     {
         return $this->isLookingForNewOwner;
     }
@@ -357,7 +366,7 @@ final class PetDto
         $this->price = $price;
     }
 
-    public function isSold(): bool
+    public function isSold(): ?bool
     {
         return $this->isSold;
     }
@@ -367,7 +376,7 @@ final class PetDto
         $this->isSold = $isSold;
     }
 
-    public function isFree(): bool
+    public function isFree(): ?bool
     {
         return $this->isFree;
     }
@@ -415,5 +424,15 @@ final class PetDto
     public function setPetLikes(array $petLikes): void
     {
         $this->petLikes = $petLikes;
+    }
+
+    public function isAlive(): ?bool
+    {
+        return $this->isAlive;
+    }
+
+    public function setIsAlive(?bool $isAlive): void
+    {
+        $this->isAlive = $isAlive;
     }
 }

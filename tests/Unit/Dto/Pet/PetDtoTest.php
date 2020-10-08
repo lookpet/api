@@ -49,7 +49,7 @@ class PetDtoTest extends TestCase
         $petDto->setAbout(PetFixture::ABOUT);
         self::assertSame(PetFixture::ABOUT, $petDto->getAbout());
 
-        self::assertFalse($petDto->isLookingForNewOwner());
+        self::assertNull($petDto->isLookingForNewOwner());
         $petDto->setIsLookingForOwner(true);
         self::assertTrue($petDto->isLookingForNewOwner());
 
@@ -68,11 +68,11 @@ class PetDtoTest extends TestCase
         $petDto->setPrice(PetFixture::PRICE);
         self::assertSame(PetFixture::PRICE, $petDto->getPrice());
 
-        self::assertFalse($petDto->isFree());
+        self::assertNull($petDto->isFree());
         $petDto->setIsFree(true);
         self::assertTrue($petDto->isFree());
 
-        self::assertFalse($petDto->isSold());
+        self::assertNull($petDto->isSold());
         $petDto->setIsSold(true);
         self::assertTrue($petDto->isSold());
 

@@ -105,7 +105,13 @@ final class PetController extends AbstractController
     {
         try {
             $petDto = $this->petDtoBuilder->build($request);
-            $pet = Pet::createFromDto($petDto, $this->getUser());
+            $pet = new Pet(
+                $petDto->getType(),
+                $petDto->getSlug(),
+                $petDto->getId()
+            );
+
+            $pet->updateFromDto($petDto, $this->getUser());
 
             $this->entityManager->persist($pet);
             $this->entityManager->flush();
@@ -206,7 +212,7 @@ final class PetController extends AbstractController
             }
 
             $petDto = $this->petDtoBuilder->build($request, $pet->getId());
-            $pet = Pet::createFromDto($petDto, $this->getUser());
+            $pet->updateFromDto($petDto, $this->getUser());
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($pet);
