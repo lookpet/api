@@ -84,20 +84,6 @@ class Pet implements \JsonSerializable
     private $eyeColor;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="pets")
-     */
-    private $user;
-
-    /**
-     * @ORM\ManyToMany(targetEntity=Media::class)
-     * @ORM\JoinTable(name="pet_media",
-     *      joinColumns={@ORM\JoinColumn(name="pet_id", referencedColumnName="id")},
-     * )
-     * @ORM\OrderBy({"createdAt" = "DESC"})
-     */
-    private $media;
-
-    /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $city;
@@ -116,17 +102,6 @@ class Pet implements \JsonSerializable
      * @ORM\OneToMany(targetEntity=PetLike::class, mappedBy="pet")
      */
     private $likes;
-
-    /**
-     * @ORM\OneToMany(targetEntity=PetComment::class, mappedBy="pet", orphanRemoval=true)
-     * @ORM\OrderBy({"createdAt" = "DESC"})
-     */
-    private $comments;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=Breeder::class, inversedBy="pets")
-     */
-    private $breeder;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -153,7 +128,32 @@ class Pet implements \JsonSerializable
      */
     private $isDeleted = false;
 
-    public function __construct(string $type, ?string $slug, ?string $name = null, ?string $id = null, ?UserInterface $user = null)
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="pets")
+     */
+    private $user;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Media::class)
+     * @ORM\JoinTable(name="pet_media",
+     *      joinColumns={@ORM\JoinColumn(name="pet_id", referencedColumnName="id")},
+     * )
+     * @ORM\OrderBy({"createdAt" = "DESC"})
+     */
+    private $media;
+
+    /**
+     * @ORM\OneToMany(targetEntity=PetComment::class, mappedBy="pet", orphanRemoval=true)
+     * @ORM\OrderBy({"createdAt" = "DESC"})
+     */
+    private $comments;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Breeder::class, inversedBy="pets")
+     */
+    private $breeder;
+
+    public function __construct(string $type, ?string $slug, ?string $id = null, ?string $name = null, ?UserInterface $user = null)
     {
         $this->user = $user;
         $this->type = $type;
@@ -181,24 +181,71 @@ class Pet implements \JsonSerializable
         $pet = new static(
             $petDto->getType(),
             $petDto->getSlug(),
-            $petDto->getName(),
-            $petDto->getId(),
-            $user
+            $petDto->getId()
         );
-        $pet->setCity($petDto->getCity())
-            ->setPlaceId($petDto->getPlaceId())
-            ->setBreed($petDto->getBreed())
-            ->setPrice($petDto->getPrice())
-            ->setMotherName($petDto->getMotherName())
-            ->setFatherName($petDto->getFatherName())
-            ->setColor($petDto->getColor())
-            ->setAbout($petDto->getAbout())
-            ->setEyeColor($petDto->getEyeColor())
-            ->setDateOfBirth($petDto->getDateOfBirth())
-            ->setIsLookingForOwner($petDto->isLookingForNewOwner())
+
+        $pet->setUser($user);
+
+        $pet->setName($petDto->getName());
+
+        if ($petDto->getCity() !== null) {
+            $pet->setCity($petDto->getCity());
+            if ($petDto->getPlaceId() !== null) {
+                $pet->setPlaceId($petDto->getPlaceId());
+            }
+        }
+
+        if ($petDto->getBreed() !== null) {
+            $pet->setBreed($petDto->getBreed());
+        }
+
+        if ($petDto->getGender() !== null) {
+            $pet->setGender($petDto->getGender());
+        }
+
+        if ($petDto->getPrice() !== null) {
+            $pet->setPrice($petDto->getPrice());
+        }
+
+        if ($petDto->getFatherName() !== null) {
+            $pet->setFatherName($petDto->getFatherName());
+        }
+
+        if ($petDto->getMotherName() !== null) {
+            $pet->setMotherName($petDto->getMotherName());
+        }
+
+        if ($petDto->getColor() !== null) {
+            $pet->setColor($petDto->getColor());
+        }
+
+        if ($petDto->getEyeColor() !== null) {
+            $pet->setEyeColor($petDto->getEyeColor());
+        }
+
+        if ($petDto->getAbout() !== null) {
+            $pet->setAbout($petDto->getAbout());
+        }
+
+        if ($petDto->getDateOfBirth() !== null) {
+            $pet->setDateOfBirth($petDto->getDateOfBirth());
+        }
+
+        if (count($petDto->getMedia()) > 0) {
+            $pet->addMedia(...$petDto->getMedia());
+        }
+
+        if (count($petDto->getComments()) > 0) {
+            $pet->addComments(...$petDto->getComments());
+        }
+
+        if (count($petDto->getPetLikes()) > 0) {
+            $pet->addLikes(...$petDto->getPetLikes());
+        }
+
+        $pet->setIsLookingForOwner($petDto->isLookingForNewOwner())
             ->setIsFree($petDto->isFree())
-            ->setIsSold($petDto->isSold())
-            ->addMedia(...$petDto->getMedia());
+            ->setIsSold($petDto->isSold());
 
         return $pet;
     }
@@ -544,17 +591,23 @@ class Pet implements \JsonSerializable
         return $this->comments;
     }
 
-    public function addComment(PetComment $comment): self
+    public function addComments(PetComment ...$comments): self
     {
-        $this->comments[] = $comment;
+        foreach ($comments as $comment) {
+            if (!$this->comments->contains($comment)) {
+                $this->comments[] = $comment;
+            }
+        }
 
         return $this;
     }
 
-    public function removeComment(PetComment $comment): self
+    public function removeComments(PetComment ...$comments): self
     {
-        if ($this->comments->contains($comment)) {
-            $this->comments->removeElement($comment);
+        foreach ($comments as $comment) {
+            if ($this->comments->contains($comment)) {
+                $this->comments->removeElement($comment);
+            }
         }
 
         return $this;
@@ -568,10 +621,12 @@ class Pet implements \JsonSerializable
         return $this->likes;
     }
 
-    public function addLike(PetLike $like): self
+    public function addLikes(PetLike ...$likes): self
     {
-        if (!$this->likes->contains($like)) {
-            $this->likes[] = $like;
+        foreach ($likes as $like) {
+            if (!$this->likes->contains($like)) {
+                $this->likes[] = $like;
+            }
         }
 
         return $this;

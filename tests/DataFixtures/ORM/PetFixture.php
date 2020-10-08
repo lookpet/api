@@ -5,6 +5,7 @@ namespace Tests\DataFixtures\ORM;
 use App\Entity\Pet;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
+use Ramsey\Uuid\Uuid;
 
 final class PetFixture extends BaseFixture
 {
@@ -14,7 +15,7 @@ final class PetFixture extends BaseFixture
     public function load(ObjectManager $manager): void
     {
         $this->faker = Factory::create();
-        $pet = new Pet('dog', self::SLUG, $this->faker->firstName);
+        $pet = new Pet('dog', self::SLUG, Uuid::uuid4()->toString(), $this->faker->firstName);
         $pet->setDateOfBirth(\DateTime::createFromFormat('Y-m-d', $this->faker->date()));
         $pet->setBreed('Husky');
         $pet->setColor('Black');
@@ -26,11 +27,8 @@ final class PetFixture extends BaseFixture
 
     public function loadData(ObjectManager $manager): void
     {
-        // $product = new Product();
-        // $manager->persist($product);
-
         $this->createMany(100, 'pets', function ($i) {
-            $pet = new Pet('dog', $this->faker->slug, $this->faker->name);
+            $pet = new Pet('dog', $this->faker->slug, Uuid::uuid4()->toString(), $this->faker->name);
             $pet->setDateOfBirth(\DateTime::createFromFormat('Y-m-d', $this->faker->date()));
             $pet->setBreed('Husky');
             $pet->setColor('Black');

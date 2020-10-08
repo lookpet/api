@@ -62,7 +62,7 @@ final class PetCommentController extends AbstractController
         }
         $pet = array_pop($pets);
         $petComment = new PetComment($this->getUser(), $request->request->get('comment'), $pet);
-        $pet->addComment($petComment);
+        $pet->addComments($petComment);
         $this->getDoctrine()->getManager()->persist($pet);
         $this->getDoctrine()->getManager()->persist($petComment);
         $this->getDoctrine()->getManager()->flush();

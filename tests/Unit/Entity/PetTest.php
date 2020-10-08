@@ -30,7 +30,7 @@ final class PetTest extends TestCase
         $dateOfBirth = new \DateTimeImmutable('-1 day');
         $age = new Age($dateOfBirth);
         $user = new User(null, null, self::USER_ID);
-        $pet = new Pet(PetFixture::TYPE, PetFixture::SLUG, PetFixture::NAME, PetFixture::ID, $user);
+        $pet = new Pet(PetFixture::TYPE, PetFixture::SLUG, PetFixture::ID, PetFixture::NAME, $user);
 
         self::assertSame(PetFixture::TYPE, $pet->getType());
         self::assertSame(PetFixture::SLUG, $pet->getSlug());
@@ -113,14 +113,14 @@ final class PetTest extends TestCase
 
         self::assertEmpty($pet->getComments());
         $comment = $this->createMock(PetComment::class);
-        $pet->addComment($comment);
+        $pet->addComments($comment);
         self::assertSame($comment, $pet->getComments()->first());
-        $pet->removeComment($comment);
+        $pet->removeComments($comment);
         self::assertEmpty($pet->getComments());
 
         self::assertEmpty($pet->getLikes());
         $like = new PetLike($pet, $user);
-        $pet->addLike($like);
+        $pet->addLikes($like);
         self::assertSame($like, $pet->getLikes()->first());
         self::assertTrue($pet->hasLike($user));
         $pet->removeLike($like);

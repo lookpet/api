@@ -6,6 +6,7 @@ use App\Entity\Pet;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
+use Ramsey\Uuid\Uuid;
 
 final class PetCommentFixture extends Fixture
 {
@@ -15,7 +16,7 @@ final class PetCommentFixture extends Fixture
     public function load(ObjectManager $manager): void
     {
         $this->faker = Factory::create();
-        $pet = new Pet('dog', self::SLUG, $this->faker->firstName);
+        $pet = new Pet('dog', self::SLUG, Uuid::uuid4()->toString(), $this->faker->firstName);
         $pet->setDateOfBirth(\DateTime::createFromFormat('Y-m-d', $this->faker->date()));
         $pet->setBreed('Husky');
         $pet->setColor('Black');

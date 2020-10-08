@@ -32,11 +32,12 @@ final class PetDtoBuilder
         if (!$request->request->has('slug')) {
             $slug = (new Slugify())->slugify(
                 implode('-', [
+                    $request->request->get('type'),
                     $request->request->get('name'),
                     random_int(1000, 1000000),
                 ])
             );
-            $request->request->get('slug', $slug);
+            $request->request->set('slug', $slug);
         }
 
         $petDto->setSlug($request->request->get('slug'));

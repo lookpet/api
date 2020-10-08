@@ -257,7 +257,7 @@ final class AuthenticationController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
-            if (!$user->isLookPetUser()) {
+            if (!$user->isLookPetUser() && !$_ENV['APP_ENV'] !== 'dev') {
                 $emailTemplateSender->send(new EmailTemplateDto(
                     EmailRecipient::create(
                         $user->getEmail(),

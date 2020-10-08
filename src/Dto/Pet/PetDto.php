@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Dto\Pet;
 
+use App\Entity\Breeder;
 use App\Entity\Media;
+use App\Entity\PetComment;
+use App\Entity\PetLike;
 use Swagger\Annotations as SWG;
 
 final class PetDto
@@ -34,7 +37,7 @@ final class PetDto
      *     example="rex2020",
      * )
      */
-    private ?string $slug;
+    private ?string $slug = null;
 
     /**
      * @SWG\Property(
@@ -43,7 +46,7 @@ final class PetDto
      *     example="rex",
      * )
      */
-    private ?string $name;
+    private ?string $name = null;
 
     /**
      * @SWG\Property(
@@ -52,7 +55,7 @@ final class PetDto
      *     example="Husky",
      * )
      */
-    private ?string $breed;
+    private ?string $breed = null;
 
     /**
      * @SWG\Property(
@@ -61,7 +64,7 @@ final class PetDto
      *     example="Black and white",
      * )
      */
-    private ?string $color;
+    private ?string $color = null;
 
     /**
      * @SWG\Property(
@@ -70,7 +73,7 @@ final class PetDto
      *     example="Blue",
      * )
      */
-    private ?string $eyeColor;
+    private ?string $eyeColor = null;
 
     /**
      * @SWG\Property(
@@ -79,7 +82,7 @@ final class PetDto
      *     example="2020-01-01",
      * )
      */
-    private ?\DateTimeInterface $dateOfBirth;
+    private ?\DateTimeInterface $dateOfBirth = null;
 
     /**
      * @SWG\Property(
@@ -88,7 +91,7 @@ final class PetDto
      *     example="male",
      * )
      */
-    private ?string $gender;
+    private ?string $gender = null;
 
     /**
      * @SWG\Property(
@@ -97,7 +100,7 @@ final class PetDto
      *     example="My pet is the Best!",
      * )
      */
-    private ?string $about;
+    private ?string $about = null;
 
     /**
      * @SWG\Property(
@@ -115,7 +118,7 @@ final class PetDto
      *     example="Husky Haven Super Father",
      * )
      */
-    private string $fatherName;
+    private ?string $fatherName = null;
 
     /**
      * @SWG\Property(
@@ -124,7 +127,7 @@ final class PetDto
      *     example="Husky Haven Super Mother",
      * )
      */
-    private string $motherName;
+    private ?string $motherName = null;
 
     /**
      * @SWG\Property(
@@ -133,7 +136,7 @@ final class PetDto
      *     example="Moscow",
      * )
      */
-    private string $city;
+    private ?string $city = null;
 
     /**
      * @SWG\Property(
@@ -142,7 +145,7 @@ final class PetDto
      *     example="",
      * )
      */
-    private string $placeId;
+    private ?string $placeId = null;
 
     /**
      * @SWG\Property(
@@ -151,7 +154,7 @@ final class PetDto
      *     example="10000$",
      * )
      */
-    private string $price;
+    private ?string $price = null;
 
     /**
      * @SWG\Property(
@@ -175,6 +178,18 @@ final class PetDto
      * @var Media[]
      */
     private array $media = [];
+
+    /**
+     * @var PetComment[]
+     */
+    private array $comments = [];
+
+    /**
+     * @var PetLike[]
+     */
+    private array $petLikes = [];
+
+    private ?Breeder $breeder = null;
 
     public function getId(): string
     {
@@ -286,42 +301,42 @@ final class PetDto
         $this->isLookingForNewOwner = $isLookingForNewOwner;
     }
 
-    public function getFatherName(): string
+    public function getFatherName(): ?string
     {
         return $this->fatherName;
     }
 
-    public function setFatherName(string $fatherName): void
+    public function setFatherName(?string $fatherName): void
     {
         $this->fatherName = $fatherName;
     }
 
-    public function getMotherName(): string
+    public function getMotherName(): ?string
     {
         return $this->motherName;
     }
 
-    public function setMotherName(string $motherName): void
+    public function setMotherName(?string $motherName): void
     {
         $this->motherName = $motherName;
     }
 
-    public function getCity(): string
+    public function getCity(): ?string
     {
         return $this->city;
     }
 
-    public function setCity(string $city): void
+    public function setCity(?string $city): void
     {
         $this->city = $city;
     }
 
-    public function getPlaceId(): string
+    public function getPlaceId(): ?string
     {
         return $this->placeId;
     }
 
-    public function setPlaceId(string $placeId): void
+    public function setPlaceId(?string $placeId): void
     {
         $this->placeId = $placeId;
     }
@@ -329,7 +344,7 @@ final class PetDto
     /**
      * @return string
      */
-    public function getPrice(): string
+    public function getPrice(): ?string
     {
         return $this->price;
     }
@@ -337,7 +352,7 @@ final class PetDto
     /**
      * @param string $price
      */
-    public function setPrice(string $price): void
+    public function setPrice(?string $price): void
     {
         $this->price = $price;
     }
@@ -370,5 +385,35 @@ final class PetDto
     public function setMedia(Media ...$media): void
     {
         $this->media = $media;
+    }
+
+    public function getBreeder(): ?Breeder
+    {
+        return $this->breeder;
+    }
+
+    public function setBreeder(?Breeder $breeder): void
+    {
+        $this->breeder = $breeder;
+    }
+
+    public function getComments(): array
+    {
+        return $this->comments;
+    }
+
+    public function setComments(array $comments): void
+    {
+        $this->comments = $comments;
+    }
+
+    public function getPetLikes(): array
+    {
+        return $this->petLikes;
+    }
+
+    public function setPetLikes(array $petLikes): void
+    {
+        $this->petLikes = $petLikes;
     }
 }

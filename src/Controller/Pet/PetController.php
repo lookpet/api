@@ -199,7 +199,7 @@ final class PetController extends AbstractController
                 ], Response::HTTP_BAD_REQUEST);
             }
 
-            if ($pet->getUser()->getId() !== $this->getUser()->getId()) {
+            if ($pet->getUser() !== null && !$pet->getUser()->equals($this->getUser())) {
                 return new JsonResponse([
                     'message' => 'Wrong user',
                 ], Response::HTTP_UNAUTHORIZED);
