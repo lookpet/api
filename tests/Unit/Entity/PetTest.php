@@ -27,7 +27,7 @@ final class PetTest extends TestCase
 
     public function testGettersSetters(): void
     {
-        $user = new User(null, null, self::USER_ID);
+        $user = new User(self::USER_ID, null, null);
         $pet = new Pet(PetFixture::TYPE, PetFixture::SLUG, PetFixture::ID, PetFixture::NAME, $user);
         self::assertSame(PetFixture::TYPE, $pet->getType());
         self::assertSame(PetFixture::SLUG, $pet->getSlug());

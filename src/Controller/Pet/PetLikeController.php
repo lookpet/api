@@ -60,13 +60,14 @@ final class PetLikeController extends AbstractController
                 'message' => 'Pet not exist',
             ], Response::HTTP_BAD_REQUEST);
         }
+
         $pet = array_pop($pets);
 
         $petLikes = $this->petLikeRepository->getPetLikes($this->getUser(), $pet);
 
         if (count($petLikes) === 0) {
             $petLike = new PetLike($pet, $this->getUser());
-            $pet->addLike(
+            $pet->addLikes(
                 $petLike
             );
             $this->getDoctrine()->getManager()->persist($petLike);

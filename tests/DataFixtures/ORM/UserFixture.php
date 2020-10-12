@@ -5,6 +5,7 @@ namespace Tests\DataFixtures\ORM;
 use App\Entity\ApiToken;
 use App\Entity\User;
 use Doctrine\Persistence\ObjectManager;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 final class UserFixture extends BaseFixture
@@ -14,6 +15,7 @@ final class UserFixture extends BaseFixture
     public const PASSWORD_BAD = '12345';
     public const TEST_USER_EMAIL = 'igor@look.pet';
     public const TEST_USER_BAD_EMAIL = 'igor.ru';
+    public const SLUG = 'super-pups';
 
     private UserPasswordEncoderInterface $passwordEncoder;
 
@@ -27,7 +29,7 @@ final class UserFixture extends BaseFixture
      */
     public function load(ObjectManager $manager): void
     {
-        $user = new User();
+        $user = new User(Uuid::uuid4()->toString(), self::SLUG);
         $user->setEmail(self::TEST_USER_EMAIL);
         $user->setPassword($this->passwordEncoder->encodePassword(
             $user,
@@ -41,7 +43,7 @@ final class UserFixture extends BaseFixture
     protected function loadData(ObjectManager $manager): void
     {
         $this->createMany(10, 'main_users', function ($i) use ($manager) {
-            $user = new User();
+            $user = new User(Uuid::uuid4()->toString(), self::SLUG . $i);
             $user->setEmail(sprintf('user%d@look.pet', $i));
             $user->setFirstName($this->faker->firstName);
             $user->setPassword($this->passwordEncoder->encodePassword(

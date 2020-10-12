@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Controller\Authentication;
 
-use App\Dto\AuthenticationUserLoginDto;
-use App\Dto\AuthenticationUserRegistrationDto;
+use App\Dto\Authentication\UserLoginDto;
+use App\Dto\Authentication\UserLoginDtoBuilder;
 use App\EmailTemplates\EmailTemplateDto;
 use App\Entity\ApiToken;
 use App\Entity\User;
@@ -21,26 +21,34 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class AuthenticationController extends AbstractController
 {
     private UserRepositoryInterface $userRepository;
     private ValidatorInterface $validator;
+    private UserPasswordEncoderInterface $passwordEncoder;
+    private EntityManagerInterface $entityManager;
+    private UserLoginDtoBuilder $loginDtoBuilder;
 
-    public function __construct(UserRepositoryInterface $userRepository, ValidatorInterface $validator)
-    {
+    public function __construct(
+        UserRepositoryInterface $userRepository,
+        ValidatorInterface $validator,
+        UserPasswordEncoderInterface $passwordEncoder,
+        EntityManagerInterface $entityManager,
+        UserLoginDtoBuilder $loginDtoBuilder
+    ) {
         $this->userRepository = $userRepository;
         $this->validator = $validator;
+        $this->passwordEncoder = $passwordEncoder;
+        $this->entityManager = $entityManager;
+        $this->loginDtoBuilder = $loginDtoBuilder;
     }
 
     /**
      * @Route("/api/v1/authentication/login", methods={"POST"}, name="api_login")
      *
      * @param Request $request
-     * @param UserPasswordEncoderInterface $passwordEncoder
-     * @param EntityManagerInterface $entityManager
      *
      * @return JsonResponse
      *
@@ -55,7 +63,7 @@ final class AuthenticationController extends AbstractController
      *     name="body",
      *     description="Lets login and get token",
      *     required=true,
-     *     @SWG\Schema(ref=@Model(type=AuthenticationUserLoginDto::class))
+     *     @SWG\Schema(ref=@Model(type=UserLoginDto::class))
      *   ),
      *   @SWG\Response(response=400, description="Invalid email or password",
      *     examples={
@@ -88,71 +96,52 @@ final class AuthenticationController extends AbstractController
      *    )
      * )
      */
-    public function login(Request $request,
-                          UserPasswordEncoderInterface $passwordEncoder,
-                          EntityManagerInterface $entityManager): JsonResponse
+    public function login(Request $request): JsonResponse
     {
-        $email = $request->request->get('email');
+        try {
+            $userLoginDto = $this->loginDtoBuilder->build($request);
+            $user = $this->userRepository->findByEmail($userLoginDto->getEmail());
 
-        if ($email === null) {
+            if ($user === null) {
+                return new JsonResponse([
+                    'message' => 'Invalid email or password',
+                ], 400);
+            }
+
+            if (!$this->passwordEncoder->isPasswordValid(
+                $user,
+                $userLoginDto->getPassword()
+            )) {
+                return new JsonResponse([
+                    'message' => 'Invalid email or password',
+                ], 400);
+            }
+
+            if (!$user->hasActiveApiToken()) {
+                $apiToken = new ApiToken($user);
+                $user->addApiToken(
+                    $apiToken
+                );
+                $this->entityManager->persist($apiToken);
+                $this->entityManager->flush();
+            }
+
+            return $this->json([
+                'user' => $user,
+                'token' => $user->getActiveApiToken()->getToken(),
+                'expires_at' => $user->getActiveApiToken()->getExpiresAt(),
+            ]);
+        } catch (\Throwable $exception) {
             return new JsonResponse([
-                'message' => 'Empty email',
-            ], Response::HTTP_FORBIDDEN);
+                'message' => $exception->getMessage(),
+            ], $exception->getCode());
         }
-
-        if (!$this->isValidEmail($email)) {
-            new JsonResponse(
-                [
-                    'message' => 'Invalid email address',
-                ], Response::HTTP_BAD_REQUEST
-            );
-        }
-
-        $password = $request->request->get('password');
-
-        if ($password === null) {
-            return new JsonResponse([
-                'message' => 'Empty password',
-            ], 400);
-        }
-
-        $user = $this->userRepository->findOneBy([
-            'email' => $email,
-        ]);
-
-        if ($user === null) {
-            return new JsonResponse([
-                'message' => 'Invalid email or password',
-            ], 400);
-        }
-
-        if (!$passwordEncoder->isPasswordValid($user, $password)) {
-            return new JsonResponse([
-                'message' => 'Invalid email or password',
-            ], 400);
-        }
-
-        $activeToken = $user->getActiveApiToken();
-
-        if ($activeToken === null) {
-            $activeToken = new ApiToken($user);
-            $entityManager->persist($activeToken);
-            $entityManager->flush();
-        }
-
-        return $this->json([
-            'user' => $user,
-            'token' => $activeToken->getToken(),
-            'expires_at' => $activeToken->getExpiresAt(),
-        ]);
     }
 
     /**
      * @Route("/api/v1/authentication/register", methods={"POST"}, name="api_register")
      *
      * @param Request $request
-     * @param UserPasswordEncoderInterface $passwordEncoder
-     * @param EntityManagerInterface $entityManager
      * @param EmailTemplateSenderInterface $emailTemplateSender
      *
      * @return JsonResponse
@@ -168,7 +157,7 @@ final class AuthenticationController extends AbstractController
      *     name="body",
      *     description="Lets login and get token",
      *     required=true,
-     *     @SWG\Schema(ref=@Model(type=AuthenticationUserRegistrationDto::class))
+     *     @SWG\Schema(ref=@Model(type=UserLoginDto::class))
      *   ),
      *   @SWG\Response(response=400, description="User already exist; empty email or password",
      *     examples={
@@ -199,54 +188,31 @@ final class AuthenticationController extends AbstractController
      */
     public function register(
         Request $request,
-        UserPasswordEncoderInterface $passwordEncoder,
-        EntityManagerInterface $entityManager,
         EmailTemplateSenderInterface $emailTemplateSender
     ): JsonResponse {
         try {
-            if (!$request->request->has('email')) {
-                return new JsonResponse([
-                    'message' => 'Empty email',
-                ], Response::HTTP_BAD_REQUEST);
-            }
+            $userLoginDto = $this->loginDtoBuilder->build($request);
 
-            if (!$request->request->has('password')) {
-                return new JsonResponse([
-                    'message' => 'Empty password',
-                ], Response::HTTP_BAD_REQUEST);
-            }
-
-            $email = $request->request->get('email');
-
-            if (!$this->isValidEmail($email)) {
-                return new JsonResponse(
-                    [
-                        'message' => 'Invalid email address',
-                    ], Response::HTTP_BAD_REQUEST
-                );
-            }
-
-            $password = $request->request->get('password');
-
-            if (!$this->isValidPassword($password)) {
-                return new JsonResponse(
-                    [
-                        'message' => 'Password too short min length is 6',
-                    ], Response::HTTP_BAD_REQUEST
-                );
-            }
-
-            /** @todo use form validation with DTO */
             $user = new User(
-                null,
-                $request->request->get('firstName')
+                $userLoginDto->getId(),
+                $userLoginDto->getSlug(),
+                $userLoginDto->getFirstName()
             );
-            $user->setEmail($request->request->get('email'));
-            $user->setPassword($passwordEncoder->encodePassword($user, $password));
 
-            $userExist = $this->userRepository->findOneBy([
-                'email' => $email,
-            ]);
+            $user->setEmail(
+                $userLoginDto->getEmail()
+            );
+
+            $user->setPassword(
+                $this->passwordEncoder->encodePassword(
+                    $user,
+                    $userLoginDto->getPassword()
+                )
+            );
+
+            $userExist = $this->userRepository->findByEmail(
+                $userLoginDto->getEmail()
+            );
 
             if ($userExist !== null) {
                 return new JsonResponse([
@@ -254,62 +220,33 @@ final class AuthenticationController extends AbstractController
                 ], Response::HTTP_BAD_REQUEST);
             }
 
-            $entityManager->persist($user);
-            $entityManager->flush();
+            $this->entityManager->persist($user);
+            $apiToken = new ApiToken($user);
+            $this->entityManager->persist($apiToken);
+            $this->entityManager->flush();
 
-            if (!$user->isLookPetUser() && !$_ENV['APP_ENV'] !== 'dev') {
+            if (!$user->isLookPetUser() && (bool) $_ENV['IS_SEND_EMAIL_NOTIFICATIONS'] === true) {
                 $emailTemplateSender->send(new EmailTemplateDto(
                     EmailRecipient::create(
                         $user->getEmail(),
                         $user->getName()
                     ),
                     'Добро пожаловать на look.pet',
-                    $_ENV['MJ_TEMPLATE_WELCOME']
+                    (int) $_ENV['MJ_TEMPLATE_WELCOME']
                 ));
             }
+
+            return new JsonResponse(
+                [
+                    'user' => $user,
+                    'token' => $apiToken->getToken(),
+                    'expires_at' => $apiToken->getExpiresAt(),
+                ]
+            );
         } catch (\Exception $exception) {
             return new JsonResponse([
                 'message' => $exception->getMessage(),
             ], Response::HTTP_BAD_REQUEST);
         }
-
-        $apiToken = new ApiToken($user);
-        $entityManager->persist($apiToken);
-        $entityManager->flush();
-
-        return new JsonResponse(
-            [
-                'user' => $user,
-                'token' => $apiToken->getToken(),
-                'expires_at' => $apiToken->getExpiresAt(),
-            ]
-        );
-    }
-
-    private function isValidEmail(string $email): bool
-    {
-        $emailConstraint = new Assert\Email();
-        $emailConstraint->message = 'Invalid email address';
-
-        $errors = $this->validator->validate(
-            $email,
-            $emailConstraint
-        );
-
-        return count($errors) === 0;
-    }
-
-    private function isValidPassword(string $password): bool
-    {
-        $passwordConstraint = new Assert\Length([
-            'min' => 6,
-        ]);
-
-        $errors = $this->validator->validate(
-            $password,
-            $passwordConstraint
-        );
-
-        return count($errors) === 0;
     }
 }

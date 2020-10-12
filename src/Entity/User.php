@@ -2,14 +2,14 @@
 
 namespace App\Entity;
 
+use App\Dto\Authentication\UserLoginDto;
+use App\Dto\User\UserDto;
 use App\Entity\Traits\LifecycleCallbackTrait;
 use App\Entity\Traits\TimestampTrait;
 use App\Repository\UserRepository;
-use Cocur\Slugify\Slugify;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Ramsey\Uuid\Uuid;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -132,20 +132,11 @@ class User implements UserInterface, \JsonSerializable
      */
     private $placeId;
 
-    public function __construct(?string $slug = null, ?string $firstName = null, ?string $id = null)
+    public function __construct(string $id = null, ?string $slug = null, ?string $firstName = null)
     {
-        if ($slug === null) {
-            $this->generateSlug($firstName);
-        } else {
-            $this->slug = $slug;
-        }
-
+        $this->slug = $slug;
         $this->firstName = $firstName;
-
         $this->id = $id;
-        if ($id === null) {
-            $this->id = Uuid::uuid4()->toString();
-        }
 
         $this->apiTokens = new ArrayCollection();
         $this->media = new ArrayCollection();
@@ -153,6 +144,29 @@ class User implements UserInterface, \JsonSerializable
         $this->petComments = new ArrayCollection();
         $this->petLikes = new ArrayCollection();
         $this->media = new ArrayCollection();
+    }
+
+    public static function createFromLoginDto(UserLoginDto $userLoginDto): self
+    {
+        return (new self(
+            $userLoginDto->getId()
+        ))->setEmail($userLoginDto->getEmail())
+            ->setPassword($userLoginDto->getPassword());
+    }
+
+    public function updateFromDto(UserDto $userDto): void
+    {
+        if ($userDto->getId() !== null) {
+            $this->id = $userDto->getId();
+        }
+
+        if ($userDto->getSlug() !== null) {
+            $this->slug = $userDto->getSlug();
+        }
+
+        if ($userDto->getFirstName() !== null) {
+            $this->firstName = $userDto->getFirstName();
+        }
     }
 
     public function getId(): ?string
@@ -264,11 +278,15 @@ class User implements UserInterface, \JsonSerializable
         return null;
     }
 
+    public function hasActiveApiToken(): bool
+    {
+        return $this->getActiveApiToken() !== null;
+    }
+
     public function addApiToken(ApiToken $apiToken): self
     {
         if (!$this->apiTokens->contains($apiToken)) {
             $this->apiTokens[] = $apiToken;
-            $apiToken->setUser($this);
         }
 
         return $this;
@@ -601,13 +619,5 @@ class User implements UserInterface, \JsonSerializable
     public function equals(User $user): bool
     {
         return $this->getId() === $user->getId();
-    }
-
-    private function generateSlug(?string $firstName): void
-    {
-        $firstName = mb_strtolower($firstName);
-        $slugify = new Slugify();
-        $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
-        $this->slug = $slugify->slugify(implode('-', [$firstName, $slugEntropy]));
     }
 }

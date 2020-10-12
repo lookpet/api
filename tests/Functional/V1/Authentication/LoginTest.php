@@ -84,7 +84,7 @@ final class LoginTest extends WebTestCase
                     'password' => UserFixture::PASSWORD_GOOD,
                 ],
                 'Empty email',
-                Response::HTTP_FORBIDDEN,
+                Response::HTTP_BAD_REQUEST,
             ],
             [
                 [
@@ -98,7 +98,7 @@ final class LoginTest extends WebTestCase
                     'email' => UserFixture::TEST_USER_BAD_EMAIL,
                     'password' => UserFixture::PASSWORD_GOOD,
                 ],
-                'Invalid email or password',
+                'Invalid email',
                 Response::HTTP_BAD_REQUEST,
             ],
         ];

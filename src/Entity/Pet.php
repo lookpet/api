@@ -175,7 +175,7 @@ class Pet implements \JsonSerializable
         $this->comments = new ArrayCollection();
     }
 
-    public function updateFromDto(PetDto $petDto, ?User $user = null): self
+    public function updateFromDto(PetDto $petDto, ?User $user = null): void
     {
         $this->setUser($user);
 
@@ -254,8 +254,8 @@ class Pet implements \JsonSerializable
             $this->isFree = $petDto->isFree();
         }
 
-        if ($petDto->isLookingForNewOwner() !== null) {
-            $this->isLookingForOwner = $petDto->isLookingForNewOwner();
+        if ($isLookingForNewOwner = $petDto->isLookingForNewOwner() !== null) {
+            $this->isLookingForOwner = $isLookingForNewOwner;
         }
 
         if ($petDto->isSold() !== null) {
@@ -265,8 +265,6 @@ class Pet implements \JsonSerializable
                 $this->isFree = false;
             }
         }
-
-        return $this;
     }
 
     public function jsonSerialize(): array

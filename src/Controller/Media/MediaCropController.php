@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\Media;
 
 use App\Repository\MediaRepository;
+use App\Repository\MediaRepositoryInterface;
 use App\Service\MediaCropperInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,18 +17,21 @@ use Symfony\Component\Routing\Annotation\Route;
 class MediaCropController extends AbstractController
 {
     private MediaCropperInterface $mediaCropper;
-    private MediaRepository $mediaRepository;
+    private MediaRepositoryInterface $mediaRepository;
     private LoggerInterface $logger;
 
     /**
      * MediaCropController constructor.
      *
      * @param MediaCropperInterface $mediaCropper
-     * @param MediaRepository $mediaRepository
+     * @param MediaRepositoryInterface $mediaRepository
      * @param LoggerInterface $logger
      */
-    public function __construct(MediaCropperInterface $mediaCropper, MediaRepository $mediaRepository, LoggerInterface $logger)
-    {
+    public function __construct(
+        MediaCropperInterface $mediaCropper,
+        MediaRepositoryInterface $mediaRepository,
+        LoggerInterface $logger
+    ) {
         $this->mediaCropper = $mediaCropper;
         $this->mediaRepository = $mediaRepository;
         $this->logger = $logger;
@@ -41,9 +45,9 @@ class MediaCropController extends AbstractController
      *
      * @return JsonResponse
      */
-    public function upload(string $id, Request $request): JsonResponse
+    public function crop(string $id, Request $request): JsonResponse
     {
-        $media = $this->mediaRepository->find($id);
+        $media = $this->mediaRepository->findById($id);
 
         if ($media === null) {
             return new JsonResponse(null, Response::HTTP_NOT_FOUND);
@@ -61,9 +65,10 @@ class MediaCropController extends AbstractController
 
             return new JsonResponse($media);
         } catch (\Exception $exception) {
+            var_dump($exception);
             $this->logger->error($exception->getMessage());
 
-            return new JsonResponse($exception->getMessage());
+            return new JsonResponse($exception->getMessage(), Response::HTTP_BAD_REQUEST);
         }
     }
 }

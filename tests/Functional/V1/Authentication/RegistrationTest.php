@@ -120,7 +120,7 @@ final class RegistrationTest extends WebTestCase
                     'email' => UserFixture::TEST_USER_BAD_EMAIL,
                     'password' => UserFixture::PASSWORD_GOOD,
                 ],
-                'Invalid email address',
+                'Invalid email',
             ],
             [
                 [
