@@ -65,7 +65,6 @@ class MediaCropController extends AbstractController
 
             return new JsonResponse($media);
         } catch (\Exception $exception) {
-            var_dump($exception);
             $this->logger->error($exception->getMessage());
 
             return new JsonResponse($exception->getMessage(), Response::HTTP_BAD_REQUEST);
