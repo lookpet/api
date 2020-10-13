@@ -14,19 +14,19 @@ use App\PetDomain\VO\Url;
 use App\PetDomain\VO\Width;
 use App\Repository\MediaRepositoryInterface;
 use App\Service\MediaCropperInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Tests\Unit\Traits\CreateContainerTrait;
 
 /**
  * group unit.
  */
 class MediaCropControllerTest extends TestCase
 {
+    use CreateContainerTrait;
+
     private const ID = 'some-id';
     private const FILE_PATH = '/file-path';
     private const URL = 'https://file-path';
@@ -47,20 +47,11 @@ class MediaCropControllerTest extends TestCase
         $request = new Request([], [
             'imageCrop' => sprintf('%d,%d,%d,%d', self::X, self::Y, self::WIDTH, self::HEIGHT),
         ]);
-        $container = $this->createContainer('security.token_storage',
-            $this->createMock(TokenStorageInterface::class)
-        );
+        $container = $this->createTokenContainer();
 
         $this->mediaCropController->setContainer(
             $container
         );
-
-        /** @var ContainerInterface|MockObject $container */
-        $container
-            ->expects(self::atLeastOnce())
-            ->method('has')
-            ->with('security.token_storage')
-            ->willReturn(true);
 
         $media = new Media(
             $this->user,
@@ -130,17 +121,5 @@ class MediaCropControllerTest extends TestCase
             $this->mediaRepository,
             $this->logger
         );
-    }
-
-    private function createContainer($serviceId, $serviceObject): ContainerInterface
-    {
-        $container = $this->createMock(ContainerInterface::class);
-
-        $container->expects($this->atLeastOnce())
-            ->method('get')
-            ->with($serviceId)
-            ->willReturn($serviceObject);
-
-        return $container;
     }
 }
