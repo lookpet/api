@@ -11,8 +11,9 @@ use Tests\Unit\Fixture\PetFixture;
 
 /**
  * @group unit
+ * @covers \App\Dto\Pet\PetDto
  */
-class PetDtoTest extends TestCase
+final class PetDtoTest extends TestCase
 {
     public function testGettersSetters(): void
     {

@@ -13,8 +13,9 @@ use Tests\Unit\Fixture\PetFixture;
 
 /**
  * @group unit
+ * @covers \App\Dto\Pet\PetDtoBuilder
  */
-class PetDtoBuilderTest extends TestCase
+final class PetDtoBuilderTest extends TestCase
 {
     private const REQUEST_MEDIA = ['some-media-id'];
     private const EMPTY_TYPE_EXCEPTION_MESSAGE = 'Empty type';

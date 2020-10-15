@@ -16,6 +16,7 @@ use Tests\Unit\Fixture\PetFixture;
 
 /**
  * @group unit
+ * @covers \App\Entity\Pet
  */
 final class PetTest extends TestCase
 {

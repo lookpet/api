@@ -7,7 +7,11 @@ use App\PetDomain\PetTypes;
 use App\Repository\PetRepositoryInterface;
 use PHPUnit\Framework\TestCase;
 
-class DogCityExistControllerTest extends TestCase
+/**
+ * @group unit
+ * @covers \App\Controller\Dog\DogCityExistController
+ */
+final class DogCityExistControllerTest extends TestCase
 {
     private const BREED_RESPONSE = [
         ['breed' => 'Siberian Husky'],

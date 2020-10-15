@@ -17,8 +17,9 @@ use Tests\Unit\Traits\CreateContainerTrait;
 
 /**
  * @group unit
+ * @covers \App\Controller\Post\CreatePostController
  */
-class CreatePostControllerTest extends TestCase
+final class CreatePostControllerTest extends TestCase
 {
     use CreateContainerTrait;
 

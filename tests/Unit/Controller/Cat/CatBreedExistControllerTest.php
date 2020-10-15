@@ -7,7 +7,11 @@ use App\PetDomain\PetTypes;
 use App\Repository\PetRepositoryInterface;
 use PHPUnit\Framework\TestCase;
 
-class CatBreedExistControllerTest extends TestCase
+/**
+ * @group unit
+ * @covers \App\Controller\Cat\CatBreedExistController
+ */
+final class CatBreedExistControllerTest extends TestCase
 {
     private const BREED_RESPONSE = [
         ['breed' => 'Maine Coon'],

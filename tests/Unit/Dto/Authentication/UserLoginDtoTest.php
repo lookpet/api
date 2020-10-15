@@ -10,8 +10,9 @@ use Tests\Unit\Fixture\UserFixture;
 
 /**
  * @group unit
+ * @covers \App\Dto\Authentication\UserLoginDto
  */
-class UserLoginDtoTest extends TestCase
+final class UserLoginDtoTest extends TestCase
 {
     public function testGettersSetters(): void
     {

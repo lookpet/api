@@ -22,8 +22,10 @@ use Tests\Unit\Traits\CreateContainerTrait;
 
 /**
  * group unit.
+ *
+ * @covers \App\Controller\Media\MediaCropController
  */
-class MediaCropControllerTest extends TestCase
+final class MediaCropControllerTest extends TestCase
 {
     use CreateContainerTrait;
 

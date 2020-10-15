@@ -24,8 +24,9 @@ use Tests\Unit\Fixture\UserFixture;
 
 /**
  * @group unit
+ * @covers \App\Controller\Authentication\AuthenticationController
  */
-class AuthenticationControllerTest extends TestCase
+final class AuthenticationControllerTest extends TestCase
 {
     private const INVALID_EMAIL_OR_PASSWORD_MESSAGE = 'Invalid email or password';
     private const USER_ALREADY_EXIST_MESSAGE = 'User already exist';

@@ -10,6 +10,7 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -141,7 +142,7 @@ class User implements UserInterface, \JsonSerializable
     {
         $this->slug = $slug;
         $this->firstName = $firstName;
-        $this->id = $id;
+        $this->id = $id ?? Uuid::uuid4()->toString();
 
         $this->apiTokens = new ArrayCollection();
         $this->media = new ArrayCollection();
@@ -162,16 +163,32 @@ class User implements UserInterface, \JsonSerializable
 
     public function updateFromDto(UserDto $userDto): void
     {
-        if ($userDto->getId() !== null) {
-            $this->id = $userDto->getId();
-        }
-
         if ($userDto->getSlug() !== null) {
             $this->slug = $userDto->getSlug();
         }
 
         if ($userDto->getFirstName() !== null) {
             $this->firstName = $userDto->getFirstName();
+        }
+
+        if ($userDto->getLastName() !== null) {
+            $this->lastName = $userDto->getLastName();
+        }
+
+        if ($userDto->getDescription() !== null) {
+            $this->description = $userDto->getDescription();
+        }
+
+        if ($userDto->getCity() !== null) {
+            $this->city = $userDto->getCity();
+        }
+
+        if ($userDto->getPlaceId() !== null) {
+            $this->placeId = $userDto->getPlaceId();
+        }
+
+        if ($userDto->getPhone() !== null) {
+            $this->phone = $userDto->getPhone();
         }
     }
 
@@ -591,7 +608,6 @@ class User implements UserInterface, \JsonSerializable
     {
         if (!$this->media->contains($mediaUser)) {
             $this->media[] = $mediaUser;
-            $mediaUser->setUser($this);
         }
 
         return $this;

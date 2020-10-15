@@ -6,7 +6,11 @@ use App\Controller\Cat\CatBreedController;
 use App\PetDomain\Cat\CatBreedList;
 use PHPUnit\Framework\TestCase;
 
-class CatBreedControllerTest extends TestCase
+/**
+ * @group unit
+ * @covers \App\Controller\Cat\CatBreedController
+ */
+final class CatBreedControllerTest extends TestCase
 {
     public function testGetBreedList(): void
     {

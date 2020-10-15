@@ -11,8 +11,9 @@ use Tests\Unit\Fixture\UserFixture;
 
 /**
  * @group unit
+ * @covers \App\Dto\Authentication\UserLoginDtoBuilder
  */
-class UserLoginDtoBuilderTest extends TestCase
+final class UserLoginDtoBuilderTest extends TestCase
 {
     private const WRONG_EMAIL = 'wrong-email';
     private const SHORT_PASSWORD = '12345';

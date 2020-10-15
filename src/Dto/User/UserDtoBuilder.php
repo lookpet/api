@@ -2,29 +2,34 @@
 
 namespace App\Dto\User;
 
+use App\Entity\Breeder;
 use Cocur\Slugify\Slugify;
-use Ramsey\Uuid\Uuid;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-final class UserDtoBuilder
+final class UserDtoBuilder implements UserDtoBuilderInterface
 {
-    /**
-     * @var Slugify
-     */
     private Slugify $slugify;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(Slugify $slugify)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        Slugify $slugify
+    ) {
         $this->slugify = $slugify;
+        $this->entityManager = $entityManager;
     }
 
-    public function build(Request $request, ?string $id = null): UserDto
+    public function build(Request $request): UserDto
     {
         $userDto = new UserDto();
-        $this->setId($userDto, $id);
 
         if ($request->request->has('firstName')) {
             $userDto->setFirstName($request->request->get('firstName'));
+        }
+
+        if ($request->request->has('lastName')) {
+            $userDto->setLastName($request->request->get('lastName'));
         }
 
         if ($request->request->has('phone')) {
@@ -41,17 +46,17 @@ final class UserDtoBuilder
 
         if ($request->request->has('slug')) {
             $userDto->setSlug($request->request->get('slug'));
+        } else {
+            $this->generateSlug($userDto);
+        }
+
+        if ($request->request->has('breeder')) {
+            $breeder = new Breeder($request->request->get('breeder'));
+            $this->entityManager->persist($breeder);
+            $userDto->setBreeder($breeder);
         }
 
         return $userDto;
-    }
-
-    private function setId(UserDto $userDto, ?string $id): void
-    {
-        if ($id === null) {
-            $id = Uuid::uuid4()->toString();
-        }
-        $userDto->setId($id);
     }
 
     private function generateSlug(UserDto $userDto): void

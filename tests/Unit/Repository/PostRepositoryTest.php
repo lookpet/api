@@ -17,6 +17,7 @@ use Ramsey\Uuid\Uuid;
 
 /**
  * @group unit
+ * @covers \App\Repository\PostRepository
  */
 class PostRepositoryTest extends TestCase
 {

@@ -11,6 +11,7 @@ use Ramsey\Uuid\Uuid;
 
 /**
  * @group unit
+ * @covers \App\Entity\Post
  */
 final class PostTest extends TestCase
 {
