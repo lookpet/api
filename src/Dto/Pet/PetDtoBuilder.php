@@ -8,7 +8,7 @@ use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-final class PetDtoBuilder
+final class PetDtoBuilder implements PetDtoBuilderInterface
 {
     private MediaRepositoryInterface $mediaRepository;
 

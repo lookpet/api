@@ -44,9 +44,8 @@ final class RegistrationTest extends WebTestCase
         self::assertSame(UserFixture::TEST_USER_FIRST_NAME, $content['user']['firstName']);
         self::assertNotEmpty($content['token']);
         self::assertNotEmpty($content['expires_at']);
-        self::assertEqualsWithDelta(new \DateTimeImmutable('+ 1 week'), new \DateTimeImmutable($content['expires_at']['date']), 1);
+        self::assertEqualsWithDelta(new \DateTimeImmutable('+ 1 week'), new \DateTimeImmutable($content['expires_at']['date']), 3);
         self::assertSame(3, $content['expires_at']['timezone_type']);
-        self::assertSame('Europe/London', $content['expires_at']['timezone']);
     }
 
     public function testRegistrationFailsBecauseUserWithSameEmailExists(): void

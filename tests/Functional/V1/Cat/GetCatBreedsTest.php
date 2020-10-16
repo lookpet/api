@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @group functional
+ * @group cat
  */
 final class GetCatBreedsTest extends WebTestCase
 {

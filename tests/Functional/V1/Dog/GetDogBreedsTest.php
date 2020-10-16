@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @group functional
+ * @group dog
  */
 final class GetDogBreedsTest extends WebTestCase
 {

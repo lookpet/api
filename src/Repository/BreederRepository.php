@@ -12,39 +12,17 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Breeder[]    findAll()
  * @method Breeder[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class BreederRepository extends ServiceEntityRepository
+class BreederRepository extends ServiceEntityRepository implements BreederRepositoryInterface
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Breeder::class);
     }
 
-    // /**
-    //  * @return Breeder[] Returns an array of Breeder objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findByName(string $name): ?Breeder
     {
-        return $this->createQueryBuilder('b')
-            ->andWhere('b.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('b.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        return $this->findOneBy([
+            'name' => $name,
+        ]);
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Breeder
-    {
-        return $this->createQueryBuilder('b')
-            ->andWhere('b.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

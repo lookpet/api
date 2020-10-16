@@ -138,6 +138,11 @@ class User implements UserInterface, \JsonSerializable
      */
     private $posts;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $lastNotificationDate;
+
     public function __construct(string $id = null, ?string $slug = null, ?string $firstName = null)
     {
         $this->slug = $slug;
@@ -402,6 +407,7 @@ class User implements UserInterface, \JsonSerializable
             'phone' => $this->getPhone(),
             'description' => $this->getDescription(),
             'city' => $this->getCity(),
+            'placeId' => $this->getPlaceId(),
             'avatar' => $this->getAvatarUrl(),
             'media' => $this->getMedia()->getValues(),
             'breeder' => $this->getBreeder(),
@@ -416,6 +422,11 @@ class User implements UserInterface, \JsonSerializable
     public function getPets(): Collection
     {
         return $this->pets;
+    }
+
+    public function havePets(): bool
+    {
+        return count($this->pets);
     }
 
     public function addPet(Pet $pet): self
@@ -672,5 +683,27 @@ class User implements UserInterface, \JsonSerializable
         }
 
         return $this;
+    }
+
+    public function getLastNotificationDate(): ?\DateTimeInterface
+    {
+        return $this->lastNotificationDate;
+    }
+
+    public function setLastNotificationDate(?\DateTimeInterface $lastNotificationDate): self
+    {
+        $this->lastNotificationDate = $lastNotificationDate;
+
+        return $this;
+    }
+
+    public function updateNotificationDate(): void
+    {
+        $this->lastNotificationDate = new \DateTimeImmutable();
+    }
+
+    public function hasNotificationSentToday(): bool
+    {
+        return $this->lastNotificationDate !== null;
     }
 }

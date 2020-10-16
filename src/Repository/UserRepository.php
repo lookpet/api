@@ -38,4 +38,18 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
             'updatedAt' => 'DESC',
         ]);
     }
+
+    public function findUsersWithNoPets(): array
+    {
+        $users = $this->findAll();
+        $result = [];
+
+        foreach ($users as $user) {
+            if (!$user->havePets()) {
+                $result[] = $user;
+            }
+        }
+
+        return $result;
+    }
 }

@@ -37,20 +37,9 @@ final class PostDtoBuilder implements PostDtoBuilderInterface
 
         $postDto->setSlug($request->request->get('slug'));
 
+        $this->setMedia($request, $postDto);
+
         return $postDto;
-    }
-
-    private function isTrue(Request $request, string $attribute): bool
-    {
-        return $request->request->has($attribute) && in_array($request->request->get($attribute), ['true', true]);
-    }
-
-    private function setId(PetDto $petDto, ?string $id): void
-    {
-        if ($id === null) {
-            $id = Uuid::uuid4()->toString();
-        }
-        $petDto->setId($id);
     }
 
     private function setMedia(Request $request, PostDto $postDto): void

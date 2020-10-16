@@ -3,6 +3,7 @@
 namespace App\Dto\User;
 
 use App\Entity\Breeder;
+use App\Repository\BreederRepositoryInterface;
 use Cocur\Slugify\Slugify;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,13 +12,16 @@ final class UserDtoBuilder implements UserDtoBuilderInterface
 {
     private Slugify $slugify;
     private EntityManagerInterface $entityManager;
+    private BreederRepositoryInterface $breederRepository;
 
     public function __construct(
         EntityManagerInterface $entityManager,
+        BreederRepositoryInterface $breederRepository,
         Slugify $slugify
     ) {
         $this->slugify = $slugify;
         $this->entityManager = $entityManager;
+        $this->breederRepository = $breederRepository;
     }
 
     public function build(Request $request): UserDto
@@ -42,6 +46,10 @@ final class UserDtoBuilder implements UserDtoBuilderInterface
 
         if ($request->request->has('city')) {
             $userDto->setCity($request->request->get('city'));
+
+            if ($request->request->has('placeId')) {
+                $userDto->setPlaceId($request->request->get('placeId'));
+            }
         }
 
         if ($request->request->has('slug')) {
@@ -51,8 +59,17 @@ final class UserDtoBuilder implements UserDtoBuilderInterface
         }
 
         if ($request->request->has('breeder')) {
-            $breeder = new Breeder($request->request->get('breeder'));
-            $this->entityManager->persist($breeder);
+            $breeder = $this->breederRepository->findByName(
+                $request->request->get('breeder')
+            );
+
+            if ($breeder === null) {
+                $breeder = new Breeder(
+                    $request->request->get('breeder')
+                );
+                $this->entityManager->persist($breeder);
+            }
+
             $userDto->setBreeder($breeder);
         }
 

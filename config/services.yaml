@@ -45,6 +45,8 @@ services:
             - '%env(MJ_FROM_EMAIL)%'
             - '%env(MJ_FROM_NAME)%'
 
+    Cocur\Slugify\Slugify: ~
+
     App\Service\EmailTemplateSenderInterface: '@App\Service\EmailTemplateTemplateSender'
     App\Service\EmailTemplateTemplateSender:
         arguments:
