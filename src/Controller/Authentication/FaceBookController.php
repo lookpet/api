@@ -7,6 +7,7 @@ namespace App\Controller\Authentication;
 use App\Entity\ApiToken;
 use App\Entity\User;
 use App\Repository\UserRepositoryInterface;
+use Cocur\Slugify\Slugify;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,10 +18,15 @@ use Symfony\Component\Routing\Annotation\Route;
 class FaceBookController extends AbstractController
 {
     private UserRepositoryInterface $userRepository;
+    private Slugify $slugify;
 
-    public function __construct(UserRepositoryInterface $userRepository)
+    public function __construct(
+        UserRepositoryInterface $userRepository,
+        Slugify $slugify
+    )
     {
         $this->userRepository = $userRepository;
+        $this->slugify = $slugify;
     }
 
     /**
@@ -58,6 +64,9 @@ class FaceBookController extends AbstractController
                 $user->setLastName($profile['last_name']);
                 $user->setProvider('facebook');
                 $user->setProviderId($profile['id']);
+                $user->setSlug(
+                    $this->slugify->slugify($profile['name'])
+                );
             }
 
             $user->setProviderLastResponse($request->getContent());
