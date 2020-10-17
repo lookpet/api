@@ -79,8 +79,10 @@ class ResetPasswordController extends AbstractController
         return new JsonResponse([], Response::HTTP_OK);
     }
 
-    private function randomPassword($length = 8) {
-        $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?";
-        return substr( str_shuffle( $chars ), 0, $length );
+    private function randomPassword($length = 8)
+    {
+        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?';
+
+        return mb_substr(str_shuffle($chars), 0, $length);
     }
 }
