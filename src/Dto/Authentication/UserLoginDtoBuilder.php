@@ -83,7 +83,7 @@ class UserLoginDtoBuilder
     private function isValidPasswordLength(string $password): bool
     {
         $passwordConstraint = new Assert\Length([
-            'min' => 6,
+            'min' => 1,
         ]);
 
         $errors = $this->validator->validate(
