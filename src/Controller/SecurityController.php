@@ -307,7 +307,7 @@ final class SecurityController extends AbstractController
     private function isValidPassword(string $password): bool
     {
         $passwordConstraint = new Assert\Length([
-            'min' => 6,
+            'min' => 1,
         ]);
 
         $errors = $this->validator->validate(
