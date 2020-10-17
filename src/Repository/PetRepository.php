@@ -48,6 +48,8 @@ final class PetRepository extends ServiceEntityRepository implements PetReposito
             $queryBuilder->andWhere($queryBuilder->expr()->eq('p.type', $queryBuilder->expr()->literal($type)));
         }
 
+        $queryBuilder->join('p.media', 'pm');
+
         return $queryBuilder->orderBy('p.updatedAt', 'DESC')
             ->setFirstResult($offset->get())
             ->setMaxResults(10)

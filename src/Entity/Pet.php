@@ -442,6 +442,11 @@ class Pet implements \JsonSerializable
         return $this->media;
     }
 
+    public function hasMedia(): bool
+    {
+        return $this->media->count() > 0;
+    }
+
     public function addMedia(Media ...$mediaCollection): self
     {
         foreach ($mediaCollection as $media) {

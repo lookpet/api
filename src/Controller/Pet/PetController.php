@@ -325,11 +325,18 @@ final class PetController extends AbstractController
     {
         $page = $request->get('p', 1);
         $limit = 10;
-        $offset = $limit * $page;
+        $offset = $page === 1 ? 0 : $limit * $page;
         $pets = $petRepository->findBy([], [
             'updatedAt' => 'desc',
         ], $limit, $offset);
 
-        return $this->petResponseBuilder->build($this->getUser(), ...$pets);
+        $filterWithNoMedia = [];
+        foreach ($pets as $pet) {
+            if ($pet->hasMedia()) {
+                $filterWithNoMedia[] = $pet;
+            }
+        }
+
+        return $this->petResponseBuilder->build($this->getUser(), ...$filterWithNoMedia);
     }
 }
