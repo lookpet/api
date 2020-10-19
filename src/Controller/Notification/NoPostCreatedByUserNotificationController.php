@@ -36,9 +36,7 @@ final class NoPostCreatedByUserNotificationController extends AbstractController
      */
     public function sendNoPost(): JsonResponse
     {
-        $emails = [];
-        $users = $this->userRepository->findUsersWithNoPets();
-
+        die();
         foreach ($users as $user) {
             if ($user->hasNotificationSentToday()) {
                 $emails[] = $user->getEmail();
@@ -49,8 +47,8 @@ final class NoPostCreatedByUserNotificationController extends AbstractController
                             $user->getEmail(),
                             $user->getName()
                         ),
-                        'Добро пожаловать на look.pet',
-                        (int) $_ENV['MJ_TEMPLATE_WELCOME']
+                        'Кое-что новенькое у вас в ленте look.pet',
+                        (int) 1801577
                     ));
                     $user->updateNotificationDate();
                     $this->entityManager->persist($user);
