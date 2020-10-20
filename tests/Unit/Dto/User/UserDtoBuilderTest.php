@@ -6,6 +6,7 @@ namespace Tests\Unit\Dto\User;
 
 use App\Dto\User\UserDtoBuilder;
 use App\Entity\Media;
+use App\Repository\BreederRepositoryInterface;
 use App\Repository\MediaRepositoryInterface;
 use Cocur\Slugify\Slugify;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,6 +23,7 @@ final class UserDtoBuilderTest extends TestCase
     private MediaRepositoryInterface $mediaRepository;
     private UserDtoBuilder $userDtoBuilder;
     private EntityManagerInterface $entityManager;
+    private BreederRepositoryInterface $breederRepository;
 
     public function testItBuildsDto(): void
     {
@@ -49,8 +51,10 @@ final class UserDtoBuilderTest extends TestCase
         parent::setUp();
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->mediaRepository = $this->createMock(MediaRepositoryInterface::class);
+        $this->breederRepository = $this->createMock(BreederRepositoryInterface::class);
         $this->userDtoBuilder = new UserDtoBuilder(
             $this->entityManager,
+            $this->breederRepository,
             new Slugify()
         );
     }

@@ -92,7 +92,7 @@ final class AuthenticationControllerTest extends TestCase
         self::assertEqualsWithDelta(
             $expiresAt->getTimestamp(),
             (new \DateTimeImmutable($decodedResponse->expires_at->date))->getTimestamp(),
-            2
+            3600
         );
         self::assertSame(3, $decodedResponse->expires_at->timezone_type);
     }
@@ -208,7 +208,7 @@ final class AuthenticationControllerTest extends TestCase
         self::assertEqualsWithDelta(
             $expiresAt->getTimestamp(),
             (new \DateTimeImmutable($decodedResponse->expires_at->date))->getTimestamp(),
-            2
+            3600
         );
         self::assertSame(3, $decodedResponse->expires_at->timezone_type);
     }
@@ -278,7 +278,7 @@ final class AuthenticationControllerTest extends TestCase
                 [
                     UserFixture::PASSWORD,
                     new Assert\Length([
-                        'min' => 6,
+                        'min' => 1,
                     ]),
                 ]
             )

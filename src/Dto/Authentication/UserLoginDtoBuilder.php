@@ -40,7 +40,7 @@ class UserLoginDtoBuilder
         if (!$this->isValidPasswordLength(
             $request->request->get('password')
         )) {
-            throw new \LogicException('Password too short min length is 6', Response::HTTP_BAD_REQUEST);
+            throw new \LogicException('Password too short min length is 1', Response::HTTP_BAD_REQUEST);
         }
 
         $userLoginDto = new UserLoginDto(

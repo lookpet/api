@@ -21,7 +21,7 @@ final class UserLoginDtoBuilderTest extends TestCase
     private const EMPTY_EMAIL_MESSAGE = 'Empty email';
     private const EMPTY_PASSWORD_MESSAGE = 'Empty password';
     private const INVALID_EMAIL_MESSAGE = 'Invalid email';
-    private const PASSWORD_TOO_SHORT_MESSAGE = 'Password too short min length is 6';
+    private const PASSWORD_TOO_SHORT_MESSAGE = 'Password too short min length is 1';
 
     private ValidatorInterface $validator;
     private UserLoginDtoBuilder $userLoginDtoBuilder;
@@ -48,7 +48,7 @@ final class UserLoginDtoBuilderTest extends TestCase
                 [
                     UserFixture::PASSWORD,
                     new Assert\Length([
-                        'min' => 6,
+                        'min' => 1,
                     ]),
                 ]
             )
@@ -158,7 +158,7 @@ final class UserLoginDtoBuilderTest extends TestCase
                 [
                     self::SHORT_PASSWORD,
                     new Assert\Length([
-                        'min' => 6,
+                        'min' => 1,
                     ]),
                 ]
             )

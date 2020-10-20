@@ -14,7 +14,7 @@ final class UserFixture extends BaseFixture
     public const TEST_USER_FIRST_NAME = 'Igor';
     public const TEST_USER_LAST_NAME = 'Sinitsyn';
     public const PASSWORD_GOOD = 'engage';
-    public const PASSWORD_BAD = '12345';
+    public const PASSWORD_BAD = '1';
     public const TEST_USER_EMAIL = 'igor@look.pet';
     public const TEST_USER_BAD_EMAIL = 'igor.ru';
     public const SLUG = 'super-pups';

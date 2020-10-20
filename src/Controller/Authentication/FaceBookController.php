@@ -23,8 +23,7 @@ class FaceBookController extends AbstractController
     public function __construct(
         UserRepositoryInterface $userRepository,
         Slugify $slugify
-    )
-    {
+    ) {
         $this->userRepository = $userRepository;
         $this->slugify = $slugify;
     }
