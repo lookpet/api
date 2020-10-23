@@ -64,7 +64,7 @@ class ResetPasswordController extends AbstractController
                     $user->getName()
                 ),
                 'Восстановить доступ к look.pet',
-                $_ENV['MJ_TEMPLATE_RESET_PASSWORD']
+                (int) getenv('MJ_TEMPLATE_RESET_PASSWORD')
             ))->setVariables([
                 'new_password' => $password,
             ]));

@@ -77,7 +77,7 @@ final class MediaCropControllerTest extends TestCase
             ->method('crop')
             ->with($media, [
                 self::X, self::Y, floatval(self::WIDTH), floatval(self::HEIGHT),
-            ], null)
+            ], $this->user)
             ->willReturn($media);
 
         $result = $this->mediaCropController->crop(

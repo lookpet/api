@@ -1,6 +1,7 @@
 .php_cs.cache
 .idea
 .env
+.env.test
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php

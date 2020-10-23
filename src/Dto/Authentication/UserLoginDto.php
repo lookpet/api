@@ -16,7 +16,7 @@ class UserLoginDto
      *     example="dog",
      * )
      */
-    private string $id;
+    private ?string $id = null;
 
     /**
      * @SWG\Property(
@@ -57,10 +57,11 @@ class UserLoginDto
      */
     private ?string $firstName;
 
-    public function __construct(string $email, string $password)
+    public function __construct(string $email, string $password, ?string $firstName = null)
     {
         $this->email = $email;
         $this->password = $password;
+        $this->firstName = $firstName;
     }
 
     public function getEmail(): string
@@ -73,7 +74,7 @@ class UserLoginDto
         return $this->password;
     }
 
-    public function getId(): string
+    public function getId(): ?string
     {
         return $this->id;
     }

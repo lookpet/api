@@ -225,14 +225,14 @@ final class AuthenticationController extends AbstractController
             $this->entityManager->persist($apiToken);
             $this->entityManager->flush();
 
-            if (!$user->isLookPetUser() && (bool) $_ENV['IS_SEND_EMAIL_NOTIFICATIONS'] === true) {
+            if (!$user->isLookPetUser() && filter_var(getenv('IS_SEND_EMAIL_NOTIFICATIONS'), FILTER_VALIDATE_BOOLEAN) === true) {
                 $emailTemplateSender->send(new EmailTemplateDto(
                     EmailRecipient::create(
-                        $user->getEmail(),
-                        $user->getName()
+                        $userLoginDto->getEmail(),
+                        $userLoginDto->getFirstName()
                     ),
                     'Добро пожаловать на look.pet',
-                    (int) $_ENV['MJ_TEMPLATE_WELCOME']
+                    (int) getenv('MJ_TEMPLATE_WELCOME')
                 ));
             }
 

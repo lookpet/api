@@ -73,7 +73,7 @@ class MediaCropper implements MediaCropperInterface
         }
 
         $relativeFilePath = '/pets/uploads/' . $fileName;
-        $imageUrl = $_ENV['AWS_S3_PATH'] . $relativeFilePath;
+        $imageUrl = getenv('AWS_S3_PATH') . $relativeFilePath;
         $imageInfo = getimagesize($imageUrl);
 
         $media = new Media(

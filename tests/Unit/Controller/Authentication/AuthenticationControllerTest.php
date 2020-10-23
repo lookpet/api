@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Controller\Authentication;
 
 use App\Controller\Authentication\AuthenticationController;
+use App\Dto\Authentication\UserLoginDto;
 use App\Dto\Authentication\UserLoginDtoBuilder;
 use App\EmailTemplates\EmailTemplateDto;
 use App\Entity\ApiToken;
@@ -30,11 +31,16 @@ final class AuthenticationControllerTest extends TestCase
 {
     private const INVALID_EMAIL_OR_PASSWORD_MESSAGE = 'Invalid email or password';
     private const USER_ALREADY_EXIST_MESSAGE = 'User already exist';
+
+    private const EMAIL = 'test@mail.com';
+    private const NAME = 'Snappy';
+
     private ValidatorInterface $validator;
     private UserRepositoryInterface $userRepository;
     private UserPasswordEncoderInterface $userPasswordEncoder;
     private EntityManagerInterface $entityManager;
     private EmailTemplateSenderInterface $emailTemplateSender;
+    private UserLoginDtoBuilder $userLoginDtoBuilder;
 
     private User $user;
 
@@ -47,6 +53,17 @@ final class AuthenticationControllerTest extends TestCase
             'password' => UserFixture::PASSWORD,
             'firstName' => UserFixture::FIRST_NAME,
         ]);
+
+        $userLoginDto = new UserLoginDto(
+            $request->request->get('email'),
+            $request->request->get('password')
+        );
+
+        $this->userLoginDtoBuilder
+            ->expects(self::atLeastOnce())
+            ->method('build')
+            ->with($request)
+            ->willReturn($userLoginDto);
 
         $this->positiveDtoValidation();
 
@@ -105,6 +122,17 @@ final class AuthenticationControllerTest extends TestCase
             'firstName' => UserFixture::FIRST_NAME,
         ]);
 
+        $userLoginDto = new UserLoginDto(
+            $request->request->get('email'),
+            $request->request->get('password')
+        );
+
+        $this->userLoginDtoBuilder
+            ->expects(self::atLeastOnce())
+            ->method('build')
+            ->with($request)
+            ->willReturn($userLoginDto);
+
         $this->positiveDtoValidation();
 
         $this->userRepository
@@ -129,6 +157,17 @@ final class AuthenticationControllerTest extends TestCase
             'firstName' => UserFixture::FIRST_NAME,
         ]);
 
+        $userLoginDto = new UserLoginDto(
+            $request->request->get('email'),
+            $request->request->get('password')
+        );
+
+        $this->userLoginDtoBuilder
+            ->expects(self::atLeastOnce())
+            ->method('build')
+            ->with($request)
+            ->willReturn($userLoginDto);
+
         $this->positiveDtoValidation();
 
         $this->userRepository
@@ -148,6 +187,7 @@ final class AuthenticationControllerTest extends TestCase
         $result = $this->authenticationController->login(
             $request
         );
+
         self::assertSame(Response::HTTP_BAD_REQUEST, $result->getStatusCode());
         $decodedResponse = json_decode($result->getContent());
         self::assertSame(self::INVALID_EMAIL_OR_PASSWORD_MESSAGE, $decodedResponse->message);
@@ -160,6 +200,18 @@ final class AuthenticationControllerTest extends TestCase
             'password' => UserFixture::PASSWORD,
             'firstName' => UserFixture::FIRST_NAME,
         ]);
+
+        $userLoginDto = new UserLoginDto(
+            $request->request->get('email'),
+            $request->request->get('password'),
+            $request->request->get('firstName')
+        );
+
+        $this->userLoginDtoBuilder
+            ->expects(self::atLeastOnce())
+            ->method('build')
+            ->with($request)
+            ->willReturn($userLoginDto);
 
         $this->positiveDtoValidation();
 
@@ -186,8 +238,7 @@ final class AuthenticationControllerTest extends TestCase
 
         $this->emailTemplateSender
             ->expects(self::once())
-            ->method('send')
-            ->with($emailTemplateDto);
+            ->method('send');
 
         $this->entityManager
             ->expects(self::atLeastOnce())
@@ -221,6 +272,17 @@ final class AuthenticationControllerTest extends TestCase
             'firstName' => UserFixture::FIRST_NAME,
         ]);
 
+        $userLoginDto = new UserLoginDto(
+            $request->request->get('email'),
+            $request->request->get('password')
+        );
+
+        $this->userLoginDtoBuilder
+            ->expects(self::atLeastOnce())
+            ->method('build')
+            ->with($request)
+            ->willReturn($userLoginDto);
+
         $this->positiveDtoValidation();
 
         $this->userRepository
@@ -248,14 +310,13 @@ final class AuthenticationControllerTest extends TestCase
         $this->userPasswordEncoder = $this->createMock(UserPasswordEncoderInterface::class);
         $this->user = $this->createMock(User::class);
         $this->emailTemplateSender = $this->createMock(EmailTemplateSenderInterface::class);
+        $this->userLoginDtoBuilder = $this->createMock(UserLoginDtoBuilder::class);
         $this->authenticationController = new AuthenticationController(
             $this->userRepository,
             $this->validator,
             $this->userPasswordEncoder,
             $this->entityManager,
-            new UserLoginDtoBuilder(
-                $this->validator
-            )
+            $this->userLoginDtoBuilder
         );
         $this->authenticationController->setContainer(
             $this->createMock(ContainerInterface::class)
@@ -266,22 +327,5 @@ final class AuthenticationControllerTest extends TestCase
     {
         $emailConstraint = new Assert\Email();
         $emailConstraint->message = 'Invalid email';
-
-        $this->validator
-            ->expects(self::exactly(2))
-            ->method('validate')
-            ->withConsecutive(
-                [
-                    UserFixture::EMAIL,
-                    $emailConstraint,
-                ],
-                [
-                    UserFixture::PASSWORD,
-                    new Assert\Length([
-                        'min' => 1,
-                    ]),
-                ]
-            )
-            ->willReturnOnConsecutiveCalls([], []);
     }
 }
