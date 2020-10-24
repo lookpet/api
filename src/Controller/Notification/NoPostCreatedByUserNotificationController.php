@@ -41,7 +41,7 @@ final class NoPostCreatedByUserNotificationController extends AbstractController
             if ($user->hasNotificationSentToday()) {
                 $emails[] = $user->getEmail();
 
-                if (false && !$user->hasNotificationSentToday() && !$user->isLookPetUser() && (bool) getenv('IS_SEND_EMAIL_NOTIFICATIONS') === true) {
+                if (false && !$user->hasNotificationSentToday() && !$user->isLookPetUser() && (bool) $_ENV['IS_SEND_EMAIL_NOTIFICATIONS'] === true) {
                     $this->emailTemplateSender->send(new EmailTemplateDto(
                         EmailRecipient::create(
                             $user->getEmail(),

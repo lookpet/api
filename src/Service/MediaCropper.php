@@ -68,13 +68,15 @@ class MediaCropper implements MediaCropperInterface
             '/pets/uploads/' . $fileName,
             $stream
         );
+        $streamContent = stream_get_contents($stream);
+        $imageInfo = getimagesizefromstring($streamContent);
         if (is_resource($stream)) {
             fclose($stream);
         }
 
         $relativeFilePath = '/pets/uploads/' . $fileName;
-        $imageUrl = getenv('AWS_S3_PATH') . $relativeFilePath;
-        $imageInfo = getimagesize($imageUrl);
+        $imageUrl = $_ENV['AWS_S3_PATH'] . $relativeFilePath;
+//        $imageInfo = getimagesize($imageUrl);
 
         $media = new Media(
             $user,

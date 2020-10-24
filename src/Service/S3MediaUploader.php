@@ -72,7 +72,7 @@ class S3MediaUploader implements MediaUploaderInterface
             if (is_resource($stream)) {
                 fclose($stream);
             }
-            $imageUrl = getenv('AWS_S3_PATH') . '/pets/uploads/' . $fileName;
+            $imageUrl = $_ENV['AWS_S3_PATH'] . '/pets/uploads/' . $fileName;
             $imageInfo = getimagesize($newPhoto->getPathname());
 
             $media = new Media(

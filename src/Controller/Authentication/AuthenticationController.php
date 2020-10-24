@@ -232,7 +232,7 @@ final class AuthenticationController extends AbstractController
                         $userLoginDto->getFirstName()
                     ),
                     'Добро пожаловать на look.pet',
-                    (int) getenv('MJ_TEMPLATE_WELCOME')
+                    (int) $_ENV['MJ_TEMPLATE_WELCOME']
                 ));
             }
 
