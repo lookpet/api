@@ -64,12 +64,12 @@ class MediaCropper implements MediaCropperInterface
         );
 
         $stream = fopen($filePath, 'rb');
+        $streamContent = stream_get_contents($stream);
+        $imageInfo = getimagesizefromstring($streamContent);
         $this->filesystem->write(
             '/pets/uploads/' . $fileName,
             $stream
         );
-        $streamContent = stream_get_contents($stream);
-        $imageInfo = getimagesizefromstring($streamContent);
         if (is_resource($stream)) {
             fclose($stream);
         }
