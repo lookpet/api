@@ -64,8 +64,6 @@ class MediaCropper implements MediaCropperInterface
         );
 
         $stream = fopen($filePath, 'rb');
-        $streamContent = stream_get_contents($stream);
-        $imageInfo = getimagesizefromstring($streamContent);
         $this->filesystem->write(
             '/pets/uploads/' . $fileName,
             $stream
@@ -76,7 +74,7 @@ class MediaCropper implements MediaCropperInterface
 
         $relativeFilePath = '/pets/uploads/' . $fileName;
         $imageUrl = $_ENV['AWS_S3_PATH'] . $relativeFilePath;
-//        $imageInfo = getimagesize($imageUrl);
+        $imageInfo = getimagesize($imageUrl);
 
         $media = new Media(
             $user,
