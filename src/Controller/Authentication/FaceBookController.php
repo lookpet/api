@@ -68,7 +68,10 @@ class FaceBookController extends AbstractController
                 $user->setProvider('facebook');
                 $user->setProviderId($profile['id']);
                 $user->setSlug(
-                    $this->slugify->slugify($profile['name'])
+                    $this->slugify->slugify(
+                        $profile['name'],
+                        random_int(1000, 99999999)
+                    ),
                 );
                 $this->welcomeEmailNotifier->notify($user);
             }
