@@ -7,6 +7,7 @@ namespace App\Controller\Authentication;
 use App\Entity\ApiToken;
 use App\Entity\User;
 use App\Repository\UserRepositoryInterface;
+use App\Service\Notification\WelcomeEmailNotifier;
 use Cocur\Slugify\Slugify;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,13 +20,16 @@ class FaceBookController extends AbstractController
 {
     private UserRepositoryInterface $userRepository;
     private Slugify $slugify;
+    private WelcomeEmailNotifier $welcomeEmailNotifier;
 
     public function __construct(
         UserRepositoryInterface $userRepository,
-        Slugify $slugify
+        Slugify $slugify,
+        WelcomeEmailNotifier $welcomeEmailNotifier
     ) {
         $this->userRepository = $userRepository;
         $this->slugify = $slugify;
+        $this->welcomeEmailNotifier = $welcomeEmailNotifier;
     }
 
     /**
@@ -66,6 +70,7 @@ class FaceBookController extends AbstractController
                 $user->setSlug(
                     $this->slugify->slugify($profile['name'])
                 );
+                $this->welcomeEmailNotifier->notify($user);
             }
 
             $user->setProviderLastResponse($request->getContent());

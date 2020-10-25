@@ -395,6 +395,11 @@ class User implements UserInterface, \JsonSerializable
         return $domain === 'look.pet';
     }
 
+    public function hasEmail(): bool
+    {
+        return $this->email !== null;
+    }
+
     public function jsonSerialize(): array
     {
         return [

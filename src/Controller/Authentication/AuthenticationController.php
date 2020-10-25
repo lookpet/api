@@ -6,12 +6,11 @@ namespace App\Controller\Authentication;
 
 use App\Dto\Authentication\UserLoginDto;
 use App\Dto\Authentication\UserLoginDtoBuilder;
-use App\EmailTemplates\EmailTemplateDto;
 use App\Entity\ApiToken;
 use App\Entity\User;
-use App\PetDomain\VO\EmailRecipient;
 use App\Repository\UserRepositoryInterface;
 use App\Service\EmailTemplateSenderInterface;
+use App\Service\Notification\WelcomeEmailNotifier;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
@@ -30,19 +29,22 @@ final class AuthenticationController extends AbstractController
     private UserPasswordEncoderInterface $passwordEncoder;
     private EntityManagerInterface $entityManager;
     private UserLoginDtoBuilder $loginDtoBuilder;
+    private WelcomeEmailNotifier $welcomeEmailNotifier;
 
     public function __construct(
         UserRepositoryInterface $userRepository,
         ValidatorInterface $validator,
         UserPasswordEncoderInterface $passwordEncoder,
         EntityManagerInterface $entityManager,
-        UserLoginDtoBuilder $loginDtoBuilder
+        UserLoginDtoBuilder $loginDtoBuilder,
+        WelcomeEmailNotifier $welcomeEmailNotifier
     ) {
         $this->userRepository = $userRepository;
         $this->validator = $validator;
         $this->passwordEncoder = $passwordEncoder;
         $this->entityManager = $entityManager;
         $this->loginDtoBuilder = $loginDtoBuilder;
+        $this->welcomeEmailNotifier = $welcomeEmailNotifier;
     }
 
     /**
@@ -187,8 +189,7 @@ final class AuthenticationController extends AbstractController
      * )
      */
     public function register(
-        Request $request,
-        EmailTemplateSenderInterface $emailTemplateSender
+        Request $request
     ): JsonResponse {
         try {
             $userLoginDto = $this->loginDtoBuilder->build($request);
@@ -225,16 +226,7 @@ final class AuthenticationController extends AbstractController
             $this->entityManager->persist($apiToken);
             $this->entityManager->flush();
 
-            if (!$user->isLookPetUser() && filter_var(getenv('IS_SEND_EMAIL_NOTIFICATIONS'), FILTER_VALIDATE_BOOLEAN) === true) {
-                $emailTemplateSender->send(new EmailTemplateDto(
-                    EmailRecipient::create(
-                        $userLoginDto->getEmail(),
-                        $userLoginDto->getFirstName()
-                    ),
-                    'Добро пожаловать на look.pet',
-                    (int) $_ENV['MJ_TEMPLATE_WELCOME']
-                ));
-            }
+            $this->welcomeEmailNotifier->notify($user);
 
             return new JsonResponse(
                 [

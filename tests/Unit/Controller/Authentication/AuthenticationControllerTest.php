@@ -7,12 +7,10 @@ namespace Tests\Unit\Controller\Authentication;
 use App\Controller\Authentication\AuthenticationController;
 use App\Dto\Authentication\UserLoginDto;
 use App\Dto\Authentication\UserLoginDtoBuilder;
-use App\EmailTemplates\EmailTemplateDto;
 use App\Entity\ApiToken;
 use App\Entity\User;
-use App\PetDomain\VO\EmailRecipient;
 use App\Repository\UserRepositoryInterface;
-use App\Service\EmailTemplateSenderInterface;
+use App\Service\Notification\WelcomeEmailNotifier;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -39,8 +37,8 @@ final class AuthenticationControllerTest extends TestCase
     private UserRepositoryInterface $userRepository;
     private UserPasswordEncoderInterface $userPasswordEncoder;
     private EntityManagerInterface $entityManager;
-    private EmailTemplateSenderInterface $emailTemplateSender;
     private UserLoginDtoBuilder $userLoginDtoBuilder;
+    private WelcomeEmailNotifier $welcomeEmailNotifier;
 
     private User $user;
 
@@ -227,18 +225,9 @@ final class AuthenticationControllerTest extends TestCase
 
         $this->entityManager->expects(self::once())->method('flush');
 
-        $emailTemplateDto = new EmailTemplateDto(
-            EmailRecipient::create(
-                UserFixture::EMAIL,
-                UserFixture::FIRST_NAME
-            ),
-            'Добро пожаловать на look.pet',
-            1685295
-        );
-
-        $this->emailTemplateSender
+        $this->welcomeEmailNotifier
             ->expects(self::once())
-            ->method('send');
+            ->method('notify');
 
         $this->entityManager
             ->expects(self::atLeastOnce())
@@ -249,8 +238,7 @@ final class AuthenticationControllerTest extends TestCase
             ->method('flush');
 
         $result = $this->authenticationController->register(
-            $request,
-            $this->emailTemplateSender
+            $request
         );
 
         $decodedResponse = json_decode($result->getContent());
@@ -292,8 +280,7 @@ final class AuthenticationControllerTest extends TestCase
             ->willReturn($this->user);
 
         $result = $this->authenticationController->register(
-            $request,
-            $this->emailTemplateSender
+            $request
         );
 
         $decodedResponse = json_decode($result->getContent());
@@ -309,14 +296,15 @@ final class AuthenticationControllerTest extends TestCase
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->userPasswordEncoder = $this->createMock(UserPasswordEncoderInterface::class);
         $this->user = $this->createMock(User::class);
-        $this->emailTemplateSender = $this->createMock(EmailTemplateSenderInterface::class);
         $this->userLoginDtoBuilder = $this->createMock(UserLoginDtoBuilder::class);
+        $this->welcomeEmailNotifier = $this->createMock(WelcomeEmailNotifier::class);
         $this->authenticationController = new AuthenticationController(
             $this->userRepository,
             $this->validator,
             $this->userPasswordEncoder,
             $this->entityManager,
-            $this->userLoginDtoBuilder
+            $this->userLoginDtoBuilder,
+            $this->welcomeEmailNotifier
         );
         $this->authenticationController->setContainer(
             $this->createMock(ContainerInterface::class)
