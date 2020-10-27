@@ -25,6 +25,7 @@ final class PetTest extends TestCase
     private const NAME = 'Leo';
 
     private const USER_ID = 'user-id';
+    private const PET_LIKE_TEST = 'pet-like-test';
 
     public function testGettersSetters(): void
     {
@@ -58,7 +59,7 @@ final class PetTest extends TestCase
         self::assertEmpty($pet->getComments());
 
         self::assertEmpty($pet->getLikes());
-        $like = new PetLike($pet, $user);
+        $like = new PetLike($pet, $user, self::PET_LIKE_TEST);
         $pet->addLikes($like);
         self::assertSame($like, $pet->getLikes()->first());
         self::assertTrue($pet->hasLike($user));

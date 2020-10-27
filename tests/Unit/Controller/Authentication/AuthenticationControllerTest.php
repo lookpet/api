@@ -7,8 +7,11 @@ namespace Tests\Unit\Controller\Authentication;
 use App\Controller\Authentication\AuthenticationController;
 use App\Dto\Authentication\UserLoginDto;
 use App\Dto\Authentication\UserLoginDtoBuilder;
+use App\Dto\Event\RequestUtmBuilderInterface;
 use App\Entity\ApiToken;
 use App\Entity\User;
+use App\PetDomain\VO\Utm;
+use App\Repository\UserEventRepositoryInterface;
 use App\Repository\UserRepositoryInterface;
 use App\Service\Notification\WelcomeEmailNotifier;
 use Doctrine\ORM\EntityManagerInterface;
@@ -39,6 +42,8 @@ final class AuthenticationControllerTest extends TestCase
     private EntityManagerInterface $entityManager;
     private UserLoginDtoBuilder $userLoginDtoBuilder;
     private WelcomeEmailNotifier $welcomeEmailNotifier;
+    private RequestUtmBuilderInterface $requestUtmBuilder;
+    private UserEventRepositoryInterface $userEventRepository;
 
     private User $user;
 
@@ -96,6 +101,18 @@ final class AuthenticationControllerTest extends TestCase
         $this->entityManager
             ->expects(self::atLeastOnce())
             ->method('flush');
+
+        $utm = new Utm();
+
+        $this->requestUtmBuilder
+            ->expects(self::atLeastOnce())
+            ->method('build')
+            ->with($request)
+            ->willReturn($utm);
+
+        $this->userEventRepository
+            ->expects(self::atLeastOnce())
+            ->method('log');
 
         $result = $this->authenticationController->login(
             $request
@@ -237,6 +254,18 @@ final class AuthenticationControllerTest extends TestCase
             ->expects(self::atLeastOnce())
             ->method('flush');
 
+        $utm = new Utm();
+
+        $this->requestUtmBuilder
+            ->expects(self::atLeastOnce())
+            ->method('build')
+            ->with($request)
+            ->willReturn($utm);
+
+        $this->userEventRepository
+            ->expects(self::atLeastOnce())
+            ->method('log');
+
         $result = $this->authenticationController->register(
             $request
         );
@@ -298,13 +327,17 @@ final class AuthenticationControllerTest extends TestCase
         $this->user = $this->createMock(User::class);
         $this->userLoginDtoBuilder = $this->createMock(UserLoginDtoBuilder::class);
         $this->welcomeEmailNotifier = $this->createMock(WelcomeEmailNotifier::class);
+        $this->requestUtmBuilder = $this->createMock(RequestUtmBuilderInterface::class);
+        $this->userEventRepository = $this->createMock(UserEventRepositoryInterface::class);
         $this->authenticationController = new AuthenticationController(
             $this->userRepository,
             $this->validator,
             $this->userPasswordEncoder,
             $this->entityManager,
             $this->userLoginDtoBuilder,
-            $this->welcomeEmailNotifier
+            $this->welcomeEmailNotifier,
+            $this->requestUtmBuilder,
+            $this->userEventRepository
         );
         $this->authenticationController->setContainer(
             $this->createMock(ContainerInterface::class)

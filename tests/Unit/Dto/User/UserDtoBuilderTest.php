@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Unit\Dto\User;
 
 use App\Dto\User\UserDtoBuilder;
-use App\Entity\Media;
 use App\Repository\BreederRepositoryInterface;
 use App\Repository\MediaRepositoryInterface;
 use Cocur\Slugify\Slugify;
@@ -27,7 +26,6 @@ final class UserDtoBuilderTest extends TestCase
 
     public function testItBuildsDto(): void
     {
-        $media = $this->createMock(Media::class);
         $request = new Request([], [
             'firstName' => UserFixture::FIRST_NAME,
             'lastName' => UserFixture::LAST_NAME,

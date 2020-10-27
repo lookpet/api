@@ -12,7 +12,7 @@ interface PetLikeRepositoryInterface
      * @param User $user
      * @param Pet $pet
      *
-     * @return PetLike[]
+     * @return null|PetLike
      */
-    public function getPetLikes(User $user, Pet $pet): array;
+    public function getUserPetLike(User $user, Pet $pet): ?PetLike;
 }

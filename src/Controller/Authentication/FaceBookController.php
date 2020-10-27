@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller\Authentication;
 
+use App\Dto\Event\RequestUtmBuilderInterface;
 use App\Entity\ApiToken;
 use App\Entity\User;
+use App\PetDomain\VO\EventType;
+use App\Repository\UserEventRepositoryInterface;
 use App\Repository\UserRepositoryInterface;
 use App\Service\Notification\WelcomeEmailNotifier;
 use Cocur\Slugify\Slugify;
@@ -21,15 +24,21 @@ class FaceBookController extends AbstractController
     private UserRepositoryInterface $userRepository;
     private Slugify $slugify;
     private WelcomeEmailNotifier $welcomeEmailNotifier;
+    private RequestUtmBuilderInterface $requestUtmBuilder;
+    private UserEventRepositoryInterface $userEventRepository;
 
     public function __construct(
         UserRepositoryInterface $userRepository,
         Slugify $slugify,
-        WelcomeEmailNotifier $welcomeEmailNotifier
+        WelcomeEmailNotifier $welcomeEmailNotifier,
+        RequestUtmBuilderInterface $requestUtmBuilder,
+        UserEventRepositoryInterface $userEventRepository
     ) {
         $this->userRepository = $userRepository;
         $this->slugify = $slugify;
         $this->welcomeEmailNotifier = $welcomeEmailNotifier;
+        $this->requestUtmBuilder = $requestUtmBuilder;
+        $this->userEventRepository = $userEventRepository;
     }
 
     /**
@@ -74,6 +83,17 @@ class FaceBookController extends AbstractController
                     ),
                 );
                 $this->welcomeEmailNotifier->notify($user);
+                $this->userEventRepository->log(
+                    new EventType(EventType::FACEBOOK_REGISTRATION),
+                    $user,
+                    $this->requestUtmBuilder->build($request)
+                );
+            } else {
+                $this->userEventRepository->log(
+                    new EventType(EventType::FACEBOOK_LOGIN),
+                    $user,
+                    $this->requestUtmBuilder->build($request)
+                );
             }
 
             $user->setProviderLastResponse($request->getContent());

@@ -143,6 +143,11 @@ class User implements UserInterface, \JsonSerializable
      */
     private $lastNotificationDate;
 
+    /**
+     * @ORM\OneToMany(targetEntity=UserEvent::class, mappedBy="user")
+     */
+    private $events;
+
     public function __construct(string $id = null, ?string $slug = null, ?string $firstName = null)
     {
         $this->slug = $slug;
@@ -156,6 +161,7 @@ class User implements UserInterface, \JsonSerializable
         $this->petLikes = new ArrayCollection();
         $this->media = new ArrayCollection();
         $this->posts = new ArrayCollection();
+        $this->events = new ArrayCollection();
     }
 
     public static function createFromLoginDto(UserLoginDto $userLoginDto): self
@@ -710,5 +716,36 @@ class User implements UserInterface, \JsonSerializable
     public function hasNotificationSentToday(): bool
     {
         return $this->lastNotificationDate !== null;
+    }
+
+    /**
+     * @return Collection|UserEvent[]
+     */
+    public function getEvents(): Collection
+    {
+        return $this->events;
+    }
+
+    public function addEvent(UserEvent $event): self
+    {
+        if (!$this->events->contains($event)) {
+            $this->events[] = $event;
+            $event->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvent(UserEvent $event): self
+    {
+        if ($this->events->contains($event)) {
+            $this->events->removeElement($event);
+            // set the owning side to null (unless already changed)
+            if ($event->getUser() === $this) {
+                $event->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }

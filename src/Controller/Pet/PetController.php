@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace App\Controller\Pet;
 
+use App\Dto\Event\RequestUtmBuilderInterface;
 use App\Dto\Pet\PetDto;
-use App\Dto\Pet\PetDtoBuilder;
+use App\Dto\Pet\PetDtoBuilderInterface;
 use App\Entity\Pet;
+use App\PetDomain\VO\EventContext;
+use App\PetDomain\VO\EventType;
+use App\PetDomain\VO\Slug;
 use App\Repository\PetRepository;
+use App\Repository\UserEventRepositoryInterface;
 use App\Service\PetResponseBuilderInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -21,17 +26,23 @@ use Symfony\Component\Routing\Annotation\Route;
 final class PetController extends AbstractController
 {
     private PetResponseBuilderInterface $petResponseBuilder;
-    private PetDtoBuilder $petDtoBuilder;
+    private PetDtoBuilderInterface $petDtoBuilder;
     private EntityManagerInterface $entityManager;
+    private RequestUtmBuilderInterface $requestUtmBuilder;
+    private UserEventRepositoryInterface $userEventRepository;
 
     public function __construct(
         PetResponseBuilderInterface $petResponseBuilder,
-        PetDtoBuilder $petDtoBuilder,
-        EntityManagerInterface $entityManager
+        PetDtoBuilderInterface $petDtoBuilder,
+        EntityManagerInterface $entityManager,
+        RequestUtmBuilderInterface $requestUtmBuilder,
+        UserEventRepositoryInterface $userEventRepository
     ) {
         $this->petResponseBuilder = $petResponseBuilder;
         $this->petDtoBuilder = $petDtoBuilder;
         $this->entityManager = $entityManager;
+        $this->requestUtmBuilder = $requestUtmBuilder;
+        $this->userEventRepository = $userEventRepository;
     }
 
     /**
@@ -115,6 +126,12 @@ final class PetController extends AbstractController
 
             $this->entityManager->persist($pet);
             $this->entityManager->flush();
+            $this->userEventRepository->log(
+                new EventType(EventType::PET_CREATE),
+                $this->getUser(),
+                $this->requestUtmBuilder->build($request),
+                EventContext::createByPet($pet)
+            );
 
             return new JsonResponse($pet);
         } catch (\Exception $exception) {
@@ -273,12 +290,7 @@ final class PetController extends AbstractController
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        $pet = $petRepository->findOneBy([
-            'slug' => $slug,
-            'isDeleted' => false,
-        ], [
-            'createdAt' => 'desc',
-        ]);
+        $pet = $petRepository->findBySlug(new Slug($slug));
 
         if ($pet === null) {
             return new JsonResponse([

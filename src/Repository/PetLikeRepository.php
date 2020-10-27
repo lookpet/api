@@ -21,11 +21,17 @@ class PetLikeRepository extends ServiceEntityRepository implements PetLikeReposi
         parent::__construct($registry, PetLike::class);
     }
 
-    public function getPetLikes(User $user, Pet $pet): array
+    public function getUserPetLike(User $user, Pet $pet): ?PetLike
     {
-        return $this->findBy([
+        $petLikes = $this->findBy([
             'pet' => $pet,
             'user' => $user,
         ]);
+
+        if (count($petLikes) === 0) {
+            return null;
+        }
+
+        return array_pop($petLikes);
     }
 }

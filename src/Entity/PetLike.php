@@ -6,7 +6,6 @@ use App\Entity\Traits\LifecycleCallbackTrait;
 use App\Entity\Traits\TimestampTrait;
 use App\Repository\PetLikeRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Ramsey\Uuid\Uuid;
 
 /**
  * @ORM\Entity(repositoryClass=PetLikeRepository::class)
@@ -34,9 +33,9 @@ class PetLike implements \JsonSerializable
      */
     private $user;
 
-    public function __construct(Pet $pet, User $user)
+    public function __construct(Pet $pet, User $user, string $id)
     {
-        $this->id = Uuid::uuid4()->toString();
+        $this->id = $id;
         $this->pet = $pet;
         $this->user = $user;
     }

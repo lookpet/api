@@ -4,12 +4,20 @@ declare(strict_types=1);
 
 namespace App\Controller\Pet;
 
+use App\Dto\Event\RequestUtmBuilderInterface;
 use App\Entity\PetLike;
+use App\PetDomain\VO\EventContext;
+use App\PetDomain\VO\EventType;
+use App\PetDomain\VO\Slug;
 use App\Repository\PetLikeRepositoryInterface;
 use App\Repository\PetRepositoryInterface;
+use App\Repository\UserEventRepositoryInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use Ramsey\Uuid\Uuid;
 use Swagger\Annotations as SWG;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -17,17 +25,29 @@ final class PetLikeController extends AbstractController
 {
     private PetRepositoryInterface $petRepository;
     private PetLikeRepositoryInterface $petLikeRepository;
+    private EntityManagerInterface $entityManager;
+    private RequestUtmBuilderInterface $requestUtmBuilder;
+    private UserEventRepositoryInterface $userEventRepository;
 
-    public function __construct(PetRepositoryInterface $petRepository, PetLikeRepositoryInterface $petLikeRepository)
-    {
+    public function __construct(
+        PetRepositoryInterface $petRepository,
+        PetLikeRepositoryInterface $petLikeRepository,
+        EntityManagerInterface $entityManager,
+        RequestUtmBuilderInterface $requestUtmBuilder,
+        UserEventRepositoryInterface $userEventRepository
+    ) {
         $this->petRepository = $petRepository;
         $this->petLikeRepository = $petLikeRepository;
+        $this->entityManager = $entityManager;
+        $this->requestUtmBuilder = $requestUtmBuilder;
+        $this->userEventRepository = $userEventRepository;
     }
 
     /**
      * @Route("/api/v1/pet/{slug}/like", methods={"POST"}, name="pet_like")
      *
      * @param string $slug
+     * @param Request $request
      *
      * @return JsonResponse
      *
@@ -49,41 +69,57 @@ final class PetLikeController extends AbstractController
      *    )
      * )
      */
-    public function like(string $slug): JsonResponse
+    public function like(string $slug, Request $request): JsonResponse
     {
-        $pets = $this->petRepository->findBy([
-            'slug' => $slug,
-        ]);
+        $petBySlug = $this->petRepository->findBySlug(
+            new Slug($slug)
+        );
 
-        if (count($pets) === 0) {
+        if ($petBySlug === null) {
             return new JsonResponse([
                 'message' => 'Pet not exist',
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        $pet = array_pop($pets);
+        $petLike = $this->petLikeRepository->getUserPetLike(
+            $this->getUser(),
+            $petBySlug
+        );
 
-        $petLikes = $this->petLikeRepository->getPetLikes($this->getUser(), $pet);
-
-        if (count($petLikes) === 0) {
-            $petLike = new PetLike($pet, $this->getUser());
-            $pet->addLikes(
+        if ($petLike === null) {
+            $petLike = new PetLike(
+                $petBySlug,
+                $this->getUser(),
+                Uuid::uuid4()->toString()
+            );
+            $petBySlug->addLikes(
                 $petLike
             );
-            $this->getDoctrine()->getManager()->persist($petLike);
+            $this->entityManager->persist($petLike);
+            $this->userEventRepository->log(
+                new EventType(EventType::PET_LIKE),
+                $this->getUser(),
+                $this->requestUtmBuilder->build($request),
+                EventContext::createByPet($petBySlug)
+            );
         } else {
-            $petLike = $petLikes[0];
-            $pet->removeLike(...[$petLike]);
-            $this->getDoctrine()->getManager()->remove($petLike);
+            $petBySlug->removeLike(...[$petLike]);
+            $this->entityManager->remove($petLike);
+            $this->userEventRepository->log(
+                new EventType(EventType::PET_UNLIKE),
+                $this->getUser(),
+                $this->requestUtmBuilder->build($request),
+                EventContext::createByPet($petBySlug)
+            );
         }
 
-        $this->getDoctrine()->getManager()->persist($pet);
-        $this->getDoctrine()->getManager()->flush();
+        $this->entityManager->persist($petBySlug);
+        $this->entityManager->flush();
 
         return new JsonResponse(
             [
-                'hasLike' => $pet->hasLike($this->getUser()),
-                'total' => count($pet->getLikes()),
+                'hasLike' => $petBySlug->hasLike($this->getUser()),
+                'total' => count($petBySlug->getLikes()),
             ]
         );
     }

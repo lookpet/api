@@ -13,6 +13,7 @@ use App\PetDomain\VO\Post\PostDescription;
 use App\Repository\PostRepositoryInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Tests\Unit\Fixture\UserFixture;
 use Tests\Unit\Traits\CreateContainerTrait;
 
 /**
@@ -68,7 +69,7 @@ final class CreatePostControllerTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->user = $this->createMock(User::class);
+        $this->user = new User(UserFixture::ID, UserFixture::SLUG);
         $this->postRepository = $this->createMock(PostRepositoryInterface::class);
         $this->postDtoBuilder = $this->createMock(PostDtoBuilderInterface::class);
         $this->createPostController = new CreatePostController(

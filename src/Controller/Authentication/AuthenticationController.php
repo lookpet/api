@@ -6,8 +6,11 @@ namespace App\Controller\Authentication;
 
 use App\Dto\Authentication\UserLoginDto;
 use App\Dto\Authentication\UserLoginDtoBuilder;
+use App\Dto\Event\RequestUtmBuilderInterface;
 use App\Entity\ApiToken;
 use App\Entity\User;
+use App\PetDomain\VO\EventType;
+use App\Repository\UserEventRepositoryInterface;
 use App\Repository\UserRepositoryInterface;
 use App\Service\EmailTemplateSenderInterface;
 use App\Service\Notification\WelcomeEmailNotifier;
@@ -30,6 +33,8 @@ final class AuthenticationController extends AbstractController
     private EntityManagerInterface $entityManager;
     private UserLoginDtoBuilder $loginDtoBuilder;
     private WelcomeEmailNotifier $welcomeEmailNotifier;
+    private RequestUtmBuilderInterface $requestUtmBuilder;
+    private UserEventRepositoryInterface $userEventRepository;
 
     public function __construct(
         UserRepositoryInterface $userRepository,
@@ -37,7 +42,9 @@ final class AuthenticationController extends AbstractController
         UserPasswordEncoderInterface $passwordEncoder,
         EntityManagerInterface $entityManager,
         UserLoginDtoBuilder $loginDtoBuilder,
-        WelcomeEmailNotifier $welcomeEmailNotifier
+        WelcomeEmailNotifier $welcomeEmailNotifier,
+        RequestUtmBuilderInterface $requestUtmBuilder,
+        UserEventRepositoryInterface $userEventRepository
     ) {
         $this->userRepository = $userRepository;
         $this->validator = $validator;
@@ -45,6 +52,8 @@ final class AuthenticationController extends AbstractController
         $this->entityManager = $entityManager;
         $this->loginDtoBuilder = $loginDtoBuilder;
         $this->welcomeEmailNotifier = $welcomeEmailNotifier;
+        $this->requestUtmBuilder = $requestUtmBuilder;
+        $this->userEventRepository = $userEventRepository;
     }
 
     /**
@@ -127,6 +136,12 @@ final class AuthenticationController extends AbstractController
                 $this->entityManager->persist($apiToken);
                 $this->entityManager->flush();
             }
+
+            $this->userEventRepository->log(
+                new EventType(EventType::LOGIN),
+                $user,
+                $this->requestUtmBuilder->build($request)
+            );
 
             return $this->json([
                 'user' => $user,
@@ -227,6 +242,11 @@ final class AuthenticationController extends AbstractController
             $this->entityManager->flush();
 
             $this->welcomeEmailNotifier->notify($user);
+            $this->userEventRepository->log(
+                new EventType(EventType::REGISTRATION),
+                $user,
+                $this->requestUtmBuilder->build($request)
+            );
 
             return new JsonResponse(
                 [

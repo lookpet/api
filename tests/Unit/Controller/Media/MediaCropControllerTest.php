@@ -18,6 +18,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Tests\Unit\Fixture\UserFixture;
 use Tests\Unit\Traits\CreateContainerTrait;
 
 /**
@@ -116,7 +117,7 @@ final class MediaCropControllerTest extends TestCase
         $this->mediaCropper = $this->createMock(MediaCropperInterface::class);
         $this->mediaRepository = $this->createMock(MediaRepositoryInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
-        $this->user = $this->createMock(User::class);
+        $this->user = new User(UserFixture::ID, UserFixture::SLUG);
 
         $this->mediaCropController = new MediaCropController(
             $this->mediaCropper,

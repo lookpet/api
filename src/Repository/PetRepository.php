@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Pet;
 use App\PetDomain\VO\Gender;
 use App\PetDomain\VO\Offset;
+use App\PetDomain\VO\Slug;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -82,5 +83,13 @@ final class PetRepository extends ServiceEntityRepository implements PetReposito
             ->andWhere($queryBuilder->expr()->neq('pet.city', "'undefined'"))
             ->getQuery()
             ->getResult();
+    }
+
+    public function findBySlug(Slug $slug): ?Pet
+    {
+        return $this->findOneBy([
+            'slug' => $slug,
+            'isDeleted' => false,
+        ]);
     }
 }

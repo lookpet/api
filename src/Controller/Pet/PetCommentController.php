@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Controller\Pet;
 
+use App\Dto\Event\RequestUtmBuilderInterface;
 use App\Entity\PetComment;
 use App\Repository\PetCommentRepository;
 use App\Repository\PetRepository;
+use App\Repository\UserEventRepositoryInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Swagger\Annotations as SWG;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,11 +21,28 @@ final class PetCommentController extends AbstractController
 {
     private PetRepository $petRepository;
     private PetCommentRepository $petCommentRepository;
+    private EntityManagerInterface $entityManager;
+    /**
+     * @var RequestUtmBuilderInterface
+     */
+    private RequestUtmBuilderInterface $requestUtmBuilder;
+    /**
+     * @var UserEventRepositoryInterface
+     */
+    private UserEventRepositoryInterface $userEventRepository;
 
-    public function __construct(PetRepository $petRepository, PetCommentRepository $petCommentRepository)
-    {
+    public function __construct(
+        PetRepository $petRepository,
+        PetCommentRepository $petCommentRepository,
+        EntityManagerInterface $entityManager,
+        RequestUtmBuilderInterface $requestUtmBuilder,
+        UserEventRepositoryInterface $userEventRepository
+    ) {
         $this->petRepository = $petRepository;
         $this->petCommentRepository = $petCommentRepository;
+        $this->entityManager = $entityManager;
+        $this->requestUtmBuilder = $requestUtmBuilder;
+        $this->userEventRepository = $userEventRepository;
     }
 
     /**
@@ -63,9 +83,9 @@ final class PetCommentController extends AbstractController
         $pet = array_pop($pets);
         $petComment = new PetComment($this->getUser(), $request->request->get('comment'), $pet);
         $pet->addComments($petComment);
-        $this->getDoctrine()->getManager()->persist($pet);
-        $this->getDoctrine()->getManager()->persist($petComment);
-        $this->getDoctrine()->getManager()->flush();
+        $this->entityManager->persist($pet);
+        $this->entityManager->persist($petComment);
+        $this->entityManager->flush();
 
         return new JsonResponse([], Response::HTTP_OK);
     }

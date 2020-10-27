@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller\Authentication;
 
+use App\Dto\Event\RequestUtmBuilderInterface;
 use App\EmailTemplates\EmailTemplateDto;
 use App\PetDomain\VO\EmailRecipient;
+use App\PetDomain\VO\EventType;
+use App\Repository\UserEventRepositoryInterface;
 use App\Repository\UserRepositoryInterface;
 use App\Service\EmailTemplateSenderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,15 +23,21 @@ class ResetPasswordController extends AbstractController
     private EmailTemplateSenderInterface $emailTemplateSender;
     private UserRepositoryInterface $userRepository;
     private UserPasswordEncoderInterface $passwordEncoder;
+    private RequestUtmBuilderInterface $requestUtmBuilder;
+    private UserEventRepositoryInterface $userEventRepository;
 
     public function __construct(
         UserPasswordEncoderInterface $passwordEncoder,
         EmailTemplateSenderInterface $emailTemplateSender,
-        UserRepositoryInterface $userRepository)
-    {
+        UserRepositoryInterface $userRepository,
+        RequestUtmBuilderInterface $requestUtmBuilder,
+        UserEventRepositoryInterface $userEventRepository
+    ) {
         $this->emailTemplateSender = $emailTemplateSender;
         $this->userRepository = $userRepository;
         $this->passwordEncoder = $passwordEncoder;
+        $this->requestUtmBuilder = $requestUtmBuilder;
+        $this->userEventRepository = $userEventRepository;
     }
 
     /**
@@ -68,6 +77,12 @@ class ResetPasswordController extends AbstractController
             ))->setVariables([
                 'new_password' => $password,
             ]));
+
+        $this->userEventRepository->log(
+            new EventType(EventType::RESET_PASSWORD),
+            $user,
+            $this->requestUtmBuilder->build($request)
+        );
 
         return new JsonResponse([], Response::HTTP_OK);
     }
