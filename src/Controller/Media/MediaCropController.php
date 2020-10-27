@@ -72,11 +72,13 @@ class MediaCropController extends AbstractController
         try {
             $media = $this->mediaCropper->crop($media, $imageCropParams, $this->getUser());
 
-            $this->userEventRepository->log(
-                new EventType(EventType::CROP_PHOTO),
-                $this->getUser(),
-                $this->requestUtmBuilder->build($request)
-            );
+            if ($this->getUser() !== null) {
+                $this->userEventRepository->log(
+                    new EventType(EventType::CROP_PHOTO),
+                    $this->getUser(),
+                    $this->requestUtmBuilder->build($request)
+                );
+            }
 
             return new JsonResponse($media);
         } catch (\Exception $exception) {
