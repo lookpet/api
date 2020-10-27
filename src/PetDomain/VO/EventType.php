@@ -15,6 +15,7 @@ final class EventType
     public const PET_CREATE = 'PET_CREATE';
     public const PET_LIKE = 'PET_LIKE';
     public const PET_UNLIKE = 'PET_UNLIKE';
+    public const PET_COMMENT = 'PET_COMMENT';
 
     private const EVENT_LIST = [
         self::REGISTRATION,
@@ -28,6 +29,7 @@ final class EventType
         self::PET_LIKE,
         self::PET_UNLIKE,
         self::PET_CREATE,
+        self::PET_COMMENT,
     ];
 
     private string $eventType;

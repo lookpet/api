@@ -6,6 +6,9 @@ namespace App\Controller\Pet;
 
 use App\Dto\Event\RequestUtmBuilderInterface;
 use App\Entity\PetComment;
+use App\PetDomain\VO\EventContext;
+use App\PetDomain\VO\EventType;
+use App\PetDomain\VO\Slug;
 use App\Repository\PetCommentRepository;
 use App\Repository\PetRepository;
 use App\Repository\UserEventRepositoryInterface;
@@ -71,22 +74,29 @@ final class PetCommentController extends AbstractController
      */
     public function comment(string $slug, Request $request): JsonResponse
     {
-        $pets = $this->petRepository->findBy([
-            'slug' => $slug,
-        ]);
+        $pet = $this->petRepository->findBySlug(new Slug($slug));
 
-        if (count($pets) === 0) {
+        if ($pet === null) {
             return new JsonResponse([
                 'message' => 'Pet not exist',
             ], Response::HTTP_BAD_REQUEST);
         }
-        $pet = array_pop($pets);
+
         $petComment = new PetComment($this->getUser(), $request->request->get('comment'), $pet);
         $pet->addComments($petComment);
         $this->entityManager->persist($pet);
         $this->entityManager->persist($petComment);
         $this->entityManager->flush();
 
-        return new JsonResponse([], Response::HTTP_OK);
+        $this->userEventRepository->log(
+            new EventType(EventType::PET_COMMENT),
+            $this->getUser(),
+            $this->requestUtmBuilder->build($request),
+            EventContext::createByPet($pet)
+        );
+
+        return new JsonResponse([
+            $petComment,
+        ], Response::HTTP_OK);
     }
 }
