@@ -13,16 +13,28 @@ final class RequestUtmBuilder implements RequestUtmBuilderInterface
         $utmMedium = $request->get('utm_medium');
         $utmCampaign = $request->get('utm_campaign');
 
-        if (empty($utmSource)) {
+        if (empty($utmSource) && $request->request->has('utm_source')) {
             $utmSource = $request->request->get('utm_source');
         }
 
-        if (empty($utmMedium)) {
+        if (empty($utmMedium) && $request->request->has('utm_medium')) {
             $utmMedium = $request->request->get('utm_medium');
         }
 
-        if (empty($utmCampaign)) {
+        if (empty($utmCampaign) && $request->request->has('utm_campaign')) {
             $utmCampaign = $request->request->get('utm_campaign');
+        }
+
+        if (empty($utmSource) && $request->headers->has('utm_source')) {
+            $utmSource = $request->headers->get('utm_source');
+        }
+
+        if (empty($utmMedium) && $request->headers->has('utm_medium')) {
+            $utmMedium = $request->headers->get('utm_medium');
+        }
+
+        if (empty($utmCampaign) && $request->headers->has('utm_campaign')) {
+            $utmCampaign = $request->headers->get('utm_campaign');
         }
 
         return new Utm(
