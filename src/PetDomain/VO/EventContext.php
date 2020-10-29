@@ -29,4 +29,9 @@ final class EventContext
     {
         return $this->context;
     }
+
+    public function __toString(): string
+    {
+        return json_encode($this->context);
+    }
 }

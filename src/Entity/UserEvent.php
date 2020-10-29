@@ -54,9 +54,9 @@ class UserEvent
     private $createdAt;
 
     /**
-     * @ORM\Column(type="json", nullable=true)
+     * @ORM\Column(type="text", nullable=true)
      */
-    private $context = [];
+    private $context;
 
     public function __construct(EventType $type, User $user, Utm $utm, ?EventContext $eventContext = null)
     {
@@ -67,7 +67,7 @@ class UserEvent
         $this->medium = $utm->getMedium();
         $this->campaign = $utm->getCampaign();
         if ($eventContext !== null) {
-            $this->context = $eventContext->get();
+            $this->context = $eventContext->__toString();
         }
     }
 

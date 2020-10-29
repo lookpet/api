@@ -25,7 +25,7 @@ class UserEventRepository extends ServiceEntityRepository implements UserEventRe
 
     public function log(EventType $type, User $user, Utm $utm, ?EventContext $context = null): void
     {
-        $userEvent = new UserEvent($type, $user, $utm);
+        $userEvent = new UserEvent($type, $user, $utm, $context);
         $this->getEntityManager()->persist($userEvent);
         $this->getEntityManager()->flush();
     }
