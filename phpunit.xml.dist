@@ -4,8 +4,12 @@
         bootstrap="tests/bootstrap.php"
         colors="true"
 >
+    <php>
+        <env name="APP_ENV" value="test" force="true" />
+        <env name="IS_SEND_EMAIL_NOTIFICATIONS" value="true" />
+    </php>
     <testsuites>
-        <testsuite>
+        <testsuite name="default">
             <directory prefix="" suffix="Test.php">./tests/</directory>
         </testsuite>
     </testsuites>

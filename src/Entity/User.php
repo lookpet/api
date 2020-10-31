@@ -2,10 +2,11 @@
 
 namespace App\Entity;
 
+use App\Dto\Authentication\UserLoginDto;
+use App\Dto\User\UserDto;
 use App\Entity\Traits\LifecycleCallbackTrait;
 use App\Entity\Traits\TimestampTrait;
 use App\Repository\UserRepository;
-use Cocur\Slugify\Slugify;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -132,20 +133,26 @@ class User implements UserInterface, \JsonSerializable
      */
     private $placeId;
 
-    public function __construct(?string $slug = null, ?string $firstName = null, ?string $id = null)
+    /**
+     * @ORM\OneToMany(targetEntity=Post::class, mappedBy="user", orphanRemoval=true)
+     */
+    private $posts;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $lastNotificationDate;
+
+    /**
+     * @ORM\OneToMany(targetEntity=UserEvent::class, mappedBy="user")
+     */
+    private $events;
+
+    public function __construct(string $id = null, ?string $slug = null, ?string $firstName = null)
     {
-        if ($slug === null) {
-            $this->generateSlug($firstName);
-        } else {
-            $this->slug = $slug;
-        }
-
+        $this->slug = $slug;
         $this->firstName = $firstName;
-
-        $this->id = $id;
-        if ($id === null) {
-            $this->id = Uuid::uuid4()->toString();
-        }
+        $this->id = $id ?? Uuid::uuid4()->toString();
 
         $this->apiTokens = new ArrayCollection();
         $this->media = new ArrayCollection();
@@ -153,6 +160,47 @@ class User implements UserInterface, \JsonSerializable
         $this->petComments = new ArrayCollection();
         $this->petLikes = new ArrayCollection();
         $this->media = new ArrayCollection();
+        $this->posts = new ArrayCollection();
+        $this->events = new ArrayCollection();
+    }
+
+    public static function createFromLoginDto(UserLoginDto $userLoginDto): self
+    {
+        return (new self(
+            $userLoginDto->getId()
+        ))->setEmail($userLoginDto->getEmail())
+            ->setPassword($userLoginDto->getPassword());
+    }
+
+    public function updateFromDto(UserDto $userDto): void
+    {
+        if ($userDto->getSlug() !== null) {
+            $this->slug = $userDto->getSlug();
+        }
+
+        if ($userDto->getFirstName() !== null) {
+            $this->firstName = $userDto->getFirstName();
+        }
+
+        if ($userDto->getLastName() !== null) {
+            $this->lastName = $userDto->getLastName();
+        }
+
+        if ($userDto->getDescription() !== null) {
+            $this->description = $userDto->getDescription();
+        }
+
+        if ($userDto->getCity() !== null) {
+            $this->city = $userDto->getCity();
+        }
+
+        if ($userDto->getPlaceId() !== null) {
+            $this->placeId = $userDto->getPlaceId();
+        }
+
+        if ($userDto->getPhone() !== null) {
+            $this->phone = $userDto->getPhone();
+        }
     }
 
     public function getId(): ?string
@@ -264,11 +312,15 @@ class User implements UserInterface, \JsonSerializable
         return null;
     }
 
+    public function hasActiveApiToken(): bool
+    {
+        return $this->getActiveApiToken() !== null;
+    }
+
     public function addApiToken(ApiToken $apiToken): self
     {
         if (!$this->apiTokens->contains($apiToken)) {
             $this->apiTokens[] = $apiToken;
-            $apiToken->setUser($this);
         }
 
         return $this;
@@ -349,6 +401,11 @@ class User implements UserInterface, \JsonSerializable
         return $domain === 'look.pet';
     }
 
+    public function hasEmail(): bool
+    {
+        return $this->email !== null;
+    }
+
     public function jsonSerialize(): array
     {
         return [
@@ -361,6 +418,7 @@ class User implements UserInterface, \JsonSerializable
             'phone' => $this->getPhone(),
             'description' => $this->getDescription(),
             'city' => $this->getCity(),
+            'placeId' => $this->getPlaceId(),
             'avatar' => $this->getAvatarUrl(),
             'media' => $this->getMedia()->getValues(),
             'breeder' => $this->getBreeder(),
@@ -375,6 +433,11 @@ class User implements UserInterface, \JsonSerializable
     public function getPets(): Collection
     {
         return $this->pets;
+    }
+
+    public function havePets(): bool
+    {
+        return count($this->pets);
     }
 
     public function addPet(Pet $pet): self
@@ -567,7 +630,6 @@ class User implements UserInterface, \JsonSerializable
     {
         if (!$this->media->contains($mediaUser)) {
             $this->media[] = $mediaUser;
-            $mediaUser->setUser($this);
         }
 
         return $this;
@@ -603,11 +665,87 @@ class User implements UserInterface, \JsonSerializable
         return $this->getId() === $user->getId();
     }
 
-    private function generateSlug(?string $firstName): void
+    /**
+     * @return Collection|Post[]
+     */
+    public function getPosts(): Collection
     {
-        $firstName = mb_strtolower($firstName);
-        $slugify = new Slugify();
-        $slugEntropy = base_convert(rand(1000000000, PHP_INT_MAX), 10, 36);
-        $this->slug = $slugify->slugify(implode('-', [$firstName, $slugEntropy]));
+        return $this->posts;
+    }
+
+    public function addPost(Post $post): self
+    {
+        if (!$this->posts->contains($post)) {
+            $this->posts[] = $post;
+            $post->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePost(Post $post): self
+    {
+        if ($this->posts->contains($post)) {
+            $this->posts->removeElement($post);
+            // set the owning side to null (unless already changed)
+            if ($post->getUser() === $this) {
+                $post->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getLastNotificationDate(): ?\DateTimeInterface
+    {
+        return $this->lastNotificationDate;
+    }
+
+    public function setLastNotificationDate(?\DateTimeInterface $lastNotificationDate): self
+    {
+        $this->lastNotificationDate = $lastNotificationDate;
+
+        return $this;
+    }
+
+    public function updateNotificationDate(): void
+    {
+        $this->lastNotificationDate = new \DateTimeImmutable();
+    }
+
+    public function hasNotificationSentToday(): bool
+    {
+        return $this->lastNotificationDate !== null;
+    }
+
+    /**
+     * @return Collection|UserEvent[]
+     */
+    public function getEvents(): Collection
+    {
+        return $this->events;
+    }
+
+    public function addEvent(UserEvent $event): self
+    {
+        if (!$this->events->contains($event)) {
+            $this->events[] = $event;
+            $event->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvent(UserEvent $event): self
+    {
+        if ($this->events->contains($event)) {
+            $this->events->removeElement($event);
+            // set the owning side to null (unless already changed)
+            if ($event->getUser() === $this) {
+                $event->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }

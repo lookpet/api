@@ -40,4 +40,15 @@ final class Age
     {
         return $this->nowToDateInterval->d;
     }
+
+    public function equals(?self $age): bool
+    {
+        if ($age === null) {
+            return false;
+        }
+
+        return $this->getDays() === $age->getDays() &&
+            $this->getMonths() === $age->getMonths() &&
+            $this->getYears() === $age->getYears();
+    }
 }

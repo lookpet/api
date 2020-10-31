@@ -15,6 +15,7 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 final class ApiTokenAuthenticator extends AbstractGuardAuthenticator
 {
     private const PUBLIC_ROUTES = [
+        'public_notify_no_post',
         'public_post_media_crop',
         'public_post_media',
         'main_page',

@@ -65,6 +65,8 @@ class S3MediaUploader implements MediaUploaderInterface
         foreach ($newPhotos as $key => $newPhoto) {
             $fileName = Uuid::uuid4()->toString() . '.jpg';
             $stream = fopen($newPhoto->getPathname(), 'rb');
+            $streamContent = stream_get_contents($stream);
+            $imageInfo = getimagesizefromstring($streamContent);
             $this->filesystem->write(
                 '/pets/uploads/' . $fileName,
                 $stream
@@ -73,7 +75,6 @@ class S3MediaUploader implements MediaUploaderInterface
                 fclose($stream);
             }
             $imageUrl = $_ENV['AWS_S3_PATH'] . '/pets/uploads/' . $fileName;
-            $imageInfo = getimagesize($imageUrl);
 
             $media = new Media(
                 $user,

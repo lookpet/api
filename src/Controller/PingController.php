@@ -21,4 +21,14 @@ final class PingController extends AbstractController
             'status' => 'ok',
         ]);
     }
+
+    /**
+     * @Route("/", methods={"GET"}, name="main_page")
+     *
+     * @return JsonResponse
+     */
+    public function main(): JsonResponse
+    {
+        return new JsonResponse();
+    }
 }

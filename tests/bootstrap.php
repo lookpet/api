@@ -6,4 +6,4 @@ use Symfony\Component\Dotenv\Dotenv;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-(new Dotenv())->load(__DIR__ . '/../.env.dist');
+(new Dotenv())->load(__DIR__ . '/../.env.test');

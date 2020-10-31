@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
+use App\Dto\Pet\PetDto;
 use App\Entity\Traits\LifecycleCallbackTrait;
 use App\Entity\Traits\TimestampTrait;
 use App\PetDomain\VO\Age;
 use App\Repository\PetRepository;
-use Cocur\Slugify\Slugify;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -84,20 +84,6 @@ class Pet implements \JsonSerializable
     private $eyeColor;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="pets")
-     */
-    private $user;
-
-    /**
-     * @ORM\ManyToMany(targetEntity=Media::class)
-     * @ORM\JoinTable(name="pet_media",
-     *      joinColumns={@ORM\JoinColumn(name="pet_id", referencedColumnName="id")},
-     * )
-     * @ORM\OrderBy({"createdAt" = "DESC"})
-     */
-    private $media;
-
-    /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $city;
@@ -116,17 +102,6 @@ class Pet implements \JsonSerializable
      * @ORM\OneToMany(targetEntity=PetLike::class, mappedBy="pet")
      */
     private $likes;
-
-    /**
-     * @ORM\OneToMany(targetEntity=PetComment::class, mappedBy="pet", orphanRemoval=true)
-     * @ORM\OrderBy({"createdAt" = "DESC"})
-     */
-    private $comments;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=Breeder::class, inversedBy="pets")
-     */
-    private $breeder;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -153,175 +128,143 @@ class Pet implements \JsonSerializable
      */
     private $isDeleted = false;
 
-    public function __construct(string $type, ?string $slug, ?string $name = null, ?string $id = null, ?UserInterface $user = null)
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="pets")
+     */
+    private $user;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Media::class)
+     * @ORM\JoinTable(name="pet_media",
+     *      joinColumns={@ORM\JoinColumn(name="pet_id", referencedColumnName="id")},
+     * )
+     * @ORM\OrderBy({"createdAt" = "DESC"})
+     */
+    private $media;
+
+    /**
+     * @ORM\OneToMany(targetEntity=PetComment::class, mappedBy="pet", orphanRemoval=true)
+     * @ORM\OrderBy({"createdAt" = "DESC"})
+     */
+    private $comments;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Breeder::class, inversedBy="pets")
+     */
+    private $breeder;
+
+    public function __construct(string $type, ?string $slug, ?string $id = null, ?string $name = null, ?UserInterface $user = null)
     {
         $this->user = $user;
         $this->type = $type;
         $this->name = $name;
 
         if ($slug === null) {
-            $this->generateSlug();
-        } else {
-            $this->slug = $slug;
+            throw new \LogicException('Slug cannot be empty');
         }
 
+        $this->slug = $slug;
+
         if ($id === null) {
-            $this->id = Uuid::uuid4()->toString();
-        } else {
-            $this->id = $id;
+            $id = Uuid::uuid4()->toString();
         }
+
+        $this->id = $id;
         $this->media = new ArrayCollection();
         $this->likes = new ArrayCollection();
         $this->comments = new ArrayCollection();
     }
 
-    public function getId(): ?string
+    public function updateFromDto(PetDto $petDto, ?User $user = null): void
     {
-        return $this->id;
-    }
+        $this->setUser($user);
 
-    public function getSlug(): ?string
-    {
-        return $this->slug;
-    }
+        if ($petDto->getType() !== null) {
+            $this->type = $petDto->getType();
+        }
 
-    public function setSlug(string $slug): self
-    {
-        $this->slug = $slug;
+        if ($petDto->getName() !== null) {
+            $this->name = $petDto->getName();
+        }
 
-        return $this;
-    }
+        if ($petDto->getSlug() !== null) {
+            $this->slug = $petDto->getSlug();
+        }
 
-    public function getIsAlive(): ?bool
-    {
-        return $this->isAlive;
-    }
+        if ($petDto->getCity() !== null) {
+            $this->city = $petDto->getCity();
+            if ($petDto->getPlaceId() !== null) {
+                $this->placeId = $petDto->getPlaceId();
+            }
+        }
 
-    public function setIsAlive(bool $isAlive): self
-    {
-        $this->isAlive = $isAlive;
+        if ($petDto->getBreed() !== null) {
+            $this->breed = $petDto->getBreed();
+        }
 
-        return $this;
-    }
+        if ($petDto->getGender() !== null) {
+            $this->gender = $petDto->getGender();
+        }
 
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
+        if ($petDto->getPrice() !== null) {
+            $this->price = $petDto->getPrice();
+        }
 
-    public function setName(?string $name): self
-    {
-        $this->name = $name;
+        if ($petDto->getFatherName() !== null) {
+            $this->fatherName = $petDto->getFatherName();
+        }
 
-        return $this;
-    }
+        if ($petDto->getMotherName() !== null) {
+            $this->motherName = $petDto->getMotherName();
+        }
 
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
+        if ($petDto->getColor() !== null) {
+            $this->color = $petDto->getColor();
+        }
 
-    public function setType(string $type): self
-    {
-        $this->type = $type;
+        if ($petDto->getEyeColor() !== null) {
+            $this->eyeColor = $petDto->getEyeColor();
+        }
 
-        return $this;
-    }
+        if ($petDto->getAbout() !== null) {
+            $this->about = $petDto->getAbout();
+        }
 
-    public function getGender(): ?string
-    {
-        return $this->gender;
-    }
+        if ($petDto->getDateOfBirth() !== null) {
+            $this->dateOfBirth = $petDto->getDateOfBirth();
+        }
 
-    public function setGender(?string $gender): self
-    {
-        $this->gender = $gender;
+        if (count($petDto->getMedia()) > 0) {
+            $this->addMedia(...$petDto->getMedia());
+        }
 
-        return $this;
-    }
+        if (count($petDto->getComments()) > 0) {
+            $this->addComments(...$petDto->getComments());
+        }
 
-    public function getBreed(): ?string
-    {
-        return $this->breed;
-    }
+        if (count($petDto->getPetLikes()) > 0) {
+            $this->addLikes(...$petDto->getPetLikes());
+        }
 
-    public function setBreed(?string $breed): self
-    {
-        $this->breed = $breed;
+        if ($petDto->isAlive() !== null) {
+            $this->isAlive = $petDto->isAlive();
+        }
 
-        return $this;
-    }
+        if ($petDto->isFree() !== null) {
+            $this->isFree = $petDto->isFree();
+        }
 
-    public function getAbout(): ?string
-    {
-        return $this->about;
-    }
+        if ($isLookingForNewOwner = $petDto->isLookingForNewOwner() !== null) {
+            $this->isLookingForOwner = $isLookingForNewOwner;
+        }
 
-    public function setAbout(?string $about): self
-    {
-        $this->about = $about;
-
-        return $this;
-    }
-
-    public function getIsLookingForOwner(): ?bool
-    {
-        return $this->isLookingForOwner;
-    }
-
-    public function setIsLookingForOwner(bool $isLookingForOwner): self
-    {
-        $this->isLookingForOwner = $isLookingForOwner;
-
-        return $this;
-    }
-
-    public function getDateOfBirth(): ?\DateTimeInterface
-    {
-        return $this->dateOfBirth;
-    }
-
-    public function setDateOfBirth(?\DateTimeInterface $dateOfBirth): self
-    {
-        $this->dateOfBirth = $dateOfBirth;
-
-        return $this;
-    }
-
-    public function getColor(): ?string
-    {
-        return $this->color;
-    }
-
-    public function setColor(?string $color): self
-    {
-        $this->color = $color;
-
-        return $this;
-    }
-
-    public function getEyeColor(): ?string
-    {
-        return $this->eyeColor;
-    }
-
-    public function setEyeColor(?string $eyeColor): self
-    {
-        $this->eyeColor = $eyeColor;
-
-        return $this;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): self
-    {
-        $this->user = $user;
-
-        return $this;
+        if ($petDto->isSold() !== null) {
+            $this->isSold = $petDto->isSold();
+            if ($this->isSold === true) {
+                $this->isLookingForOwner = false;
+                $this->isFree = false;
+            }
+        }
     }
 
     public function jsonSerialize(): array
@@ -344,7 +287,7 @@ class Pet implements \JsonSerializable
             'comments' => $this->getComments()->toArray(),
             'createdAt' => $this->getCreatedAt(),
             'updatedAt' => $this->getUpdatedAt(),
-            'isLookingForNewOwner' => $this->getIsLookingForOwner(),
+            'isLookingForNewOwner' => $this->isLookingForOwner(),
             'price' => $this->getPrice(),
             'isFree' => $this->isFree(),
             'isSold' => $this->isSold(),
@@ -352,8 +295,143 @@ class Pet implements \JsonSerializable
             'user' => $this->getUser(),
             'breeder' => $this->getBreeder(),
             'isAlive' => true,
-//            'description' => $this->des
         ];
+    }
+
+    public function equals(self $pet): bool
+    {
+        return $pet->getId() === $this->getId();
+    }
+
+    public function getId(): ?string
+    {
+        return $this->id;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function isAlive(): ?bool
+    {
+        return $this->isAlive;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function getGender(): ?string
+    {
+        return $this->gender;
+    }
+
+    public function getBreed(): ?string
+    {
+        return $this->breed;
+    }
+
+    public function getAbout(): ?string
+    {
+        return $this->about;
+    }
+
+    public function isLookingForOwner(): bool
+    {
+        return $this->isLookingForOwner;
+    }
+
+    public function getDateOfBirth(): ?\DateTimeInterface
+    {
+        return $this->dateOfBirth;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function getEyeColor(): ?string
+    {
+        return $this->eyeColor;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getCity(): ?string
+    {
+        return $this->city;
+    }
+
+    public function getFatherName(): ?string
+    {
+        return $this->fatherName;
+    }
+
+    public function getMotherName(): ?string
+    {
+        return $this->motherName;
+    }
+
+    public function getBreeder(): ?Breeder
+    {
+        return $this->breeder;
+    }
+
+    public function getAge(): ?Age
+    {
+        if ($this->dateOfBirth === null) {
+            return null;
+        }
+
+        return new Age($this->dateOfBirth);
+    }
+
+    public function getPlaceId(): ?string
+    {
+        return $this->placeId;
+    }
+
+    public function getPrice(): ?string
+    {
+        return $this->price;
+    }
+
+    public function isFree(): ?bool
+    {
+        return $this->isFree;
+    }
+
+    public function isSold(): ?bool
+    {
+        return $this->isSold;
+    }
+
+    public function isDeleted(): bool
+    {
+        return $this->isDeleted;
+    }
+
+    public function delete(): void
+    {
+        $this->isDeleted = true;
     }
 
     /**
@@ -389,38 +467,32 @@ class Pet implements \JsonSerializable
         return $this;
     }
 
-    public function getCity(): ?string
+    /**
+     * @return Collection|PetComment[]
+     */
+    public function getComments(): Collection
     {
-        return $this->city;
+        return $this->comments;
     }
 
-    public function setCity(?string $city): self
+    public function addComments(PetComment ...$comments): self
     {
-        $this->city = $city;
+        foreach ($comments as $comment) {
+            if (!$this->comments->contains($comment)) {
+                $this->comments[] = $comment;
+            }
+        }
 
         return $this;
     }
 
-    public function getFatherName(): ?string
+    public function removeComments(PetComment ...$comments): self
     {
-        return $this->fatherName;
-    }
-
-    public function setFatherName(?string $fatherName): self
-    {
-        $this->fatherName = $fatherName;
-
-        return $this;
-    }
-
-    public function getMotherName(): ?string
-    {
-        return $this->motherName;
-    }
-
-    public function setMotherName(?string $motherName): self
-    {
-        $this->motherName = $motherName;
+        foreach ($comments as $comment) {
+            if ($this->comments->contains($comment)) {
+                $this->comments->removeElement($comment);
+            }
+        }
 
         return $this;
     }
@@ -433,10 +505,12 @@ class Pet implements \JsonSerializable
         return $this->likes;
     }
 
-    public function addLike(PetLike $like): self
+    public function addLikes(PetLike ...$likes): self
     {
-        if (!$this->likes->contains($like)) {
-            $this->likes[] = $like;
+        foreach ($likes as $like) {
+            if (!$this->likes->contains($like)) {
+                $this->likes[] = $like;
+            }
         }
 
         return $this;
@@ -460,125 +534,13 @@ class Pet implements \JsonSerializable
 
     public function removeLike(PetLike ...$like): self
     {
-        if ($this->likes->contains($like)) {
-            $this->likes->removeElement($like);
+        /** @var PetLike $like */
+        foreach ($this->likes as $like) {
+            if ($like->equals($like)) {
+                $this->likes->removeElement($like);
+            }
         }
 
         return $this;
-    }
-
-    /**
-     * @return Collection|PetComment[]
-     */
-    public function getComments(): Collection
-    {
-        return $this->comments;
-    }
-
-    public function addComment(PetComment $comment): self
-    {
-        $this->comments[] = $comment;
-
-        return $this;
-    }
-
-    public function removeComment(PetComment $comment): self
-    {
-        if ($this->comments->contains($comment)) {
-            $this->comments->removeElement($comment);
-        }
-
-        return $this;
-    }
-
-    public function getBreeder(): ?Breeder
-    {
-        return $this->breeder;
-    }
-
-    public function setBreeder(?Breeder $breeder): self
-    {
-        $this->breeder = $breeder;
-
-        return $this;
-    }
-
-    public function getAge(): ?Age
-    {
-        if ($this->dateOfBirth === null) {
-            return null;
-        }
-
-        return new Age($this->dateOfBirth);
-    }
-
-    public function getPlaceId(): ?string
-    {
-        return $this->placeId;
-    }
-
-    public function setPlaceId(?string $placeId): self
-    {
-        $this->placeId = $placeId;
-
-        return $this;
-    }
-
-    public function getPrice(): ?string
-    {
-        return $this->price;
-    }
-
-    public function setPrice(?string $price): self
-    {
-        $this->price = $price;
-
-        return $this;
-    }
-
-    public function isFree(): ?bool
-    {
-        return $this->isFree;
-    }
-
-    public function setIsFree(?bool $isFree): self
-    {
-        $this->isFree = $isFree;
-
-        return $this;
-    }
-
-    public function isSold(): ?bool
-    {
-        return $this->isSold;
-    }
-
-    public function setIsSold(?bool $isSold): self
-    {
-        $this->isSold = $isSold;
-
-        if ($this->isSold === true) {
-            $this->isLookingForOwner = false;
-            $this->isFree = false;
-        }
-
-        return $this;
-    }
-
-    public function getIsDeleted(): bool
-    {
-        return $this->isDeleted;
-    }
-
-    public function delete(): void
-    {
-        $this->isDeleted = true;
-    }
-
-    private function generateSlug(): void
-    {
-        $slugify = new Slugify();
-        $slugEntropy = random_int(10, 100000);
-        $this->slug = $slugify->slugify(implode('-', [$this->name, $slugEntropy]));
     }
 }

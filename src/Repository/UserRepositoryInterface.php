@@ -9,4 +9,9 @@ interface UserRepositoryInterface
     public function findBySlug(string $slug): User;
 
     public function findByEmail(string $email): ?User;
+
+    /**
+     * @return User[]
+     */
+    public function findUsersWithNoPets(): array;
 }

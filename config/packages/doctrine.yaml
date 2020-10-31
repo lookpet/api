@@ -6,6 +6,7 @@ doctrine:
             url: App\Entity\Type\Url
             file_path: App\Entity\Type\FilePath
             mime: App\Entity\Type\Mime
+            post_description: App\Entity\Type\PostDescription
 
 #        url: '%env(resolve:DATABASE_URL)%'
 #        server_version: '8.0'

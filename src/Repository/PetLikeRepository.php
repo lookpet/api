@@ -2,7 +2,9 @@
 
 namespace App\Repository;
 
+use App\Entity\Pet;
 use App\Entity\PetLike;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -12,39 +14,24 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method PetLike[]    findAll()
  * @method PetLike[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class PetLikeRepository extends ServiceEntityRepository
+class PetLikeRepository extends ServiceEntityRepository implements PetLikeRepositoryInterface
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, PetLike::class);
     }
 
-    // /**
-    //  * @return PetLike[] Returns an array of PetLike objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getUserPetLike(User $user, Pet $pet): ?PetLike
     {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+        $petLikes = $this->findBy([
+            'pet' => $pet,
+            'user' => $user,
+        ]);
 
-    /*
-    public function findOneBySomeField($value): ?PetLike
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        if (count($petLikes) === 0) {
+            return null;
+        }
+
+        return array_pop($petLikes);
     }
-    */
 }
