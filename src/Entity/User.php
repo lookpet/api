@@ -148,6 +148,11 @@ class User implements UserInterface, \JsonSerializable
      */
     private $events;
 
+    /**
+     * @ORM\OneToMany(targetEntity=PostLike::class, mappedBy="user")
+     */
+    private $postLikes;
+
     public function __construct(string $id = null, ?string $slug = null, ?string $firstName = null)
     {
         $this->slug = $slug;
@@ -162,6 +167,7 @@ class User implements UserInterface, \JsonSerializable
         $this->media = new ArrayCollection();
         $this->posts = new ArrayCollection();
         $this->events = new ArrayCollection();
+        $this->postLikes = new ArrayCollection();
     }
 
     public static function createFromLoginDto(UserLoginDto $userLoginDto): self
@@ -750,6 +756,36 @@ class User implements UserInterface, \JsonSerializable
             // set the owning side to null (unless already changed)
             if ($event->getUser() === $this) {
                 $event->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|PostLike[]
+     */
+    public function getPostLikes(): Collection
+    {
+        return $this->postLikes;
+    }
+
+    public function addPostLike(PostLike $postLike): self
+    {
+        if (!$this->postLikes->contains($postLike)) {
+            $this->postLikes[] = $postLike;
+            $postLike->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePostLike(PostLike $postLike): self
+    {
+        if ($this->postLikes->removeElement($postLike)) {
+            // set the owning side to null (unless already changed)
+            if ($postLike->getUser() === $this) {
+                $postLike->setUser(null);
             }
         }
 

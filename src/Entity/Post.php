@@ -15,8 +15,7 @@ class Post implements \JsonSerializable
 {
     /**
      * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string")
      */
     private $id;
 
@@ -36,6 +35,11 @@ class Post implements \JsonSerializable
      */
     private $description;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=PostLike::class, mappedBy="post")
+     */
+    private $likes;
+
     public function __construct(
         string $uuid,
         User $user,
@@ -51,6 +55,7 @@ class Post implements \JsonSerializable
                 $this->addMedia($media);
             }
         }
+        $this->likes = new ArrayCollection();
     }
 
     public function jsonSerialize(): array
@@ -106,5 +111,32 @@ class Post implements \JsonSerializable
     public function getDescription(): string
     {
         return $this->description === null ? '' : $this->description->__toString();
+    }
+
+    /**
+     * @return Collection|PostLike[]
+     */
+    public function getLikes(): Collection
+    {
+        return $this->likes;
+    }
+
+    public function addLike(PostLike $like): self
+    {
+        if (!$this->likes->contains($like)) {
+            $this->likes[] = $like;
+            $like->addPost($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLike(PostLike $like): self
+    {
+        if ($this->likes->removeElement($like)) {
+            $like->removePost($this);
+        }
+
+        return $this;
     }
 }
