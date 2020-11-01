@@ -2,6 +2,7 @@
 
 namespace App\PetDomain\VO;
 
+use App\Entity\Media;
 use App\Entity\Pet;
 
 final class EventContext
@@ -22,6 +23,18 @@ final class EventContext
     {
         return new static([
             'pet' => $pet->getId(),
+        ]);
+    }
+
+    public static function createByMedia(Media ...$mediaCollection): self
+    {
+        $result = [];
+        foreach ($mediaCollection as $media) {
+            $result[] = $media->getId();
+        }
+
+        return new static([
+            'media' => $result,
         ]);
     }
 

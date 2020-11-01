@@ -6,6 +6,7 @@ namespace App\Controller\Media;
 
 use App\Dto\Event\RequestUtmBuilderInterface;
 use App\Entity\User;
+use App\PetDomain\VO\EventContext;
 use App\PetDomain\VO\EventType;
 use App\Repository\UserEventRepositoryInterface;
 use App\Service\MediaUploaderInterface;
@@ -51,7 +52,8 @@ class MediaUploadController extends AbstractController
             $this->userEventRepository->log(
                 new EventType(EventType::UPLOAD_PHOTO),
                 $user,
-                $this->requestUtmBuilder->build($request)
+                $this->requestUtmBuilder->build($request),
+                EventContext::createByMedia(...$mediaCollection)
             );
         }
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\Media;
 
 use App\Dto\Event\RequestUtmBuilderInterface;
+use App\PetDomain\VO\EventContext;
 use App\PetDomain\VO\EventType;
 use App\Repository\MediaRepository;
 use App\Repository\MediaRepositoryInterface;
@@ -31,6 +32,8 @@ class MediaCropController extends AbstractController
      * @param MediaCropperInterface $mediaCropper
      * @param MediaRepositoryInterface $mediaRepository
      * @param LoggerInterface $logger
+     * @param RequestUtmBuilderInterface $requestUtmBuilder
+     * @param UserEventRepositoryInterface $userEventRepository
      */
     public function __construct(
         MediaCropperInterface $mediaCropper,
@@ -76,7 +79,8 @@ class MediaCropController extends AbstractController
                 $this->userEventRepository->log(
                     new EventType(EventType::CROP_PHOTO),
                     $this->getUser(),
-                    $this->requestUtmBuilder->build($request)
+                    $this->requestUtmBuilder->build($request),
+                    EventContext::createByMedia(...[$media])
                 );
             }
 
