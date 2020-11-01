@@ -8,7 +8,7 @@ use App\PetDomain\VO\EmailRecipient;
 use App\Service\EmailTemplateSenderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class WelcomeEmailNotifier implements EmailNotifyInterface
+class EmailNoPostCreatedNotifier implements EmailNotifyInterface
 {
     private EmailTemplateSenderInterface $emailTemplateSender;
     private TranslatorInterface $translator;
@@ -30,8 +30,8 @@ class WelcomeEmailNotifier implements EmailNotifyInterface
                     $user->getEmail(),
                     $user->getFirstName()
                 ),
-                $this->translator->trans('EMAIL_WELCOME_SUBJECT'),
-                (int) $_ENV['MJ_TEMPLATE_WELCOME']
+                $this->translator->trans('EMAIL_NO_POST_SUBJECT'),
+                (int) $_ENV['MJ_TEMPLATE_USER_NO_POST']
             ));
         }
     }

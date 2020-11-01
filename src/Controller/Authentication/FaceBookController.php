@@ -83,6 +83,7 @@ class FaceBookController extends AbstractController
                     ),
                 );
                 $this->welcomeEmailNotifier->notify($user);
+                $this->userRepository->updateNotificationDate($user);
                 $this->userEventRepository->log(
                     new EventType(EventType::FACEBOOK_REGISTRATION),
                     $user,

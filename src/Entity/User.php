@@ -406,6 +406,13 @@ class User implements UserInterface, \JsonSerializable
         return $this->email !== null;
     }
 
+    public function allowSendEmailNotifications(): bool
+    {
+        return $this->hasEmail()
+            && !$this->isLookPetUser()
+            && $_ENV['IS_SEND_EMAIL_NOTIFICATIONS'] === 'true';
+    }
+
     public function jsonSerialize(): array
     {
         return [
