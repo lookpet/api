@@ -280,9 +280,9 @@ class User implements UserInterface, \JsonSerializable
         // $this->plainPassword = null;
     }
 
-    public function getFirstName(): ?string
+    public function getFirstName(): string
     {
-        return $this->firstName;
+        return $this->firstName === null ? '' : $this->firstName;
     }
 
     public function setFirstName(?string $firstName): self
