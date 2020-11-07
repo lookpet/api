@@ -30,7 +30,7 @@ class EmailUserPollNotifier implements EmailNotifyInterface
                     $user->getEmail(),
                     $user->getFirstName()
                 ),
-                $this->translator->trans('EMAIL_USER_UPDATES_SUBJECT'),
+                $this->translator->trans('EMAIL_USER_NEW_COMMENTS_SUBJECT'),
                 (int) $_ENV['MJ_TEMPLATE_USER_POLL']
             ));
         }
