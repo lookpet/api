@@ -54,7 +54,7 @@ class MediaCropper implements MediaCropperInterface
         }
 
         $filePath = sprintf(
-            'http://photo-proxy-production.eu-central-1.elasticbeanstalk.com/cx%d,cy%d,cw%d,ch%d,%dx/%s',
+            $_ENV['IMAGE_PROXY_URL'] . '/cx%d,cy%d,cw%d,ch%d,%dx/%s',
             $startXCoordinate,
             $startYCoordinate,
             $cropWidth,
