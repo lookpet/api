@@ -1,4 +1,4 @@
 EMAIL_WELCOME_SUBJECT: 'Welcome to look.pet'
 EMAIL_NO_POST_SUBJECT: 'Add your first post at look.pet'
 EMAIL_USER_POLL_SUBJECT: 'We appreciate your opinion look.pet'
-EMAIL_USER_UPDATES_SUBJECT: 'New comments at look.pet'
+EMAIL_USER_NEW_COMMENTS_SUBJECT: 'New comments at look.pet'

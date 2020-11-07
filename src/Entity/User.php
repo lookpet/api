@@ -6,6 +6,7 @@ use App\Dto\Authentication\UserLoginDto;
 use App\Dto\User\UserDto;
 use App\Entity\Traits\LifecycleCallbackTrait;
 use App\Entity\Traits\TimestampTrait;
+use App\PetDomain\VO\Uuid as UuidVO;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -415,8 +416,12 @@ class User implements UserInterface, \JsonSerializable
     public function allowSendEmailNotifications(): bool
     {
         return $this->hasEmail()
-            && !$this->isLookPetUser()
-            && $_ENV['IS_SEND_EMAIL_NOTIFICATIONS'] === 'true';
+            && !$this->isLookPetUser();
+    }
+
+    public function getUuid(): UuidVO
+    {
+        return new UuidVO($this->id);
     }
 
     public function jsonSerialize(): array

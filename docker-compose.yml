@@ -7,13 +7,12 @@ services:
     build:
       context: docker/database
     environment:
-      MYSQL_DATABASE: ${DATABASE_NAME}
-      MYSQL_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'true'
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
       TZ: 'Europe/London'
       PGTZ: 'Europe/London'
-    volumes:
-      - /docker/database/data:/var/lib/mysql
 
   php:
     image: 641201314091.dkr.ecr.eu-central-1.amazonaws.com/api-php-dev:${PROJECT_VERSION:-latest}

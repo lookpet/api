@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
+use App\Message\MailNewCommentsMessage;
 use App\Repository\UserRepositoryInterface;
-use App\Service\Notification\EmailUserNewCommentsNotifier;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class MailUserHasNewCommentsCommand extends Command
 {
@@ -14,15 +17,15 @@ class MailUserHasNewCommentsCommand extends Command
     protected static $defaultName = 'mail:user-new-comments';
 
     private UserRepositoryInterface $userRepository;
-    private EmailUserNewCommentsNotifier $emailUserNewCommentsNotifier;
+    private MessageBusInterface $messageBus;
 
     public function __construct(
         UserRepositoryInterface $userRepository,
-        EmailUserNewCommentsNotifier $emailUserNewCommentsNotifier
+        MessageBusInterface $messageBus
     ) {
         parent::__construct();
         $this->userRepository = $userRepository;
-        $this->emailUserNewCommentsNotifier = $emailUserNewCommentsNotifier;
+        $this->messageBus = $messageBus;
     }
 
     protected function configure()
@@ -34,7 +37,8 @@ class MailUserHasNewCommentsCommand extends Command
     {
         $users = $this->userRepository->findUsersToNotifyNewPetComments();
         foreach ($users as $user) {
-            $this->emailUserNewCommentsNotifier->notify($user);
+            $mailNewCommentMessage = new MailNewCommentsMessage($user->getUuid());
+            $this->messageBus->dispatch($mailNewCommentMessage);
             $this->userRepository->updateNotificationDate($user);
         }
 
