@@ -116,7 +116,7 @@ class UserEvent
         }
     }
 
-    public function getContext(): ?array
+    public function getContext(): ?string
     {
         return $this->context;
     }

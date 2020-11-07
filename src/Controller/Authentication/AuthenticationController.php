@@ -242,6 +242,7 @@ final class AuthenticationController extends AbstractController
             $this->entityManager->flush();
 
             $this->welcomeEmailNotifier->notify($user);
+            $this->userRepository->updateNotificationDate($user);
             $this->userEventRepository->log(
                 new EventType(EventType::REGISTRATION),
                 $user,

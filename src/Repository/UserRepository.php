@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 
 /**
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
@@ -14,9 +15,12 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class UserRepository extends ServiceEntityRepository implements UserRepositoryInterface
 {
+    private ObjectManager $entityManager;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, User::class);
+        $this->entityManager = $registry->getManager();
     }
 
     public function findBySlug(string $slug): User
@@ -51,5 +55,41 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         }
 
         return $result;
+    }
+
+    public function findUsersToNotifyNoPets(): iterable
+    {
+        return [];
+        $queryBuilder = $this->createQueryBuilder('u');
+        $queryBuilder->join('u.pets', 'p');
+        $queryBuilder->having('count(u.pets) = 0');
+        $queryBuilder->where($queryBuilder->expr()->gte('u.lastNotificationDate', ':dateLastNotified'));
+        $queryBuilder->setParameter('dateLastNotified', new \DateTimeImmutable('+1 day'));
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
+    public function findUsersToNotifyNewPetComments(): iterable
+    {
+        $queryBuilder = $this->createQueryBuilder('u');
+
+        return $queryBuilder->join('u.pets', 'p')
+            ->join('p.comments', 'pc')
+            ->where($queryBuilder->expr()->lte('u.lastNotificationDate', 'pc.createdAt'))
+            ->groupBy('u.id')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findUsersToNotifyPoll(): iterable
+    {
+        // TODO: Implement findUsersToNotifyPoll() method.
+    }
+
+    public function updateNotificationDate(User $user): void
+    {
+        $user->updateNotificationDate();
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
     }
 }
