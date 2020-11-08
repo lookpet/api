@@ -12,17 +12,17 @@ use Doctrine\Migrations\AbstractMigration;
  */
 final class Version20201108232727 extends AbstractMigration
 {
-    public function getDescription() : string
+    public function getDescription(): string
     {
         return 'add next_notification_after_date';
     }
 
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
         $this->addSql('ALTER TABLE user ADD next_notification_after_date DATETIME DEFAULT NULL');
     }
 
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
         $this->addSql('ALTER TABLE user DROP next_notification_after_date');
     }
