@@ -124,7 +124,7 @@ class Pet implements \JsonSerializable
     private $isSold;
 
     /**
-     * @ORM\Column(type="boolean", options={"default":"0"})
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $isDeleted = false;
 
