@@ -39,7 +39,7 @@ class MailUserHasNewCommentsCommand extends Command
         foreach ($users as $user) {
             $mailNewCommentMessage = new MailNewCommentsMessage($user->getUuid());
             $this->messageBus->dispatch($mailNewCommentMessage);
-            $this->userRepository->updateNotificationDate($user);
+            $this->userRepository->updateNotificationAfterDate($user);
         }
 
         return 0;

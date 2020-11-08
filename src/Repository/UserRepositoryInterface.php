@@ -9,7 +9,7 @@ interface UserRepositoryInterface
 {
     public function findByUuid(Uuid $uuid): ?User;
 
-    public function findBySlug(string $slug): User;
+    public function findBySlug(string $slug): ?User;
 
     public function findByEmail(string $email): ?User;
 
@@ -28,4 +28,6 @@ interface UserRepositoryInterface
     public function findUsersToNotifyPoll(): iterable;
 
     public function updateNotificationDate(User $user): void;
+
+    public function updateNotificationAfterDate(User $user): void;
 }

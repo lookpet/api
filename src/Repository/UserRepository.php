@@ -31,7 +31,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         ]);
     }
 
-    public function findBySlug(string $slug): User
+    public function findBySlug(string $slug): ?User
     {
         return $this->findOneBy([
             'slug' => $slug,
@@ -84,6 +84,8 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         return $queryBuilder->join('u.pets', 'p')
             ->join('p.comments', 'pc')
             ->where($queryBuilder->expr()->lte('u.lastNotificationDate', 'pc.createdAt'))
+            ->where($queryBuilder->expr()->lte('u.nextNotificationAfterDate', ':dateNextNotification'))
+            ->setParameter('dateNextNotification', new \DateTimeImmutable(User::NEXT_NOTIFICATION_SEND_INTERVAL))
             ->groupBy('u.id')
             ->getQuery()
             ->getResult();
@@ -97,6 +99,13 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
     public function updateNotificationDate(User $user): void
     {
         $user->updateNotificationDate();
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+    }
+
+    public function updateNotificationAfterDate(User $user): void
+    {
+        $user->updateNotificationAfterDate();
         $this->entityManager->persist($user);
         $this->entityManager->flush();
     }

@@ -10,15 +10,18 @@ use App\Dto\Authentication\UserLoginDtoBuilder;
 use App\Dto\Event\RequestUtmBuilderInterface;
 use App\Entity\ApiToken;
 use App\Entity\User;
+use App\Message\MailWelcomeMessage;
 use App\PetDomain\VO\Utm;
+use App\PetDomain\VO\Uuid;
 use App\Repository\UserEventRepositoryInterface;
 use App\Repository\UserRepositoryInterface;
-use App\Service\Notification\WelcomeEmailNotifier;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -41,7 +44,7 @@ final class AuthenticationControllerTest extends TestCase
     private UserPasswordEncoderInterface $userPasswordEncoder;
     private EntityManagerInterface $entityManager;
     private UserLoginDtoBuilder $userLoginDtoBuilder;
-    private WelcomeEmailNotifier $welcomeEmailNotifier;
+    private MessageBusInterface $messageBus;
     private RequestUtmBuilderInterface $requestUtmBuilder;
     private UserEventRepositoryInterface $userEventRepository;
 
@@ -242,10 +245,6 @@ final class AuthenticationControllerTest extends TestCase
 
         $this->entityManager->expects(self::once())->method('flush');
 
-        $this->welcomeEmailNotifier
-            ->expects(self::once())
-            ->method('notify');
-
         $this->entityManager
             ->expects(self::atLeastOnce())
             ->method('persist');
@@ -253,6 +252,27 @@ final class AuthenticationControllerTest extends TestCase
         $this->entityManager
             ->expects(self::atLeastOnce())
             ->method('flush');
+
+        $this->userRepository
+            ->expects(self::once())
+            ->method('findByEmail')
+            ->with(UserFixture::EMAIL)
+            ->willReturn($this->user);
+
+        $this->user
+            ->expects(self::atLeastOnce())
+            ->method('getUuid')
+            ->willReturn(new Uuid(UserFixture::ID));
+
+        $this->messageBus->expects(self::exactly(1))
+            ->method('dispatch')
+            ->withConsecutive(
+                ...[self::isInstanceOf(MailWelcomeMessage::class)]
+            )
+            ->willReturn(new Envelope(new MailWelcomeMessage(new Uuid(UserFixture::ID))));
+        $this->messageBus
+            ->expects(self::atLeastOnce())
+            ->method('dispatch');
 
         $utm = new Utm();
 
@@ -271,6 +291,7 @@ final class AuthenticationControllerTest extends TestCase
         );
 
         $decodedResponse = json_decode($result->getContent());
+        var_dump($decodedResponse);
         $expiresAt = new \DateTimeImmutable('+7 days', new \DateTimeZone('Europe/London'));
         self::assertNotEmpty($decodedResponse->token);
         self::assertEqualsWithDelta(
@@ -326,7 +347,7 @@ final class AuthenticationControllerTest extends TestCase
         $this->userPasswordEncoder = $this->createMock(UserPasswordEncoderInterface::class);
         $this->user = $this->createMock(User::class);
         $this->userLoginDtoBuilder = $this->createMock(UserLoginDtoBuilder::class);
-        $this->welcomeEmailNotifier = $this->createMock(WelcomeEmailNotifier::class);
+        $this->messageBus = $this->createMock(MessageBusInterface::class);
         $this->requestUtmBuilder = $this->createMock(RequestUtmBuilderInterface::class);
         $this->userEventRepository = $this->createMock(UserEventRepositoryInterface::class);
         $this->authenticationController = new AuthenticationController(
@@ -335,7 +356,7 @@ final class AuthenticationControllerTest extends TestCase
             $this->userPasswordEncoder,
             $this->entityManager,
             $this->userLoginDtoBuilder,
-            $this->welcomeEmailNotifier,
+            $this->messageBus,
             $this->requestUtmBuilder,
             $this->userEventRepository
         );
