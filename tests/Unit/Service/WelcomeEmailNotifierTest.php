@@ -8,6 +8,7 @@ use App\PetDomain\VO\EmailRecipient;
 use App\Service\EmailTemplateSenderInterface;
 use App\Service\Notification\WelcomeEmailNotifier;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @covers \App\Service\Notification\WelcomeEmailNotifier
@@ -23,12 +24,18 @@ class WelcomeEmailNotifierTest extends TestCase
     private const MJ_TEMPLATE_WELCOME = 1685295;
     private EmailTemplateSenderInterface $emailTemplateSender;
     private WelcomeEmailNotifier $welcomeNotifier;
+    private TranslatorInterface $translator;
 
     public function testItNotify(): void
     {
         $user = new User();
         $user->setEmail(self::EMAIL);
         $user->setFirstName(self::FIRST_NAME);
+        $this->translator
+            ->expects(self::atLeastOnce())
+            ->method('trans')
+            ->with('EMAIL_WELCOME_SUBJECT')
+            ->willReturn(self::EMAIL_SUBJECT);
         $this->emailTemplateSender
             ->expects(self::once())
             ->method('send')
@@ -74,8 +81,10 @@ class WelcomeEmailNotifierTest extends TestCase
     {
         parent::setUp();
         $this->emailTemplateSender = $this->createMock(EmailTemplateSenderInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->welcomeNotifier = new WelcomeEmailNotifier(
-            $this->emailTemplateSender
+            $this->emailTemplateSender,
+            $this->translator
         );
     }
 }

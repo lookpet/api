@@ -9,11 +9,11 @@ use App\Dto\Authentication\UserLoginDtoBuilder;
 use App\Dto\Event\RequestUtmBuilderInterface;
 use App\Entity\ApiToken;
 use App\Entity\User;
+use App\Message\MailWelcomeMessage;
 use App\PetDomain\VO\EventType;
 use App\Repository\UserEventRepositoryInterface;
 use App\Repository\UserRepositoryInterface;
 use App\Service\EmailTemplateSenderInterface;
-use App\Service\Notification\WelcomeEmailNotifier;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
@@ -21,6 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -32,7 +33,7 @@ final class AuthenticationController extends AbstractController
     private UserPasswordEncoderInterface $passwordEncoder;
     private EntityManagerInterface $entityManager;
     private UserLoginDtoBuilder $loginDtoBuilder;
-    private WelcomeEmailNotifier $welcomeEmailNotifier;
+    private MessageBusInterface $messageBus;
     private RequestUtmBuilderInterface $requestUtmBuilder;
     private UserEventRepositoryInterface $userEventRepository;
 
@@ -42,7 +43,7 @@ final class AuthenticationController extends AbstractController
         UserPasswordEncoderInterface $passwordEncoder,
         EntityManagerInterface $entityManager,
         UserLoginDtoBuilder $loginDtoBuilder,
-        WelcomeEmailNotifier $welcomeEmailNotifier,
+        MessageBusInterface $messageBus,
         RequestUtmBuilderInterface $requestUtmBuilder,
         UserEventRepositoryInterface $userEventRepository
     ) {
@@ -51,7 +52,7 @@ final class AuthenticationController extends AbstractController
         $this->passwordEncoder = $passwordEncoder;
         $this->entityManager = $entityManager;
         $this->loginDtoBuilder = $loginDtoBuilder;
-        $this->welcomeEmailNotifier = $welcomeEmailNotifier;
+        $this->messageBus = $messageBus;
         $this->requestUtmBuilder = $requestUtmBuilder;
         $this->userEventRepository = $userEventRepository;
     }
@@ -241,8 +242,10 @@ final class AuthenticationController extends AbstractController
             $this->entityManager->persist($apiToken);
             $this->entityManager->flush();
 
-            $this->welcomeEmailNotifier->notify($user);
-            $this->userRepository->updateNotificationDate($user);
+            $this->messageBus->dispatch(
+                new MailWelcomeMessage($user->getUuid())
+            );
+
             $this->userEventRepository->log(
                 new EventType(EventType::REGISTRATION),
                 $user,

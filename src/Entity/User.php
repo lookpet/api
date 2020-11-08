@@ -23,6 +23,7 @@ class User implements UserInterface, \JsonSerializable
 {
     use LifecycleCallbackTrait;
     use TimestampTrait;
+    public const NEXT_NOTIFICATION_SEND_INTERVAL = '+1 day';
 
     /**
      * @ORM\Id()
@@ -143,6 +144,11 @@ class User implements UserInterface, \JsonSerializable
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $lastNotificationDate;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $nextNotificationAfterDate;
 
     /**
      * @ORM\OneToMany(targetEntity=UserEvent::class, mappedBy="user")
@@ -726,14 +732,23 @@ class User implements UserInterface, \JsonSerializable
         return $this;
     }
 
-    public function updateNotificationDate(): void
+    public function updateNotificationDate(?\DateTimeInterface $dateTime = null): void
     {
-        $this->lastNotificationDate = new \DateTimeImmutable();
+        if ($dateTime === null) {
+            $dateTime = new \DateTimeImmutable();
+        }
+
+        $this->lastNotificationDate = $dateTime;
     }
 
-    public function hasNotificationSentToday(): bool
+    public function updateNotificationAfterDate(): void
     {
-        return $this->lastNotificationDate !== null;
+        $this->nextNotificationAfterDate = new \DateTimeImmutable(self::NEXT_NOTIFICATION_SEND_INTERVAL);
+    }
+
+    public function canSendNotification(): bool
+    {
+        return $this->lastNotificationDate === null || $this->lastNotificationDate <= new \DateTimeImmutable('-1 day');
     }
 
     /**
