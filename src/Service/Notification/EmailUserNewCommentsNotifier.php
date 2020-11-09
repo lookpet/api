@@ -30,7 +30,7 @@ class EmailUserNewCommentsNotifier implements EmailNotifyInterface
                     $user->getEmail(),
                     $user->getFirstName()
                 ),
-                $this->translator->trans('EMAIL_USER_NEW_COMMENTS_SUBJECT'),
+                $user->getFirstName(). ' ' .$this->translator->trans('EMAIL_USER_NEW_COMMENTS_SUBJECT'),
                 (int) $_ENV['MJ_TEMPLATE_USER_NEW_COMMENTS']
             ));
         }

@@ -1,4 +1,4 @@
 EMAIL_WELCOME_SUBJECT: 'Добро пожаловать на look.pet'
 EMAIL_NO_POST_SUBJECT: 'Разместите первый пост на look.pet'
 EMAIL_USER_POLL_SUBJECT: 'Нам важно ваше мнение о сайте look.pet'
-EMAIL_USER_NEW_COMMENTS_SUBJECT: 'Новый комментарий у вашего поста на look.pet'
+EMAIL_USER_NEW_COMMENTS_SUBJECT: 'новый комментарий у вашего поста на look.pet'
