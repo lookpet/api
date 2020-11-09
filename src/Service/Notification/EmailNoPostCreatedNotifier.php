@@ -24,13 +24,17 @@ class EmailNoPostCreatedNotifier implements EmailNotifyInterface
     public function notify(User $user): void
     {
         if ($user->allowSendEmailNotifications()) {
+            $subject = empty($user->getFirstName()) ?
+                $this->translator->trans('EMAIL_NO_POST_SUBJECT') :
+                $user->getFirstName() . ' ' . $this->translator->trans('EMAIL_NO_POST_SUBJECT');
+
             $this->emailTemplateSender->send(
                 new EmailTemplateDto(
                     EmailRecipient::create(
                     $user->getEmail(),
                     $user->getFirstName()
                 ),
-                $this->translator->trans('EMAIL_NO_POST_SUBJECT'),
+                    $subject,
                 (int) $_ENV['MJ_TEMPLATE_USER_NO_POST']
             ));
         }
