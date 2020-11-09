@@ -741,9 +741,13 @@ class User implements UserInterface, \JsonSerializable
         $this->lastNotificationDate = $dateTime;
     }
 
-    public function updateNotificationAfterDate(): void
+    public function updateNotificationAfterDate(?\DateTimeInterface $dateTime = null): void
     {
-        $this->nextNotificationAfterDate = new \DateTimeImmutable(self::NEXT_NOTIFICATION_SEND_INTERVAL);
+        if ($dateTime === null) {
+            $dateTime = new \DateTimeImmutable(self::NEXT_NOTIFICATION_SEND_INTERVAL);
+        }
+
+        $this->nextNotificationAfterDate = $dateTime;
     }
 
     public function canSendNotification(): bool

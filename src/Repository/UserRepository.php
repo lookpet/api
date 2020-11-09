@@ -77,6 +77,9 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         return $queryBuilder->getQuery()->getResult();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function findUsersToNotifyNewPetComments(): iterable
     {
         $queryBuilder = $this->createQueryBuilder('u');
@@ -84,8 +87,8 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         return $queryBuilder->join('u.pets', 'p')
             ->join('p.comments', 'pc')
             ->where($queryBuilder->expr()->lte('u.lastNotificationDate', 'pc.createdAt'))
-            ->where($queryBuilder->expr()->lte('u.nextNotificationAfterDate', ':dateNextNotification'))
-            ->setParameter('dateNextNotification', new \DateTimeImmutable(User::NEXT_NOTIFICATION_SEND_INTERVAL))
+            ->andWhere($queryBuilder->expr()->lte('u.nextNotificationAfterDate', ':dateNextNotification'))
+            ->setParameter('dateNextNotification', new \DateTimeImmutable('now'))
             ->groupBy('u.id')
             ->getQuery()
             ->getResult();

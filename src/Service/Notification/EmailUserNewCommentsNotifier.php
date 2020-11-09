@@ -25,7 +25,7 @@ class EmailUserNewCommentsNotifier implements EmailNotifyInterface
     {
         $subject = empty($user->getFirstName()) ?
             $this->translator->trans('EMAIL_USER_NEW_COMMENTS_SUBJECT_NO_NAME') :
-            $user->getFirstName(). ' ' .$this->translator->trans('EMAIL_USER_NEW_COMMENTS_SUBJECT');
+            $user->getFirstName() . ' ' . $this->translator->trans('EMAIL_USER_NEW_COMMENTS_SUBJECT');
 
         if ($user->allowSendEmailNotifications()) {
             $this->emailTemplateSender->send(
