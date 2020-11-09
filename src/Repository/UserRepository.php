@@ -87,6 +87,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
             ->where($queryBuilder->expr()->lte('u.nextNotificationAfterDate', ':dateNextNotification'))
             ->setParameter('dateNextNotification', new \DateTimeImmutable(User::NEXT_NOTIFICATION_SEND_INTERVAL))
             ->groupBy('u.id')
+            ->setMaxResults(3)
             ->getQuery()
             ->getResult();
     }
