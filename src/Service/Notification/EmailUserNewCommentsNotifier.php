@@ -23,6 +23,10 @@ class EmailUserNewCommentsNotifier implements EmailNotifyInterface
 
     public function notify(User $user): void
     {
+        $subject = empty($user->getFirstName()) ?
+            $this->translator->trans('EMAIL_USER_NEW_COMMENTS_SUBJECT_NO_NAME') :
+            $user->getFirstName(). ' ' .$this->translator->trans('EMAIL_USER_NEW_COMMENTS_SUBJECT');
+
         if ($user->allowSendEmailNotifications()) {
             $this->emailTemplateSender->send(
                 new EmailTemplateDto(
@@ -30,7 +34,7 @@ class EmailUserNewCommentsNotifier implements EmailNotifyInterface
                     $user->getEmail(),
                     $user->getFirstName()
                 ),
-                $user->getFirstName(). ' ' .$this->translator->trans('EMAIL_USER_NEW_COMMENTS_SUBJECT'),
+                    $subject,
                 (int) $_ENV['MJ_TEMPLATE_USER_NEW_COMMENTS']
             ));
         }
