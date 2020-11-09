@@ -14,10 +14,8 @@ interface UserRepositoryInterface
     public function findByEmail(string $email): ?User;
 
     /**
-     * @return User[]
+     * @return User[]&iterable
      */
-    public function findUsersWithNoPets(): array;
-
     public function findUsersToNotifyNoPets(): iterable;
 
     /**

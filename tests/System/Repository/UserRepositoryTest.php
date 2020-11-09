@@ -5,10 +5,15 @@ declare(strict_types=1);
 namespace Tests\System\Repository;
 
 use App\Entity\User;
+use App\Entity\UserEvent;
+use App\PetDomain\VO\EventType;
+use App\PetDomain\VO\Utm;
+use App\Repository\UserEventRepository;
 use App\Repository\UserRepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Liip\TestFixturesBundle\Test\FixturesTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Tests\DataFixtures\ORM\UserFixtureWithNoPet;
 use Tests\DataFixtures\ORM\UserFixtureWithPetComments;
 
 /**
@@ -62,6 +67,58 @@ class UserRepositoryTest extends KernelTestCase
         $this->entityManager->persist($user);
         $this->entityManager->flush();
         $result = $this->userRepository->findUsersToNotifyNewPetComments();
+        self::assertCount(0, $result);
+    }
+
+    public function testFindUsersToNotifyNoPets(): void
+    {
+        $timeInPast = new \DateTimeImmutable('-1 minute');
+        $this->loadFixtures([UserFixtureWithNoPet::class]);
+
+        /** @var User $user */
+        $user = $this->userRepository->find(UserFixtureWithNoPet::ID_USER_WITH_NO_PET);
+        $user->updateNotificationAfterDate($timeInPast);
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        $result = $this->userRepository->findUsersToNotifyNoPets();
+        self::assertCount(1, $result);
+        self::assertTrue($user->equals($result[0]));
+    }
+
+    public function testFindUsersToNotifyNoPetsReturnEmptyArrayBecauseAfterNotificationDateIsInFuture(): void
+    {
+        $timeInPast = new \DateTimeImmutable('+1 minute');
+        $this->loadFixtures([UserFixtureWithNoPet::class]);
+
+        /** @var User $user */
+        $user = $this->userRepository->find(UserFixtureWithNoPet::ID_USER_WITH_NO_PET);
+        $user->updateNotificationAfterDate($timeInPast);
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        $result = $this->userRepository->findUsersToNotifyNoPets();
+        self::assertCount(0, $result);
+    }
+
+    public function testFindUsersToNotifyNoPetsReturnEmptyArrayBecauseMessageHasAlreadyBeenSent(): void
+    {
+        $timeInPast = new \DateTimeImmutable('-1 minute');
+        $this->loadFixtures([UserFixtureWithNoPet::class]);
+
+        /** @var User $user */
+        $user = $this->userRepository->find(UserFixtureWithNoPet::ID_USER_WITH_NO_PET);
+        $user->updateNotificationAfterDate($timeInPast);
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        /** @var UserEventRepository $userEventRepository */
+        $userEventRepository = $this->entityManager->getRepository(UserEvent::class);
+        $userEventRepository->log(new EventType(EventType::NO_PET_NOTIFICATION),
+            $user,
+            new Utm());
+
+        $result = $this->userRepository->findUsersToNotifyNoPets();
         self::assertCount(0, $result);
     }
 

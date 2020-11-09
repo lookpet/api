@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\DataFixtures\ORM;
 
 use App\Entity\Pet;

@@ -3,8 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use App\PetDomain\VO\EventType;
 use App\PetDomain\VO\Uuid;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 
@@ -51,28 +53,20 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         ]);
     }
 
-    public function findUsersWithNoPets(): array
-    {
-        $users = $this->findAll();
-        $result = [];
-
-        foreach ($users as $user) {
-            if (!$user->havePets()) {
-                $result[] = $user;
-            }
-        }
-
-        return $result;
-    }
-
+    /**
+     * {@inheritdoc}
+     */
     public function findUsersToNotifyNoPets(): iterable
     {
-        return [];
         $queryBuilder = $this->createQueryBuilder('u');
-        $queryBuilder->join('u.pets', 'p');
-        $queryBuilder->having('count(u.pets) = 0');
-        $queryBuilder->where($queryBuilder->expr()->gte('u.lastNotificationDate', ':dateLastNotified'));
-        $queryBuilder->setParameter('dateLastNotified', new \DateTimeImmutable('+1 day'));
+
+        $queryBuilder->leftJoin('u.pets', 'p')
+            ->leftJoin('u.events', 'e', Expr\Join::WITH, 'e.type = :noPetNotification')
+            ->where($queryBuilder->expr()->isNull('p.id'))
+            ->andWhere($queryBuilder->expr()->isNull('e.id'))
+            ->andWhere($queryBuilder->expr()->lte('u.nextNotificationAfterDate', ':dateNextNotification'))
+            ->setParameter('dateNextNotification', new \DateTimeImmutable('now'))
+            ->setParameter('noPetNotification', EventType::NO_PET_NOTIFICATION);
 
         return $queryBuilder->getQuery()->getResult();
     }
