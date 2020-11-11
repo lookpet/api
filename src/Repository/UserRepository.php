@@ -80,7 +80,8 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
 
         return $queryBuilder->join('u.pets', 'p')
             ->join('p.comments', 'pc')
-            ->where($queryBuilder->expr()->lte('u.lastNotificationDate', 'pc.createdAt'))
+            ->where($queryBuilder->expr()->neq('p.user', 'pc.user'))
+            ->andWhere($queryBuilder->expr()->lte('u.lastNotificationDate', 'pc.createdAt'))
             ->andWhere($queryBuilder->expr()->lte('u.nextNotificationAfterDate', ':dateNextNotification'))
             ->setParameter('dateNextNotification', new \DateTimeImmutable('now'))
             ->groupBy('u.id')
