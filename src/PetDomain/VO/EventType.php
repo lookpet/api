@@ -17,6 +17,7 @@ final class EventType
     public const PET_UNLIKE = 'PET_UNLIKE';
     public const PET_COMMENT = 'PET_COMMENT';
     public const NO_PET_NOTIFICATION = 'NO_PET_NOTIFICATION';
+    public const POLL_NOTIFICATION = 'POLL_NOTIFICATION';
 
     private const EVENT_LIST = [
         self::REGISTRATION,
@@ -32,6 +33,7 @@ final class EventType
         self::PET_CREATE,
         self::PET_COMMENT,
         self::NO_PET_NOTIFICATION,
+        self::POLL_NOTIFICATION,
     ];
 
     private string $eventType;

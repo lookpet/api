@@ -91,7 +91,17 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
 
     public function findUsersToNotifyPoll(): iterable
     {
-        // TODO: Implement findUsersToNotifyPoll() method.
+        $queryBuilder = $this->createQueryBuilder('u');
+
+        $queryBuilder->join('u.apiTokens', 'token')
+            ->leftJoin('u.events', 'e', Expr\Join::WITH, 'e.type = :pollNotification')
+            ->where($queryBuilder->expr()->isNull('e.id'))
+            ->andWhere($queryBuilder->expr()->gte('token.createdAt', ':threeDays'))
+            ->andWhere($queryBuilder->expr()->isNull('e.id'))
+            ->setParameter('threeDays', new \DateTimeImmutable('-3 days'))
+            ->setParameter('pollNotification', EventType::POLL_NOTIFICATION);
+
+        return $queryBuilder->getQuery()->getResult();
     }
 
     public function updateNotificationDate(User $user): void
