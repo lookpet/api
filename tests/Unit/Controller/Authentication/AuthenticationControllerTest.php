@@ -38,6 +38,7 @@ final class AuthenticationControllerTest extends TestCase
 
     private const EMAIL = 'test@mail.com';
     private const NAME = 'Snappy';
+    private const UUID = 'user-id';
 
     private ValidatorInterface $validator;
     private UserRepositoryInterface $userRepository;
@@ -259,20 +260,14 @@ final class AuthenticationControllerTest extends TestCase
             ->with(UserFixture::EMAIL)
             ->willReturn($this->user);
 
-        $this->user
-            ->expects(self::atLeastOnce())
-            ->method('getUuid')
-            ->willReturn(new Uuid(UserFixture::ID));
+        $mailWelcomeMessage = new MailWelcomeMessage(
+            new Uuid(UserFixture::ID)
+        );
 
         $this->messageBus->expects(self::exactly(1))
             ->method('dispatch')
-            ->withConsecutive(
-                ...[self::isInstanceOf(MailWelcomeMessage::class)]
-            )
-            ->willReturn(new Envelope(new MailWelcomeMessage(new Uuid(UserFixture::ID))));
-        $this->messageBus
-            ->expects(self::atLeastOnce())
-            ->method('dispatch');
+            ->withConsecutive([self::isInstanceOf(MailWelcomeMessage::class)])
+            ->willReturnOnConsecutiveCalls(new Envelope($mailWelcomeMessage));
 
         $utm = new Utm();
 
@@ -291,7 +286,6 @@ final class AuthenticationControllerTest extends TestCase
         );
 
         $decodedResponse = json_decode($result->getContent());
-        var_dump($decodedResponse);
         $expiresAt = new \DateTimeImmutable('+7 days', new \DateTimeZone('Europe/London'));
         self::assertNotEmpty($decodedResponse->token);
         self::assertEqualsWithDelta(
