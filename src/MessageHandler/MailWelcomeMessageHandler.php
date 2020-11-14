@@ -2,7 +2,7 @@
 
 namespace App\MessageHandler;
 
-use App\Message\MailNewCommentsMessage;
+use App\Message\MailWelcomeMessage;
 use App\Repository\UserRepositoryInterface;
 use App\Service\Notification\WelcomeEmailNotifier;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
@@ -20,7 +20,7 @@ class MailWelcomeMessageHandler implements MessageHandlerInterface
         $this->emailUserWelcomeNotifier = $emailUserWelcomeNotifier;
     }
 
-    public function __invoke(MailNewCommentsMessage $mailNewCommentsMessage)
+    public function __invoke(MailWelcomeMessage $mailNewCommentsMessage)
     {
         $user = $this->userRepository->findByUuid($mailNewCommentsMessage->getUuid());
         if ($user->canSendNotification()) {

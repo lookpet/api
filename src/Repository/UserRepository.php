@@ -80,7 +80,8 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
 
         return $queryBuilder->join('u.pets', 'p')
             ->join('p.comments', 'pc')
-            ->where($queryBuilder->expr()->lte('u.lastNotificationDate', 'pc.createdAt'))
+            ->where($queryBuilder->expr()->neq('p.user', 'pc.user'))
+            ->andWhere($queryBuilder->expr()->lte('u.lastNotificationDate', 'pc.createdAt'))
             ->andWhere($queryBuilder->expr()->lte('u.nextNotificationAfterDate', ':dateNextNotification'))
             ->setParameter('dateNextNotification', new \DateTimeImmutable('now'))
             ->groupBy('u.id')
@@ -90,7 +91,17 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
 
     public function findUsersToNotifyPoll(): iterable
     {
-        // TODO: Implement findUsersToNotifyPoll() method.
+        $queryBuilder = $this->createQueryBuilder('u');
+
+        $queryBuilder->join('u.apiTokens', 'token')
+            ->leftJoin('u.events', 'e', Expr\Join::WITH, 'e.type = :pollNotification')
+            ->where($queryBuilder->expr()->isNull('e.id'))
+            ->andWhere($queryBuilder->expr()->gte('token.createdAt', ':threeDays'))
+            ->andWhere($queryBuilder->expr()->isNull('e.id'))
+            ->setParameter('threeDays', new \DateTimeImmutable('-3 days'))
+            ->setParameter('pollNotification', EventType::POLL_NOTIFICATION);
+
+        return $queryBuilder->getQuery()->getResult();
     }
 
     public function updateNotificationDate(User $user): void

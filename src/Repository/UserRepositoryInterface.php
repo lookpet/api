@@ -23,6 +23,9 @@ interface UserRepositoryInterface
      */
     public function findUsersToNotifyNewPetComments(): iterable;
 
+    /**
+     * @return User[]&iterable
+     */
     public function findUsersToNotifyPoll(): iterable;
 
     public function updateNotificationDate(User $user): void;
