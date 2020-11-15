@@ -10,8 +10,8 @@ use App\Entity\User;
 use App\Entity\UserFollower;
 use App\PetDomain\VO\EventContext;
 use App\PetDomain\VO\EventType;
+use App\PetDomain\VO\Id;
 use App\PetDomain\VO\Utm;
-use App\PetDomain\VO\Uuid;
 use App\Repository\PetLikeRepositoryInterface;
 use App\Repository\UserEventRepositoryInterface;
 use App\Repository\UserFollowerRepositoryInterface;
@@ -112,7 +112,7 @@ final class UserFollowerControllerTest extends TestCase
                 $this->user
             )
             ->willReturn(new UserFollower(
-                new Uuid(self::USER_FOLLOWER_ID),
+                new Id(self::USER_FOLLOWER_ID),
                 $user,
                 $this->user
             ));

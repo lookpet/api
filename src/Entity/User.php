@@ -6,7 +6,7 @@ use App\Dto\Authentication\UserLoginDto;
 use App\Dto\User\UserDto;
 use App\Entity\Traits\LifecycleCallbackTrait;
 use App\Entity\Traits\TimestampTrait;
-use App\PetDomain\VO\Uuid as UuidVO;
+use App\PetDomain\VO\Id as UuidVO;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -165,6 +165,16 @@ class User implements UserInterface, \JsonSerializable
      */
     private $followers;
 
+    /**
+     * @ORM\OneToMany(targetEntity=UserMessage::class, mappedBy="fromUser")
+     */
+    private $fromUserMessages;
+
+    /**
+     * @ORM\OneToMany(targetEntity=UserMessage::class, mappedBy="toUser")
+     */
+    private $toUserMessages;
+
     public function __construct(string $id = null, ?string $slug = null, ?string $firstName = null)
     {
         $this->slug = $slug;
@@ -181,6 +191,8 @@ class User implements UserInterface, \JsonSerializable
         $this->events = new ArrayCollection();
         $this->postLikes = new ArrayCollection();
         $this->followers = new ArrayCollection();
+        $this->fromUserMessages = new ArrayCollection();
+        $this->toUserMessages = new ArrayCollection();
     }
 
     public static function createFromLoginDto(UserLoginDto $userLoginDto): self
@@ -864,5 +876,62 @@ class User implements UserInterface, \JsonSerializable
     public function getCountFollowers(): int
     {
         return count($this->followers);
+    }
+
+    /**
+     * @return Collection|UserMessage[]
+     */
+    public function getFromUserMessages(): Collection
+    {
+        return $this->fromUserMessages;
+    }
+
+    public function addFromUserMessage(UserMessage $fromUserMessage): self
+    {
+        if (!$this->fromUserMessages->contains($fromUserMessage)) {
+            $this->fromUserMessages[] = $fromUserMessage;
+            $fromUserMessage->addFromUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFromUserMessage(UserMessage $fromUserMessage): self
+    {
+        if ($this->fromUserMessages->removeElement($fromUserMessage)) {
+            $fromUserMessage->removeFromUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|UserMessage[]
+     */
+    public function getToUserMessages(): Collection
+    {
+        return $this->toUserMessages;
+    }
+
+    public function addToUserMessage(UserMessage $toUserMessage): self
+    {
+        if (!$this->toUserMessages->contains($toUserMessage)) {
+            $this->toUserMessages[] = $toUserMessage;
+            $toUserMessage->setToUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeToUserMessage(UserMessage $toUserMessage): self
+    {
+        if ($this->toUserMessages->removeElement($toUserMessage)) {
+            // set the owning side to null (unless already changed)
+            if ($toUserMessage->getToUser() === $this) {
+                $toUserMessage->setToUser(null);
+            }
+        }
+
+        return $this;
     }
 }

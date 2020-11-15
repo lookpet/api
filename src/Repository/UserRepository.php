@@ -4,7 +4,7 @@ namespace App\Repository;
 
 use App\Entity\User;
 use App\PetDomain\VO\EventType;
-use App\PetDomain\VO\Uuid;
+use App\PetDomain\VO\Id;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\Persistence\ManagerRegistry;
@@ -26,7 +26,7 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
         $this->entityManager = $registry->getManager();
     }
 
-    public function findByUuid(Uuid $uuid): ?User
+    public function findByUuid(Id $uuid): ?User
     {
         return $this->findOneBy([
             'id' => $uuid->__toString(),

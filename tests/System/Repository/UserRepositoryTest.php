@@ -7,8 +7,8 @@ namespace Tests\System\Repository;
 use App\Entity\User;
 use App\Entity\UserEvent;
 use App\PetDomain\VO\EventType;
+use App\PetDomain\VO\Id;
 use App\PetDomain\VO\Utm;
-use App\PetDomain\VO\Uuid;
 use App\Repository\UserEventRepository;
 use App\Repository\UserRepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -129,7 +129,7 @@ class UserRepositoryTest extends KernelTestCase
         $this->loadFixtures([UserFixtureWithApiToken::class]);
 
         $userForTest = $this->userRepository->findByUuid(
-            new Uuid(UserFixtureWithApiToken::ID_USER_WITH_API_TOKEN)
+            new Id(UserFixtureWithApiToken::ID_USER_WITH_API_TOKEN)
         );
         $activeApiToken = $userForTest->getActiveApiToken();
         $activeApiToken->setCreatedAt(new \DateTimeImmutable('yesterday'));
@@ -145,7 +145,7 @@ class UserRepositoryTest extends KernelTestCase
         $this->loadFixtures([UserFixtureWithApiToken::class]);
 
         $userForTest = $this->userRepository->findByUuid(
-            new Uuid(UserFixtureWithApiToken::ID_USER_WITH_API_TOKEN)
+            new Id(UserFixtureWithApiToken::ID_USER_WITH_API_TOKEN)
         );
         $activeApiToken = $userForTest->getActiveApiToken();
         $activeApiToken->setCreatedAt(new \DateTimeImmutable('-4 days'));
@@ -161,7 +161,7 @@ class UserRepositoryTest extends KernelTestCase
         $this->loadFixtures([UserFixtureWithApiToken::class]);
 
         $userForTest = $this->userRepository->findByUuid(
-            new Uuid(UserFixtureWithApiToken::ID_USER_WITH_API_TOKEN)
+            new Id(UserFixtureWithApiToken::ID_USER_WITH_API_TOKEN)
         );
         $activeApiToken = $userForTest->getActiveApiToken();
         $activeApiToken->setCreatedAt(new \DateTimeImmutable('-2 hours 59 minutes'));

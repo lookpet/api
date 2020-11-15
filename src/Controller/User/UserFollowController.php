@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Entity\UserFollower;
 use App\PetDomain\VO\EventContext;
 use App\PetDomain\VO\EventType;
+use App\PetDomain\VO\Id;
 use App\Repository\UserEventRepositoryInterface;
 use App\Repository\UserFollowerRepositoryInterface;
 use App\Repository\UserRepositoryInterface;
@@ -85,7 +86,7 @@ final class UserFollowController extends AbstractController
 
         if ($userFollower === null) {
             $userFollower = new UserFollower(
-                new \App\PetDomain\VO\Uuid(Uuid::uuid4()->toString()),
+                new Id(Uuid::uuid4()->toString()),
                 $user,
                 $follower
             );

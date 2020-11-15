@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Traits\LifecycleCallbackTrait;
 use App\Entity\Traits\TimestampTrait;
-use App\PetDomain\VO\Uuid;
+use App\PetDomain\VO\Id;
 use App\Repository\UserFollowerRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -35,7 +35,7 @@ class UserFollower
      */
     private $follower;
 
-    public function __construct(Uuid $uuid, User $user, User $follower)
+    public function __construct(Id $uuid, User $user, User $follower)
     {
         $this->id = $uuid->__toString();
         $this->user = $user;

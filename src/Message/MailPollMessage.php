@@ -2,18 +2,18 @@
 
 namespace App\Message;
 
-use App\PetDomain\VO\Uuid;
+use App\PetDomain\VO\Id;
 
 class MailPollMessage
 {
-    private Uuid $uuid;
+    private Id $uuid;
 
-    public function __construct(Uuid $uuid)
+    public function __construct(Id $uuid)
     {
         $this->uuid = $uuid;
     }
 
-    public function getUuid(): Uuid
+    public function getUuid(): Id
     {
         return $this->uuid;
     }

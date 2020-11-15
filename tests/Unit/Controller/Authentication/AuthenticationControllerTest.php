@@ -11,8 +11,8 @@ use App\Dto\Event\RequestUtmBuilderInterface;
 use App\Entity\ApiToken;
 use App\Entity\User;
 use App\Message\MailWelcomeMessage;
+use App\PetDomain\VO\Id;
 use App\PetDomain\VO\Utm;
-use App\PetDomain\VO\Uuid;
 use App\Repository\UserEventRepositoryInterface;
 use App\Repository\UserRepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -261,7 +261,7 @@ final class AuthenticationControllerTest extends TestCase
             ->willReturn($this->user);
 
         $mailWelcomeMessage = new MailWelcomeMessage(
-            new Uuid(UserFixture::ID)
+            new Id(UserFixture::ID)
         );
 
         $this->messageBus->expects(self::exactly(1))

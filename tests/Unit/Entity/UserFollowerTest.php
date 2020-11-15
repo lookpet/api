@@ -6,7 +6,7 @@ namespace Tests\Unit\Entity;
 
 use App\Entity\User;
 use App\Entity\UserFollower;
-use App\PetDomain\VO\Uuid;
+use App\PetDomain\VO\Id;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -25,7 +25,7 @@ final class UserFollowerTest extends TestCase
     {
         $user = new User(self::USER_ID, self::USER_SLUG);
         $follower = new User(self::FOLLOWER_ID, self::FOLLOWER_SLUG);
-        $userFollower = new UserFollower(new Uuid(self::ID), $user, $follower);
+        $userFollower = new UserFollower(new Id(self::ID), $user, $follower);
         self::assertTrue($user->equals($userFollower->getUser()));
         self::assertTrue($follower->equals($userFollower->getFollower()));
     }

@@ -20,6 +20,7 @@ final class EventType
     public const PET_COMMENT = 'PET_COMMENT';
     public const NO_PET_NOTIFICATION = 'NO_PET_NOTIFICATION';
     public const POLL_NOTIFICATION = 'POLL_NOTIFICATION';
+    public const SEND_MESSAGE = 'SEND_MESSAGE';
 
     private const EVENT_LIST = [
         self::REGISTRATION,
@@ -38,6 +39,7 @@ final class EventType
         self::PET_COMMENT,
         self::NO_PET_NOTIFICATION,
         self::POLL_NOTIFICATION,
+        self::SEND_MESSAGE,
     ];
 
     private string $eventType;

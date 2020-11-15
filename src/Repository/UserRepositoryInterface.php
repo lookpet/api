@@ -3,11 +3,11 @@
 namespace App\Repository;
 
 use App\Entity\User;
-use App\PetDomain\VO\Uuid;
+use App\PetDomain\VO\Id;
 
 interface UserRepositoryInterface
 {
-    public function findByUuid(Uuid $uuid): ?User;
+    public function findByUuid(Id $uuid): ?User;
 
     public function findBySlug(string $slug): ?User;
 
