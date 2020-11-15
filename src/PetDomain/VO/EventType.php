@@ -15,6 +15,8 @@ final class EventType
     public const PET_CREATE = 'PET_CREATE';
     public const PET_LIKE = 'PET_LIKE';
     public const PET_UNLIKE = 'PET_UNLIKE';
+    public const USER_FOLLOW = 'USER_FOLLOW';
+    public const USER_UNFOLLOW = 'USER_UNFOLLOW';
     public const PET_COMMENT = 'PET_COMMENT';
     public const NO_PET_NOTIFICATION = 'NO_PET_NOTIFICATION';
     public const POLL_NOTIFICATION = 'POLL_NOTIFICATION';
@@ -30,6 +32,8 @@ final class EventType
         self::DELETE_PHOTO,
         self::PET_LIKE,
         self::PET_UNLIKE,
+        self::USER_FOLLOW,
+        self::USER_UNFOLLOW,
         self::PET_CREATE,
         self::PET_COMMENT,
         self::NO_PET_NOTIFICATION,

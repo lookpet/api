@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Controller\Media;
 
 use App\Controller\Media\MediaCropController;
+use App\Dto\Event\RequestUtmBuilderInterface;
 use App\Entity\Media;
 use App\Entity\User;
 use App\PetDomain\VO\FilePath;
@@ -13,6 +14,7 @@ use App\PetDomain\VO\Mime;
 use App\PetDomain\VO\Url;
 use App\PetDomain\VO\Width;
 use App\Repository\MediaRepositoryInterface;
+use App\Repository\UserEventRepositoryInterface;
 use App\Service\MediaCropperInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -22,8 +24,7 @@ use Tests\Unit\Fixture\UserFixture;
 use Tests\Unit\Traits\CreateContainerTrait;
 
 /**
- * group unit.
- *
+ * @group unit
  * @covers \App\Controller\Media\MediaCropController
  */
 final class MediaCropControllerTest extends TestCase
@@ -42,6 +43,8 @@ final class MediaCropControllerTest extends TestCase
     private MediaCropperInterface $mediaCropper;
     private MediaRepositoryInterface $mediaRepository;
     private LoggerInterface $logger;
+    private RequestUtmBuilderInterface $requestUtmBuilder;
+    private UserEventRepositoryInterface $userEventRepository;
     private MediaCropController $mediaCropController;
     private User $user;
 
@@ -117,12 +120,16 @@ final class MediaCropControllerTest extends TestCase
         $this->mediaCropper = $this->createMock(MediaCropperInterface::class);
         $this->mediaRepository = $this->createMock(MediaRepositoryInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
+        $this->requestUtmBuilder = $this->createMock(RequestUtmBuilderInterface::class);
+        $this->userEventRepository = $this->createMock(UserEventRepositoryInterface::class);
         $this->user = new User(UserFixture::ID, UserFixture::SLUG);
 
         $this->mediaCropController = new MediaCropController(
             $this->mediaCropper,
             $this->mediaRepository,
-            $this->logger
+            $this->logger,
+            $this->requestUtmBuilder,
+            $this->userEventRepository
         );
     }
 }

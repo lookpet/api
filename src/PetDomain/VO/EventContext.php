@@ -4,6 +4,7 @@ namespace App\PetDomain\VO;
 
 use App\Entity\Media;
 use App\Entity\Pet;
+use App\Entity\User;
 
 final class EventContext
 {
@@ -23,6 +24,13 @@ final class EventContext
     {
         return new static([
             'pet' => $pet->getId(),
+        ]);
+    }
+
+    public static function createByUser(User $user): self
+    {
+        return new static([
+            'user' => $user->getId(),
         ]);
     }
 

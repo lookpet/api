@@ -31,4 +31,6 @@ interface UserRepositoryInterface
     public function updateNotificationDate(User $user): void;
 
     public function updateNotificationAfterDate(User $user): void;
+
+    public function save(User $user): void;
 }

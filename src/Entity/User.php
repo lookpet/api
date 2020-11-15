@@ -160,6 +160,11 @@ class User implements UserInterface, \JsonSerializable
      */
     private $postLikes;
 
+    /**
+     * @ORM\OneToMany(targetEntity=UserFollower::class, mappedBy="user")
+     */
+    private $followers;
+
     public function __construct(string $id = null, ?string $slug = null, ?string $firstName = null)
     {
         $this->slug = $slug;
@@ -175,6 +180,7 @@ class User implements UserInterface, \JsonSerializable
         $this->posts = new ArrayCollection();
         $this->events = new ArrayCollection();
         $this->postLikes = new ArrayCollection();
+        $this->followers = new ArrayCollection();
     }
 
     public static function createFromLoginDto(UserLoginDto $userLoginDto): self
@@ -814,5 +820,49 @@ class User implements UserInterface, \JsonSerializable
         }
 
         return $this;
+    }
+
+    public function addFollower(UserFollower $userFollower): self
+    {
+        if (!$this->hasFollower($userFollower->getFollower())) {
+            $this->followers[] = $userFollower;
+        }
+
+        return $this;
+    }
+
+    public function removeFollower(UserFollower $userFollower): self
+    {
+        if ($this->hasFollower($userFollower->getFollower())) {
+            $this->postLikes->removeElement($userFollower);
+        }
+
+        return $this;
+    }
+
+    public function hasFollower(?User $user): bool
+    {
+        if ($user === null) {
+            return false;
+        }
+
+        /** @var UserFollower $userFollower */
+        foreach ($this->followers as $userFollower) {
+            if ($userFollower->getFollower()->equals($user)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function getFollowers(): iterable
+    {
+        return $this->followers;
+    }
+
+    public function getCountFollowers(): int
+    {
+        return count($this->followers);
     }
 }
