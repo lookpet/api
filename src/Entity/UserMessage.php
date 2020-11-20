@@ -89,6 +89,7 @@ class UserMessage implements \JsonSerializable
     {
         return [
             'message' => $this->message,
+            'createdAt' => $this->createdAt,
             'from' => $this->fromUser,
             'to' => $this->toUser,
         ];

@@ -7,7 +7,7 @@ use App\Entity\UserMessage;
 
 interface UserMessageRepositoryInterface
 {
-    public function getUserMessages(User $from, User $to): iterable;
+    public function getChatMessages(User $from, User $to): iterable;
 
     public function save(UserMessage $userMessage): void;
 

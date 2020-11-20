@@ -22,6 +22,7 @@ final class UserFixture extends BaseFixture
     public const PLACE_ID = 'super-slug';
     public const PHONE = '+39001234567';
     public const DESCRIPTION = 'My super description!';
+    public const ID = 'user-id';
 
     private UserPasswordEncoderInterface $passwordEncoder;
 
@@ -35,7 +36,7 @@ final class UserFixture extends BaseFixture
      */
     public function load(ObjectManager $manager): void
     {
-        $user = new User(Uuid::uuid4()->toString(), self::SLUG);
+        $user = new User(self::ID, self::SLUG);
         $user->setEmail(self::TEST_USER_EMAIL);
         $user->setPassword($this->passwordEncoder->encodePassword(
             $user,

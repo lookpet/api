@@ -101,4 +101,47 @@ class UserMessageController extends AbstractController
             $userMessage,
         ]);
     }
+
+    /**
+     * @Route("/api/v1/user/{slug}/chat", methods={"GET"}, name="get_user_chat")
+     *
+     * @param string $slug
+     * @param Request $request
+     *
+     * @return JsonResponse
+     *
+     * @SWG\Get(path="/api/v1/user/{slug}/chat",
+     *   tags={"User"},
+     *   summary="Get chat messages",
+     *   description="",
+     *   operationId="getUserChat",
+     *   produces={"application/json"},
+     *   @SWG\Response(
+     *     response=200,
+     *     description="OK",
+     *     examples={
+     *     "application/json": {
+     *           "message": "Hello!"
+     *          }
+     *       }
+     *    )
+     * )
+     */
+    public function chatMessages(string $slug): JsonResponse
+    {
+        $toUser = $this->userRepository->findBySlug($slug);
+
+        if ($toUser === null) {
+            return new JsonResponse([
+                'message' => 'User not exist',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        return new JsonResponse(
+            $this->userMessageRepository->getChatMessages(
+                $this->getUser(),
+                $toUser
+            )
+        );
+    }
 }

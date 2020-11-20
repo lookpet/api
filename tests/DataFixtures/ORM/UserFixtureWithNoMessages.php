@@ -14,8 +14,8 @@ final class UserFixtureWithNoMessages extends BaseFixture
 
     protected function loadData(ObjectManager $manager): void
     {
-        $userWithNoFollower = new User(self::ID_USER_WITH_NO_MESSAGE, self::SLUG_USER_WITH_NO_MESSAGE);
-        $manager->persist($userWithNoFollower);
+        $userWithNoMessage = new User(self::ID_USER_WITH_NO_MESSAGE, self::SLUG_USER_WITH_NO_MESSAGE);
+        $manager->persist($userWithNoMessage);
         $manager->flush();
     }
 }

@@ -24,12 +24,21 @@ class UserMessageRepository extends ServiceEntityRepository implements UserMessa
         $this->entityManager = $registry->getManager();
     }
 
-    public function getUserMessages(User $from, User $to): iterable
+    public function getChatMessages(User $from, User $to): iterable
     {
-        return $this->findBy([
-            'fromUser' => $from,
-            'toUser' => $to,
-        ]);
+        $queryBuilder = $this->createQueryBuilder('m');
+        $queryBuilder->where($queryBuilder->expr()->andX(
+                $queryBuilder->expr()->eq('m.fromUser', ':fromUser'),
+                $queryBuilder->expr()->eq('m.toUser', ':toUser')
+            ))
+            ->orWhere($queryBuilder->expr()->andX(
+                $queryBuilder->expr()->eq('m.fromUser', ':toUser'),
+                $queryBuilder->expr()->eq('m.toUser', ':fromUser')
+            ))->orderBy('m.createdAt')->groupBy('m.id');
+        $queryBuilder->setParameter('fromUser', $from)
+            ->setParameter('toUser', $to);
+
+        return $queryBuilder->getQuery()->getResult();
     }
 
     public function save(UserMessage $userMessage): void
