@@ -13,6 +13,7 @@ class UserResponseUser implements UserResponseBuilderInterface
             $user->jsonSerialize(),
             [
                 'hasFollower' => $user->hasFollower($authenticatedUser),
+                'totalFollowers' => $user->getCountFollowers(),
             ]
         ));
     }
