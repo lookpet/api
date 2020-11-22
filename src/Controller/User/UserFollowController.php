@@ -113,7 +113,7 @@ final class UserFollowController extends AbstractController
         return new JsonResponse(
             [
                 'hasFollower' => $user->hasFollower($follower),
-                'total' => $user->getCountFollowers(),
+                'totalFollowers' => $user->getCountFollowers(),
             ]
         );
     }
