@@ -7,8 +7,8 @@ namespace App\Controller\User;
 use App\Entity\User;
 use App\Repository\PetRepository;
 use App\Repository\UserRepository;
-use App\Service\MediaUploaderInterface;
 use App\Service\PetResponseBuilderInterface;
+use App\Service\UserResponseBuilderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,10 +17,14 @@ use Symfony\Component\Routing\Annotation\Route;
 final class UserController extends AbstractController
 {
     private PetResponseBuilderInterface $petResponseBuilder;
+    private UserResponseBuilderInterface $userResponseBuilder;
 
-    public function __construct(MediaUploaderInterface $mediaUploader, PetResponseBuilderInterface $petResponseBuilder)
-    {
+    public function __construct(
+        UserResponseBuilderInterface $userResponseBuilder,
+        PetResponseBuilderInterface $petResponseBuilder
+    ) {
         $this->petResponseBuilder = $petResponseBuilder;
+        $this->userResponseBuilder = $userResponseBuilder;
     }
 
     /**
@@ -47,8 +51,9 @@ final class UserController extends AbstractController
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        return new JsonResponse(
-            $user
+        return $this->userResponseBuilder->buildForOneUser(
+            $user,
+            $this->getUser()
         );
     }
 
