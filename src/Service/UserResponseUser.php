@@ -12,7 +12,7 @@ class UserResponseUser implements UserResponseBuilderInterface
         return new JsonResponse(array_merge(
             $user->jsonSerialize(),
             [
-                'hasLike' => $user->hasFollower($authenticatedUser),
+                'hasFollower' => $user->hasFollower($authenticatedUser),
             ]
         ));
     }
