@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity(repositoryClass=UserFollowerRepository::class)
  * @ORM\HasLifecycleCallbacks
  */
-class UserFollower
+class UserFollower implements \JsonSerializable
 {
     use LifecycleCallbackTrait;
     use TimestampTrait;
@@ -55,5 +55,13 @@ class UserFollower
     public function getFollower(): User
     {
         return $this->follower;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'user' => $this->user,
+            'follower' => $this->follower,
+        ];
     }
 }

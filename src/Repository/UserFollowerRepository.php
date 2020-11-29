@@ -49,4 +49,22 @@ class UserFollowerRepository extends ServiceEntityRepository implements UserFoll
         $this->entityManager->remove($userFollower);
         $this->entityManager->flush();
     }
+
+    public function getFollowers(User $user): iterable
+    {
+        return $this->findBy([
+            'user' => $user,
+        ], [
+            'createdAt' => 'desc',
+        ]);
+    }
+
+    public function getFollowingUsers(User $user): iterable
+    {
+        return $this->findBy([
+            'follower' => $user,
+        ], [
+            'createdAt' => 'desc',
+        ]);
+    }
 }

@@ -12,4 +12,18 @@ interface UserFollowerRepositoryInterface
     public function save(UserFollower $userFollower): void;
 
     public function remove(UserFollower $userFollower): void;
+
+    /**
+     * @param User $user
+     *
+     * @return UserFollower[]|iterable
+     */
+    public function getFollowers(User $user): iterable;
+
+    /**
+     * @param User $user
+     *
+     * @return UserFollower|iterable
+     */
+    public function getFollowingUsers(User $user): iterable;
 }

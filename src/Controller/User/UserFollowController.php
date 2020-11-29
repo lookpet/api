@@ -117,4 +117,48 @@ final class UserFollowController extends AbstractController
             ]
         );
     }
+
+    /**
+     * @Route("/api/v1/user/{slug}/followers", methods={"GET"}, name="user_followers")
+     *
+     * @param string $slug
+     *
+     * @return JsonResponse
+     */
+    public function followers(string $slug): JsonResponse
+    {
+        $user = $this->userRepository->findBySlug($slug);
+
+        if ($user === null) {
+            return new JsonResponse([
+                'message' => 'User not exist',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        return new JsonResponse(
+            $this->userFollowerRepository->getFollowers($user)
+        );
+    }
+
+    /**
+     * @Route("/api/v1/user/{slug}/following", methods={"GET"}, name="user_following")
+     *
+     * @param string $slug
+     *
+     * @return JsonResponse
+     */
+    public function following(string $slug): JsonResponse
+    {
+        $user = $this->userRepository->findBySlug($slug);
+
+        if ($user === null) {
+            return new JsonResponse([
+                'message' => 'User not exist',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        return new JsonResponse(
+            $this->userFollowerRepository->getFollowingUsers($user)
+        );
+    }
 }
