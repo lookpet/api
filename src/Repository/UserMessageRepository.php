@@ -41,6 +41,40 @@ class UserMessageRepository extends ServiceEntityRepository implements UserMessa
         return $queryBuilder->getQuery()->getResult();
     }
 
+    public function getChatLastMessages(User $user): iterable
+    {
+        $queryBuilder = $this->createQueryBuilder('m');
+        $queryBuilder->where($queryBuilder->expr()->orX(
+            $queryBuilder->expr()->eq('m.fromUser', ':fromUser'),
+            $queryBuilder->expr()->eq('m.toUser', ':toUser')
+        ))
+            ->orderBy('m.createdAt', 'DESC')
+            ->groupBy('m.fromUser')
+            ->addGroupBy('m.toUser');
+
+        $queryBuilder->setParameter('fromUser', $user)
+            ->setParameter('toUser', $user);
+
+        /** @var UserMessage[] $userMessages */
+        $userMessages = $queryBuilder->getQuery()->getResult();
+
+        /** @var UserMessage[] $result */
+        $result = [];
+        foreach ($userMessages as $userMessage) {
+            foreach ($result as $resultUserMessage) {
+                if (
+                    $resultUserMessage->getToUser()->equals($userMessage->getFromUser()) &&
+                    $resultUserMessage->getFromUser()->equals($userMessage->getToUser())
+                ) {
+                    continue 2;
+                }
+            }
+            $result[] = $userMessage;
+        }
+
+        return $result;
+    }
+
     public function save(UserMessage $userMessage): void
     {
         $this->entityManager->persist($userMessage);
@@ -51,5 +85,23 @@ class UserMessageRepository extends ServiceEntityRepository implements UserMessa
     {
         $this->entityManager->remove($userMessage);
         $this->entityManager->flush();
+    }
+
+    public function readMessages(User $from, User $to): void
+    {
+        $queryBuilder = $this->createQueryBuilder('m');
+        $queryBuilder->update(UserMessage::class)
+            ->where($queryBuilder->expr()->andX(
+            $queryBuilder->expr()->eq('m.fromUser', ':fromUser'),
+            $queryBuilder->expr()->eq('m.toUser', ':toUser')
+        ))
+            ->orWhere($queryBuilder->expr()->andX(
+                $queryBuilder->expr()->eq('m.fromUser', ':toUser'),
+                $queryBuilder->expr()->eq('m.toUser', ':fromUser')
+            ))->orderBy('m.createdAt')->groupBy('m.id');
+        $queryBuilder->setParameter('fromUser', $from)
+            ->setParameter('toUser', $to);
+
+        $queryBuilder->getQuery()->execute();
     }
 }

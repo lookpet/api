@@ -15,7 +15,16 @@ interface UserMessageRepositoryInterface
      */
     public function getChatMessages(User $from, User $to): iterable;
 
+    /**
+     * @param User $user
+     *
+     * @return UserMessage[]
+     */
+    public function getChatLastMessages(User $user): iterable;
+
     public function save(UserMessage $userMessage): void;
 
     public function remove(UserMessage $userMessage): void;
+
+    public function readMessages(User $from, User $to): void;
 }

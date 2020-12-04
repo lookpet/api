@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\User;
 
 use App\Dto\Event\RequestUtmBuilderInterface;
@@ -143,5 +145,35 @@ class UserMessageController extends AbstractController
                 $toUser
             )
         );
+    }
+
+    /**
+     * @Route("/api/v1/user/chat/list", methods={"GET"}, name="get_user_chat")
+     *
+     * @param string $slug
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    public function chatList(): JsonResponse
+    {
+        return new JsonResponse(
+            $this->userMessageRepository->getChatLastMessages(
+                $this->getUser()
+            )
+        );
+    }
+
+    public function readMessages(string $slug): JsonResponse
+    {
+        $toUser = $this->userRepository->findBySlug($slug);
+
+        if ($toUser === null) {
+            return new JsonResponse([
+                'message' => 'User not exist',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        return new JsonResponse([]);
     }
 }

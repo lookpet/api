@@ -2,6 +2,7 @@ version: "3.3"
 
 services:
   database:
+    command: mysqld --sql_mode=""
     ports:
       - "3306:3306"
     build:
