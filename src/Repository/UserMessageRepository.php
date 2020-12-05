@@ -60,6 +60,16 @@ class UserMessageRepository extends ServiceEntityRepository implements UserMessa
 
         /** @var UserMessage[] $result */
         $result = [];
+
+        foreach ($userMessages as $userMessage) {
+            var_dump(
+                $userMessage->getFromUser()->getUsername(),
+                $userMessage->getToUser()->getUsername(),
+                $userMessage->getMessage(),
+                $userMessage->getCreatedAt()->format('Y-m-d H:i:s'),
+            );
+        }
+
         foreach ($userMessages as $userMessage) {
             foreach ($result as $resultUserMessage) {
                 if (
