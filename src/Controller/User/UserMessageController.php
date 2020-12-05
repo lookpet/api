@@ -148,7 +148,7 @@ class UserMessageController extends AbstractController
     }
 
     /**
-     * @Route("/api/v1/user/chat/list", methods={"GET"}, name="get_user_chat")
+     * @Route("/api/v1/user/chat/list", methods={"GET"}, name="get_user_chat_list")
      *
      * @param string $slug
      * @param Request $request
