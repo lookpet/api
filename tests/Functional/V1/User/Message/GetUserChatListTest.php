@@ -19,7 +19,7 @@ final class GetUserChatListTest extends WebTestCase
 {
     use FixturesTrait;
 
-    private const GET_PETS_CHAT_URL = '/api/v1/user/chat/list';
+    private const GET_USER_CHAT_URL = '/api/v1/user/chat/list';
 
     public function testGetUserLastChatMessages(): void
     {
@@ -30,7 +30,7 @@ final class GetUserChatListTest extends WebTestCase
 
         $client->request(
             Request::METHOD_GET,
-            self::GET_PETS_CHAT_URL
+            self::GET_USER_CHAT_URL
         );
         $response = $client->getResponse();
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());

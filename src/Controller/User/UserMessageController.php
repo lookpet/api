@@ -150,9 +150,6 @@ class UserMessageController extends AbstractController
     /**
      * @Route("/api/v1/user/chat/list", methods={"GET"}, name="get_user_chat_list")
      *
-     * @param string $slug
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     public function chatList(): JsonResponse
@@ -160,6 +157,49 @@ class UserMessageController extends AbstractController
         return new JsonResponse(
             $this->userMessageRepository->getChatLastMessages(
                 $this->getUser()
+            )
+        );
+    }
+
+    /**
+     * @Route("/api/v1/user/chat/list/hash", methods={"GET"}, name="get_user_chat_list_hash")
+     *
+     * @return JsonResponse
+     */
+    public function chatListCountHash(): JsonResponse
+    {
+        return new JsonResponse(
+            sha1(
+                (string) $this->userMessageRepository->getChatListCount(
+                    $this->getUser()
+                )
+            )
+        );
+    }
+
+    /**
+     * @Route("/api/v1/user/{slug}/chat/hash", methods={"GET"}, name="get_user_chat_hash")
+     *
+     * @param string $slug
+     *
+     * @return JsonResponse
+     */
+    public function chatMessagesCountHash(string $slug): JsonResponse
+    {
+        $toUser = $this->userRepository->findBySlug($slug);
+
+        if ($toUser === null) {
+            return new JsonResponse([
+                'message' => 'User not exist',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        return new JsonResponse(
+            sha1(
+                (string) $this->userMessageRepository->getChatMessagesCount(
+                    $this->getUser(),
+                    $toUser
+                )
             )
         );
     }

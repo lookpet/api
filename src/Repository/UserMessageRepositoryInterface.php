@@ -27,4 +27,8 @@ interface UserMessageRepositoryInterface
     public function remove(UserMessage $userMessage): void;
 
     public function readMessages(User $from, User $to): void;
+
+    public function getChatListCount(User $user): int;
+
+    public function getChatMessagesCount(User $from, User $to): int;
 }

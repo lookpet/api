@@ -19,7 +19,7 @@ final class GetUserMessagesTest extends WebTestCase
 {
     use FixturesTrait;
 
-    private const GET_PETS_CHAT_URL = '/api/v1/user/%s/chat';
+    private const GET_USER_MESSAGES_CHAT_URL = '/api/v1/user/%s/chat';
 
     public function testGetUserChatMessages(): void
     {
@@ -30,7 +30,7 @@ final class GetUserMessagesTest extends WebTestCase
 
         $client->request(
             Request::METHOD_GET,
-            sprintf(self::GET_PETS_CHAT_URL, UserFixtureWithMessages::SLUG_USER_TO_MESSAGE)
+            sprintf(self::GET_USER_MESSAGES_CHAT_URL, UserFixtureWithMessages::SLUG_USER_TO_MESSAGE)
         );
         $response = $client->getResponse();
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());

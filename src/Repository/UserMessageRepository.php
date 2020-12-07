@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\User;
 use App\Entity\UserMessage;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 
@@ -104,5 +105,47 @@ class UserMessageRepository extends ServiceEntityRepository implements UserMessa
             ->setParameter('toUser', $to);
 
         $queryBuilder->getQuery()->execute();
+    }
+
+    public function getChatListCount(User $user): int
+    {
+        $queryBuilder = $this->createQueryBuilder('m');
+        $queryBuilder->select('count(m.id)')
+            ->where($queryBuilder->expr()->orX(
+            $queryBuilder->expr()->eq('m.fromUser', ':fromUser'),
+            $queryBuilder->expr()->eq('m.toUser', ':toUser')
+        ))
+            ->orderBy('m.createdAt', 'DESC');
+
+        $queryBuilder->setParameter('fromUser', $user)
+            ->setParameter('toUser', $user);
+
+        try {
+            return (int) $queryBuilder->getQuery()->getSingleScalarResult();
+        } catch (NoResultException $noResultException) {
+            return 0;
+        }
+    }
+
+    public function getChatMessagesCount(User $from, User $to): int
+    {
+        $queryBuilder = $this->createQueryBuilder('m');
+        $queryBuilder->select('count(m.id)')
+            ->where($queryBuilder->expr()->andX(
+            $queryBuilder->expr()->eq('m.fromUser', ':fromUser'),
+            $queryBuilder->expr()->eq('m.toUser', ':toUser')
+        ))
+            ->orWhere($queryBuilder->expr()->andX(
+                $queryBuilder->expr()->eq('m.fromUser', ':toUser'),
+                $queryBuilder->expr()->eq('m.toUser', ':fromUser')
+            ))->orderBy('m.createdAt');
+        $queryBuilder->setParameter('fromUser', $from)
+            ->setParameter('toUser', $to);
+
+        try {
+            return (int) $queryBuilder->getQuery()->getSingleScalarResult();
+        } catch (NoResultException $noResultException) {
+            return 0;
+        }
     }
 }
