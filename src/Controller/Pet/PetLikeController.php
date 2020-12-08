@@ -6,6 +6,7 @@ namespace App\Controller\Pet;
 
 use App\Dto\Event\RequestUtmBuilderInterface;
 use App\Entity\PetLike;
+use App\Entity\User;
 use App\PetDomain\VO\EventContext;
 use App\PetDomain\VO\EventType;
 use App\PetDomain\VO\Slug;
@@ -122,5 +123,39 @@ final class PetLikeController extends AbstractController
                 'total' => count($petBySlug->getLikes()),
             ]
         );
+    }
+
+    /**
+     * @Route("/api/v1/pet/{slug}/like", methods={"GET"}, name="public_get_pet_like")
+     *
+     * @param string $slug
+     *
+     * @return JsonResponse
+     */
+    public function likes(string $slug): JsonResponse
+    {
+        $result = [];
+
+        $petBySlug = $this->petRepository->findBySlug(
+            new Slug($slug)
+        );
+
+        if ($petBySlug === null) {
+            return new JsonResponse([
+                'message' => 'Pet not exist',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+
+        foreach ($petBySlug->getLikes() as $like) {
+            $result[] = [
+                'user' => $like->getUser(),
+                'hasFollower' => $like->getUser()->hasFollower($currentUser),
+            ];
+        }
+
+        return new JsonResponse($result);
     }
 }
