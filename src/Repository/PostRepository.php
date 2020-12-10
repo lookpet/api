@@ -51,7 +51,7 @@ class PostRepository extends ServiceEntityRepository implements PostRepositoryIn
         $queryBuilder = $this->createQueryBuilder('p');
 
         return $queryBuilder->join('p.media', 'pm')
-            ->orderBy('p.updatedAt', 'DESC')
+            ->orderBy('p.createdAt', 'DESC')
             ->setFirstResult($offset->get())
             ->setMaxResults(10)
             ->getQuery()
