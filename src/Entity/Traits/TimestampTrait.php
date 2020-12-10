@@ -10,13 +10,13 @@ trait TimestampTrait
 {
     /**
      * @var \DateTime
-     * @ORM\Column(type="datetime", name="created_at", nullable=false)
+     * @ORM\Column(type="datetime", name="created_at", nullable=true)
      */
     protected $createdAt;
 
     /**
      * @var \DateTime
-     * @ORM\Column(type="datetime", name="updated_at", nullable=false)
+     * @ORM\Column(type="datetime", name="updated_at", nullable=true)
      */
     protected $updatedAt;
 
