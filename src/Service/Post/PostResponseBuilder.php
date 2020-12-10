@@ -29,7 +29,7 @@ final class PostResponseBuilder implements PostResponseBuilderInterface
         }
 
         return new JsonResponse([
-            'pets' => $result,
+            'posts' => $result,
         ]);
     }
 

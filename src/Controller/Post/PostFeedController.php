@@ -44,6 +44,7 @@ final class PostFeedController extends AbstractController
                 Limit::create()
             )
         );
-        $this->postResponseBuilder->build($this->getUser(), ...$posts);
+
+        return $this->postResponseBuilder->build($this->getUser(), ...$posts);
     }
 }
