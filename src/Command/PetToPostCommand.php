@@ -48,7 +48,7 @@ class PetToPostCommand extends Command
                 new PostDescription(
                     $pet->getAbout()
                 ),
-                ... $pet->getMedia()
+                ...$pet->getMedia()
             );
             $this->entityManager->persist($post);
             $this->entityManager->flush();
