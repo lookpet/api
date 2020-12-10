@@ -145,4 +145,20 @@ class Post implements \JsonSerializable
 
         return $this;
     }
+
+    public function hasLike(?User $user): bool
+    {
+        if ($user === null) {
+            return false;
+        }
+
+        /** @var PostLike $currentLike */
+        foreach ($this->likes as $currentLike) {
+            if ($currentLike->getUser()->equals($user)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
