@@ -13,7 +13,7 @@ class PostDescription extends Type
 
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
     {
-        return $platform->getVarcharTypeDeclarationSQL($fieldDeclaration);
+        return 'text';
     }
 
     public function convertToPHPValue($value, AbstractPlatform $platform): \App\PetDomain\VO\Post\PostDescription

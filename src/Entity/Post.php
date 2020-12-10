@@ -31,7 +31,7 @@ class Post implements \JsonSerializable
     private $media;
 
     /**
-     * @ORM\Column(type="post_description", length=16000, nullable=true)
+     * @ORM\Column(type="post_description", nullable=true)
      */
     private $description;
 
