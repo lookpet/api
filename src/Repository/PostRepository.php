@@ -4,6 +4,8 @@ namespace App\Repository;
 
 use App\Dto\Post\PostDto;
 use App\Entity\Post;
+use App\Entity\User;
+use App\PetDomain\VO\Offset;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
@@ -24,6 +26,9 @@ class PostRepository extends ServiceEntityRepository implements PostRepositoryIn
         $this->entityManager = $registry->getManager();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function createFromDto(PostDto $postDto): Post
     {
         $post = new Post(
@@ -36,5 +41,20 @@ class PostRepository extends ServiceEntityRepository implements PostRepositoryIn
         $this->entityManager->flush();
 
         return $post;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFeed(Offset $offset, ?User $user = null): iterable
+    {
+        $queryBuilder = $this->createQueryBuilder('p');
+
+        return $queryBuilder->join('p.media', 'pm')
+            ->orderBy('p.updatedAt', 'DESC')
+            ->setFirstResult($offset->get())
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
     }
 }

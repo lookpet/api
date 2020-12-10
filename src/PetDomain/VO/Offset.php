@@ -18,6 +18,11 @@ class Offset
         }
     }
 
+    public static function create(PageNumber $pageNumber, Limit $limit): self
+    {
+        return new static($pageNumber, $limit);
+    }
+
     public function get(): int
     {
         return $this->offset;

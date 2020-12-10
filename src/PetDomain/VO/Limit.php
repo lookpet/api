@@ -12,6 +12,11 @@ class Limit
         $this->limit = $limit;
     }
 
+    public static function create(int $limit = self::DEFAULT_LIMIT): self
+    {
+        return new static($limit);
+    }
+
     public function get(): int
     {
         return $this->limit;

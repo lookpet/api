@@ -15,6 +15,11 @@ class PageNumber
         $this->pageNumber = $pageNumber;
     }
 
+    public static function create(?int $pageNumber = 1): self
+    {
+        return new static($pageNumber);
+    }
+
     public function isFirst(): bool
     {
         return $this->pageNumber === 1;
