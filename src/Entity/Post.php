@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Entity\Traits\LifecycleCallbackTrait;
+use App\Entity\Traits\TimestampTrait;
 use App\PetDomain\VO\Post\PostDescription;
 use App\Repository\PostRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -10,9 +12,13 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=PostRepository::class)
+ * @ORM\HasLifecycleCallbacks
  */
 class Post implements \JsonSerializable
 {
+    use TimestampTrait;
+    use LifecycleCallbackTrait;
+
     /**
      * @ORM\Id()
      * @ORM\Column(type="string")
