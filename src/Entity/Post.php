@@ -71,6 +71,8 @@ class Post implements \JsonSerializable
             'description' => $this->getDescription(),
             'user' => $this->user,
             'media' => $this->media,
+            'createdAt' => $this->createdAt,
+            'updatesAt' => $this->updatedAt,
         ];
     }
 
