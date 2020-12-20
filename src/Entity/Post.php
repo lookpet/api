@@ -72,7 +72,7 @@ class Post implements \JsonSerializable
             'user' => $this->user,
             'media' => $this->media,
             'createdAt' => $this->createdAt,
-            'updatesAt' => $this->updatedAt,
+            'updatedAt' => $this->updatedAt,
         ];
     }
 
