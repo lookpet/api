@@ -39,17 +39,17 @@ final class RegistrationTest extends WebTestCase
         $this->client->request(
             Request::METHOD_POST,
             self::REGISTER_URL,
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            (string) json_encode([
+            [
                 'firstName' => UserFixture::TEST_USER_FIRST_NAME,
                 'email' => UserFixture::TEST_USER_EMAIL,
                 'password' => '123456',
-            ])
+            ],
+            [],
+            ['CONTENT_TYPE' => 'application/json']
         );
         $response = $this->client->getResponse();
         $content = json_decode($response->getContent(), true);
+        var_dump($content);
 
         $user = $this->userRepository->findByEmail(UserFixture::TEST_USER_EMAIL);
         self::assertNotEmpty($user->getId());
@@ -82,13 +82,12 @@ final class RegistrationTest extends WebTestCase
         $this->client->request(
             Request::METHOD_POST,
             self::REGISTER_URL,
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            (string) json_encode([
+            [
                 'email' => UserFixture::TEST_USER_EMAIL,
                 'password' => '1234',
-            ])
+            ],
+            [],
+            ['CONTENT_TYPE' => 'application/json']
         );
         $response = $this->client->getResponse();
         $content = json_decode($response->getContent(), true);
@@ -110,10 +109,9 @@ final class RegistrationTest extends WebTestCase
         $this->client->request(
             Request::METHOD_POST,
             self::REGISTER_URL,
+            $requestData,
             [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            (string) json_encode($requestData)
+            ['CONTENT_TYPE' => 'application/json']
         );
 
         $response = $this->client->getResponse();

@@ -92,7 +92,7 @@ final class UserFollowerControllerTest extends TestCase
             true
         );
         self::assertTrue($result['hasFollower']);
-        self::assertSame(1, $result['total']);
+        self::assertSame(1, $result['totalFollowers']);
     }
 
     public function testUserUnFollows(): void
@@ -144,7 +144,7 @@ final class UserFollowerControllerTest extends TestCase
         );
 
         self::assertFalse($result['hasFollower']);
-        self::assertSame(0, $result['total']);
+        self::assertSame(0, $result['totalFollowers']);
     }
 
     public function testFollowFailsBecausePetIsNotFound(): void

@@ -22,7 +22,7 @@ final class GetUserFollowersTest extends WebTestCase
 
     private const POST_PETS_LIKE_URL = '/api/v1/user/%s/follow';
 
-    public function testUserFollow(): void
+    public function testUserFollows(): void
     {
         $client = static::createClient();
         $this->loadFixtures([UserFixtureWithNoFollowers::class, UserFixture::class]);
@@ -30,8 +30,9 @@ final class GetUserFollowersTest extends WebTestCase
         $client = AuthenticationHelper::login($client);
 
         $content = $this->makeRequest($client, Response::HTTP_OK);
+        var_dump($content);
         self::assertTrue($content['hasFollower']);
-        self::assertSame(1, $content['total']);
+        self::assertSame(1, $content['totalFollowers']);
     }
 
     public function testUserSwitchesFollow(): void
@@ -43,13 +44,13 @@ final class GetUserFollowersTest extends WebTestCase
 
         $content = $this->makeRequest($client, Response::HTTP_OK);
         self::assertTrue($content['hasFollower']);
-        self::assertSame(1, $content['total']);
+        self::assertSame(1, $content['totalFollowers']);
         $content = $this->makeRequest($client, Response::HTTP_OK);
         self::assertFalse($content['hasFollower']);
-        self::assertSame(0, $content['total']);
+        self::assertSame(0, $content['totalFollowers']);
         $content = $this->makeRequest($client, Response::HTTP_OK);
         self::assertTrue($content['hasFollower']);
-        self::assertSame(1, $content['total']);
+        self::assertSame(1, $content['totalFollowers']);
     }
 
     private function makeRequest(KernelBrowser $client, int $expectedStatusCode): array

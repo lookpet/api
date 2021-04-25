@@ -16,13 +16,12 @@ final class AuthenticationHelper
         $client->request(
             Request::METHOD_POST,
             self::LOGIN_URL,
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            (string) json_encode([
+            [
                 'email' => UserFixture::TEST_USER_EMAIL,
                 'password' => UserFixture::PASSWORD_GOOD,
-            ])
+            ],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
         );
         $response = $client->getResponse();
         $content = json_decode($response->getContent(), true);

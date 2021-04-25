@@ -43,10 +43,7 @@ class CreatePetTest extends WebTestCase
         $client->request(
             Request::METHOD_POST,
             self::CREATE_PET_URL,
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            (string) json_encode([
+            [
                 'type' => self::TYPE,
                 'name' => self::NAME,
                 'slug' => self::SLUG,
@@ -60,7 +57,9 @@ class CreatePetTest extends WebTestCase
                 'dateOfBirth' => $dateOfbirth->format('Y-m-d'),
                 'about' => self::ABOUT,
                 'gender' => self::GENDER,
-            ])
+            ],
+            [],
+            ['CONTENT_TYPE' => 'application/json']
         );
 
         $response = $client->getResponse();
@@ -89,10 +88,7 @@ class CreatePetTest extends WebTestCase
         $client->request(
             Request::METHOD_POST,
             sprintf(self::UPDATE_PET_URL, PetFixture::SLUG),
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            (string) json_encode([
+            [
                 'type' => self::TYPE,
                 'name' => self::NAME,
                 'slug' => self::SLUG,
@@ -106,7 +102,9 @@ class CreatePetTest extends WebTestCase
                 'dateOfBirth' => $dateOfbirth->format('Y-m-d'),
                 'about' => self::ABOUT,
                 'gender' => self::GENDER,
-            ])
+            ],
+            [],
+            ['CONTENT_TYPE' => 'application/json']
         );
 
         $response = $client->getResponse();

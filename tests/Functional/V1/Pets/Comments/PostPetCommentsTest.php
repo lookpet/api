@@ -37,12 +37,11 @@ final class PostPetCommentsTest extends WebTestCase
         $client->request(
             Request::METHOD_POST,
             sprintf(self::POST_PETS_COMMENTS_URL, PetFixture::SLUG),
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            (string) json_encode([
+            [
                 'comment' => 'some text',
-            ])
+            ],
+            [],
+            ['CONTENT_TYPE' => 'application/json']
         );
 
         $response = $client->getResponse();

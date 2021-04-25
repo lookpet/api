@@ -40,13 +40,12 @@ final class LoginTest extends WebTestCase
         $this->client->request(
             Request::METHOD_POST,
             self::LOGIN_URL,
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            (string) json_encode([
+            [
                 'email' => UserFixture::TEST_USER_EMAIL,
                 'password' => UserFixture::PASSWORD_GOOD,
-            ])
+            ],
+            [],
+            ['CONTENT_TYPE' => 'application/json']
         );
         $response = $this->client->getResponse();
         $content = json_decode($response->getContent(), true);
@@ -86,10 +85,9 @@ final class LoginTest extends WebTestCase
         $this->client->request(
             Request::METHOD_POST,
             self::LOGIN_URL,
+            $requestData,
             [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            (string) json_encode($requestData)
+            ['CONTENT_TYPE' => 'application/json']
         );
         $response = $this->client->getResponse();
         $content = json_decode($response->getContent(), true);
