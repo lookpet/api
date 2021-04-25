@@ -4,7 +4,7 @@ WORKING_DIR		=	$(CURDIR)
 PULL_IF_EXIST  ?= 	true
 AWS_REGION = eu-central-1
 
-BASE_PHP_IMAGE  =   641201314091.dkr.ecr.eu-central-1.amazonaws.com/php-base:ed4e38c5abd0eaffc88b6b2d76b895fdd784c15f
+BASE_PHP_IMAGE  =   641201314091.dkr.ecr.eu-central-1.amazonaws.com/php-base:bd7fa64ea7f48c6fba453501780bc423b32f0703
 
 # BUILD CONFIG
 TARGET_DIR                     ?= target
